@@ -34,11 +34,25 @@ This file records research assumptions and decisions that affect formulation, im
 - **Decision:** Use the same maps, seeds, sensing range, movement model, and completion targets for comparable algorithms; retain failed and unfavorable results and record tuning and failure reasons.
 - **Rationale:** Prevent biased comparisons and preserve falsifiability.
 
+### D-006 — Refined Candidate 1 Assumption Package
+
+- **Status:** Accepted for the theory gate; empirical instantiation remains open
+- **Decision:** The core bound applies only to a finite fixed grid with static deterministic truth, correct monotone belief updates, UNKNOWN-transparent optimistic planning visibility, immutable full viewpoint identity, fixed sensor/ray geometry, unweighted visible-UNKNOWN cardinality gain, and atomic planning snapshots.
+- **Rationale:** Minimal counterexamples break admissibility when candidate configuration changes, UNKNOWN is opaque, beliefs revert, obstacles are dynamic, or visibility/range rules change.
+
+### D-007 — Candidate 1 Conditional Theory Verdict
+
+- **Status:** PASS for logical validity; novelty gate remains open
+- **Decision:** Accept the set-intersection gain bound, inverse-incidence decrement invariant, exact-current-distance score bound, and tie-aware exhaustive-NBV certificate under D-006. Do not treat this as approval to claim novelty or begin implementation.
+- **Rationale:** The proofs are valid under the fixed assumptions, but generic lazy certification is prior art and APN remains a close incremental-visibility risk.
+
 ## Open Decisions
 
 - 4-neighbor versus 8-neighbor movement
 - Exact sensor ray discretization and initial sensing range
-- Exact Candidate 1 gain and utility definitions
-- Candidate generation and lifecycle rules
+- Concrete ray traversal, sensor footprint/range, and FOV within the fixed theory
+- Concrete Candidate 1 candidate generation and persistent-ID policy
+- Deterministic total tie order
+- Full-method novelty comparison against APN and related work
 - Benchmark map sizes, seed sets, and completion thresholds
 - Raw-result schema and storage location

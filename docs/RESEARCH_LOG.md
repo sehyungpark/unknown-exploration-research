@@ -71,3 +71,37 @@ The run metadata needed to reproduce or independently verify these observations 
 - **Status: MODIFY / CONTINUE RESEARCH.** The original cached scalar monotone-gain framing is too close to established lazy-greedy theory and existing NBV caching.
 - Candidate 1 is **not ready for implementation** until the exploration-specific bound, its proof, candidate lifecycle, and exact-certificate conditions are formalized and compared carefully against APN and related work.
 - Detailed comparison is recorded in `docs/CANDIDATE_1_PRIOR_ART.md`.
+
+## 2026-09-14 — Refined Candidate 1 Theory Gate
+
+### Verified Theoretical Results
+
+- **Verified under explicit assumptions:** For a persistent immutable viewpoint, static deterministic truth, correct monotone belief updates, fixed sensor/ray geometry, and UNKNOWN-transparent planning visibility,
+
+  \[
+  G_t(v)\le \overline G_t(v)=|A_{\tau(v)}(v)\cap U_t|.
+  \]
+
+- **Verified:** \(\overline G_t(v)\le G_{\tau(v)}(v)\); the first inequality is strict when newly known cells are removed from the cached set, while the admissibility inequality can be strict when a newly discovered obstacle occludes still-UNKNOWN cached cells.
+- **Verified:** An inverse incidence index \(I(c)=\{v:c\in A_{\tau(v)}(v)\}\) preserves the exact cached-intersection count when each UNKNOWN-to-known transition decrements every current member exactly once.
+- **Verified:** Combining the gain bound with the exact current distance yields a score upper bound. A separately proved distance lower bound could be used only as a future extension.
+- **Verified:** Exact exhaustive-NBV equivalence requires a tie-aware certificate. Numerical \(\ge\) alone is insufficient if an equal-score competitor is preferred by the deterministic baseline.
+
+### Counterexamples and Required Assumptions
+
+- **Counterexample found:** With opaque UNKNOWN cells, a 1×3 ray containing two UNKNOWN cells violates the bound after the nearer cell becomes FREE and reveals the farther UNKNOWN cell.
+- **Counterexamples found:** Reusing an identity after candidate position or orientation changes can make current visible UNKNOWN cells absent from the cached set.
+- **Counterexamples found:** Belief reversion, dynamic-obstacle removal, increased range/FOV, changed ray discretization, or a changed visibility/gain definition can reveal previously uncached UNKNOWN cells and violate admissibility.
+- **Required:** Candidate identity includes position, orientation when relevant, range, FOV, and ray convention; selection operates on an atomic snapshot.
+
+### Candidate Lifecycle Result
+
+- **Verified:** A new candidate may be evaluated exactly or initialized with the geometric footprint bound \(|U_t\cap\mathcal F(v)|\), where \(\mathcal F(v)\) ignores all occlusion. The global bound \(|U_t|\) is also admissible but looser.
+- **Verified:** Unreachable candidates must be excluded from the eligible set; candidate-set changes are valid only if every new member has a proven bound and deleted members are removed from the certificate.
+
+### Theory Verdict and Novelty Status
+
+- **Theory Gate: PASS, conditional.** The refined bound, decremental maintenance invariant, score bound, and tie-aware exact-selection theorem are logically valid under the stated assumptions.
+- **Unresolved:** This PASS does not establish novelty, useful tightness, runtime improvement, or implementation readiness.
+- **Novelty risk remains high:** Stale-bound priority evaluation and exact-greedy certification are prior art, while APN is close on difference-aware visibility maintenance. Full-method comparison remains required.
+- Full definitions, proofs, counterexamples, lifecycle rules, and prior-art comparison are recorded in `docs/CANDIDATE_1_FORMULATION.md`.

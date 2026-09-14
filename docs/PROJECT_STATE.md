@@ -7,7 +7,7 @@ Last updated: 2026-09-14
 - Four candidate research directions have been selected.
 - No final candidate has been chosen yet.
 - Candidate 1 is being investigated first.
-- Candidate 1 is currently under **MODIFY / CONTINUE RESEARCH** status after a focused prior-art review.
+- Candidate 1 has passed a **conditional theory gate** for its refined bound, but novelty and empirical-value gates remain open.
 - Common simulator implementation has not started yet.
 
 ## Current Candidate
@@ -44,20 +44,19 @@ The proposed bound is
 \overline G_t(v)=|A_{\tau(v)}(v)\cap U_t|.
 \]
 
-The research question is whether this bound can be proved admissible under a precisely defined static deterministic occupancy model, maintained cheaply with a changed-cell inverse index, and combined with current travel-distance evaluation to certify exactly the same deterministic NBV as exhaustive evaluation.
+`docs/CANDIDATE_1_FORMULATION.md` proves that this bound is admissible under a fixed finite grid, static deterministic truth, monotone correct belief updates, immutable full viewpoint identity, fixed sensor geometry, and UNKNOWN-transparent planning visibility. It also proves that inverse-incidence decrements preserve the bound and gives a tie-aware certificate for the same deterministic NBV as exhaustive evaluation.
 
-This is not yet a verified theorem.
+This is a conditional mathematical result, not a novelty result or empirical performance result.
 
 ## Current Phase
 
-Pre-implementation formalization and novelty validation:
+Pre-implementation novelty validation and simulator specification:
 
-1. Compare the refined bound/certificate directly against the closest prior work.
-2. Formalize the occupancy-map update model and optimistic visibility relation.
-3. Prove or refute the admissibility of the proposed bound.
-4. Prove or refute the exact selection certificate when current travel distance is included.
-5. Define candidate lifecycle, new-candidate bounds, reachability handling, invalidation, and deterministic ties.
-6. Only then freeze the minimal common simulator specification.
+1. Revisit the full APN method and citation chain for an equivalent admissible-bound certificate.
+2. Validate the refined distinction against all closest robotics prior art.
+3. Freeze the symbolic choices left open by the theorem: ray traversal, FOV/range, candidate generation, movement graph, and total tie order.
+4. Specify theorem-derived counterexample and correctness tests.
+5. Only then decide whether Candidate 1 is sufficiently differentiated to implement.
 
 ## Implemented Features
 
@@ -82,18 +81,17 @@ No claim of novelty is currently approved.
 
 ## Current Problems and Unresolved Questions
 
-- Is the proposed set-intersection upper bound always admissible under the exact visibility definition?
-- Does sensing during movement alter the clean cross-cycle proof assumptions?
-- How should newly created candidates receive valid finite upper bounds?
-- How should persistent candidate identity be defined if candidate generation changes over time?
+- Does APN or another incremental exploration planner already contain an equivalent admissible bound or exhaustive-NBV certificate?
+- Is the refined combination sufficiently different from existing caching, selective reevaluation, and incremental visibility maintenance?
 - Can current path distance be recomputed cheaply enough that gain evaluation remains the dominant bottleneck?
 - Is the refined bound materially tighter than a stale scalar gain in realistic exploration progress?
-- Does APN or another incremental exploration planner already imply an equivalent certificate that the current search has missed?
+- What fixed ray traversal, FOV/range, candidate identity, candidate generator, movement graph, and tie order should instantiate the symbolic theorem?
+- How should atomic planning snapshots be enforced if sensing occurs during movement?
 
 ## Next Steps
 
-1. Create a formal Candidate 1 mathematical specification based on `docs/CANDIDATE_1_PRIOR_ART.md`.
-2. Search specifically for counterexamples to the proposed admissible bound.
-3. Establish the exact theorem assumptions before coding.
-4. Specify a minimal deterministic experiment only after theorem-level consistency is established.
-5. Begin implementation only after Candidate 1 passes this theory gate.
+1. Perform full-text and citation-chained comparison with APN and the closest NBV caching/incremental-update methods.
+2. Decide whether the refined research distinction passes the novelty gate.
+3. Freeze the minimal deterministic simulator specification and deterministic tie rule.
+4. Translate every excluded-assumption counterexample into a future correctness test specification.
+5. Preregister the first experiment before any implementation.
