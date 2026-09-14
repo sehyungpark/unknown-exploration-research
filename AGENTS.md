@@ -157,3 +157,18 @@ Candidate 4
 4. correctness condition은 무엇인가?
 5. 현재 구현으로 검증하려는 hypothesis는 무엇인가?
 6. 결과가 좋지 않으면 연구 가설을 기각할 수 있는가?
+
+## Shared Research State
+
+This repository is the shared source of truth between ChatGPT research conversations and Codex.
+
+After every meaningful implementation or experiment:
+
+1. Update docs/PROJECT_STATE.md.
+2. If a research assumption changes, update docs/DECISIONS.md.
+3. If an experiment is executed, append it to docs/EXPERIMENT_LOG.md.
+4. If a research or theoretical conclusion changes, append it to docs/RESEARCH_LOG.md.
+5. Update docs/TODO.md.
+6. Never delete failed or unfavorable experimental results.
+7. Clearly distinguish verified results, hypotheses, unresolved questions, and failed experiments.
+8. Important information must not exist only in the Codex conversation. It must be written into this repository.
