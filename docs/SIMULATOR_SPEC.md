@@ -41,6 +41,14 @@ For the minimal deterministic simulator, avoid arbitrary angular beam-count disc
 - The same supercover convention must be used everywhere in sensing, planning-time visibility, tests, and Candidate 1 caching.
 - Cells outside the finite grid do not exist and do not contribute information.
 
+The first implementation fixes that convention as follows:
+
+- The closed line segment connects the source and target cell centers.
+- Both source and target cells are included.
+- Every cell touched by the segment is included.
+- If the segment passes exactly through an interior grid corner, both side-adjacent cells at that corner are included before the diagonal cell; the two side cells use lexicographic order for deterministic traversal.
+- The covered-cell set is direction-symmetric. For target-cell visibility, any OCCUPIED cell in the covered sequence strictly before the target blocks that target; an OCCUPIED target itself remains visible.
+
 This target-cell line-of-sight definition is the discrete sensor convention for the first study. Later work may study angular beam sensors separately, but changing the ray convention invalidates cached Candidate 1 bounds and must start a new experiment configuration.
 
 ## 4. Physical Sensor Visibility

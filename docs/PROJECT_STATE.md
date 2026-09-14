@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-09-14
+Last updated: 2026-09-15
 
 ## Current Research Stage
 
@@ -10,7 +10,8 @@ Last updated: 2026-09-14
 - Candidate 1 has passed a **conditional theory gate**.
 - Candidate 1 has received a **provisional novelty pass with high risk and a narrow claim only** after full-method comparison with major close prior art.
 - The empirical-value gate remains open.
-- Common simulator implementation has not started yet.
+- The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented and pass the current correctness suite.
+- Stale-scalar lazy and proposed change-aware lazy methods have not been implemented.
 
 ## Current Candidate
 
@@ -67,11 +68,22 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - **Theory gate:** PASS, conditional on stated assumptions.
 - **Novelty gate:** PROVISIONAL PASS, HIGH RISK, NARROW CLAIM ONLY.
 - **Empirical-value gate:** OPEN.
-- **Implementation:** CONDITIONAL GO for the smallest deterministic implementation needed to test correctness and computational value.
+- **Implementation:** The reference-oracle subphase is complete; lazy-method implementation remains deferred pending review of the exhaustive reference.
 
 ## Implemented Features
 
-- No common simulator or Candidate 1 algorithm code has been implemented in this repository.
+- Validated finite rectangular ground-truth and UNKNOWN/FREE/OCCUPIED belief grids.
+- Atomic monotone observation batches and exact robot/start validation.
+- Fixed corner-inclusive, endpoint-inclusive deterministic supercover grid lines.
+- Ground-truth physical visibility with first-hit OCCUPIED occlusion and deterministic arrival scans.
+- Planning-time optimistic visible-UNKNOWN sets \(A_t(v)\), retained as cell sets rather than counts only.
+- Legal 8-neighbor known-FREE motion with costs \(1\) and \(\sqrt 2\), no diagonal corner cutting, and one exact Dijkstra search per plan.
+- Deterministic generation of all reachable known-FREE candidates except the current robot cell.
+- Exhaustive optimistic-NBV reference with the frozen score and four-level total tie order, structured evaluations, selected path, and deterministic all-zero-gain stop.
+- Atomic arrival-scan/planning/movement cycle with no sensing en route.
+- Seven fixed 20×20 fixtures: open, single room, corridor, dead end, separated rooms, clutter, and maze-like.
+- A 29-test correctness suite covering all required reference behaviors; full suite passed on 2026-09-15.
+- No Candidate 1 cache, inverse-incidence index, stale-lazy selector, or proposed change-aware lazy selector has been implemented.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
 ## Required Baselines for Candidate 1
@@ -83,6 +95,8 @@ The first implementation must distinguish the proposed change-aware bound from a
 3. change-aware cached-set bound `|A_tau(v) ∩ U_t|`;
 4. optional tighter occlusion-aware bound only if the third method is too loose.
 
+Only baseline 1 is implemented in the current phase.
+
 Correctness is primary: methods 2/3 must match the exhaustive deterministic argmax and target sequence exactly under the shared tie rule whenever they claim exact equivalence.
 
 ## Current Problems and Unresolved Questions
@@ -91,15 +105,15 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 - How large does `sum_v |A_tau(v)|` become as candidate density and sensing range grow?
 - Is the change-aware bound materially tighter than the stale scalar bound on realistic map progress?
 - Can one shortest-path computation per planning snapshot supply current distances cheaply enough that information-gain evaluation remains the dominant bottleneck?
-- Which fixed ray traversal, FOV/range, candidate generator, movement graph, candidate identity convention, and total tie order should instantiate the theorem?
-- How should atomic planning snapshots be enforced if sensing occurs during movement?
+- Does the corner-inclusive supercover convention create materially different behavior from other fixed supercover conventions in later sensitivity checks?
+- The large-experiment coverage, failure, raw-result, timing, and memory protocols remain unfrozen.
 
 ## Next Steps
 
-1. Freeze the minimal deterministic simulator specification and deterministic tie rule.
-2. Convert every theorem counterexample into a deterministic correctness test.
-3. Preregister the first experiment and its baselines/metrics before implementation.
-4. Implement the common simulator, exhaustive optimistic NBV, stale-scalar lazy baseline, and change-aware Candidate 1 in that order.
-5. Require 100% target agreement before runtime/scaling claims.
-6. Measure exact gain evaluations, wall-clock time, distance-computation time, bound-maintenance time, memory, and coverage/path metrics.
-7. Drop or modify Candidate 1 if its empirical savings are weak after total overhead is counted.
+1. Review the deterministic simulator and exhaustive optimistic-NBV reference as the future correctness oracle.
+2. Freeze the first experiment's coverage, failure, raw-result, timing, and memory protocols.
+3. Preregister the first experiment before implementing either lazy method.
+4. Implement the stale-scalar lazy baseline only after the reference is accepted.
+5. Implement the change-aware Candidate 1 method only after the stale baseline.
+6. Require 100% target and target-sequence agreement before runtime/scaling claims.
+7. Measure all bookkeeping overhead and drop or modify Candidate 1 if total savings are weak.

@@ -138,3 +138,25 @@ The run metadata needed to reproduce or independently verify these observations 
 - Require exact argmax and target-sequence equality to exhaustive NBV before making efficiency claims.
 - Measure exact gain-evaluation count, wall-clock planning time, distance-computation time, bound/index maintenance time, and memory usage.
 - **Drop or modify** Candidate 1 if total overhead erases the reduction in exact gain evaluations or if the change-aware bound is not materially tighter than the stale scalar bound.
+
+## 2026-09-15 — Deterministic Simulator and Exhaustive Reference
+
+### Verified Implementation Results
+
+- **Verified by tests:** The minimal common simulator now enforces finite rectangular truth/belief grids, correct monotone UNKNOWN-to-known observation batches, exact pose, known-FREE-only 8-neighbor movement, and prohibited diagonal corner cutting.
+- **Verified by tests:** Physical sensing exposes the first OCCUPIED target and blocks cells behind it; planning visibility keeps UNKNOWN transparent and returns the exact visible-UNKNOWN cell set rather than only its cardinality.
+- **Verified by tests:** One Dijkstra search supplies current distances and reachable candidate membership for each exhaustive planning call.
+- **Verified by tests:** The exhaustive optimistic-NBV reference evaluates every eligible candidate, applies the specified score and total tie order, returns structured evaluation data, and deterministically stops when every eligible gain is zero.
+- **Verified by tests:** The simulator performs an initial scan and thereafter uses atomic arrival-scan snapshots with no sensing while moving.
+- **Verified by tests:** Repeated execution from the same deterministic fixture produces identical targets, paths, belief states, and scan counts.
+- **Test result:** 29 tests passed on 2026-09-15.
+
+### Specification Finding
+
+- **Resolved underspecification:** The prior specification required one deterministic supercover but did not define exact corner-touch traversal. The first implementation now includes both endpoints and both side-adjacent cells when a center-to-center segment crosses an interior grid corner. Covered-cell sets are direction-symmetric, and side-cell traversal order is lexicographic.
+- **No contradiction found:** The frozen movement, sensing, candidate, score, tie, and atomic-cycle assumptions were mutually implementable.
+
+### Scope
+
+- **Not implemented:** stale-scalar lazy evaluation, Candidate 1 cached sets, inverse-incidence maintenance, and proposed lazy selection.
+- **No research experiment executed:** This entry records implementation verification only, so no experiment result was added to `docs/EXPERIMENT_LOG.md`.

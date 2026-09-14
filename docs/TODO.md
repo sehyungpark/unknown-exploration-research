@@ -1,6 +1,6 @@
 # TODO
 
-Last updated: 2026-09-14
+Last updated: 2026-09-15
 
 ## P0 — Research Gates Before Implementation
 
@@ -15,22 +15,23 @@ Last updated: 2026-09-14
 
 ## P1 — Common Simulator and Preregistered Test Specification
 
-- [ ] Decide 4-neighbor versus 8-neighbor movement and its cost convention.
-- [ ] Specify ray casting, angular/ray discretization, endpoint behavior, UNKNOWN transparency, physical occlusion, and sensing range.
-- [ ] Specify candidate generation independently of frontier-only assumptions.
-- [ ] Specify immutable candidate identity, persistent-ID rules, eligibility transitions, and total tie order.
-- [ ] Define deterministic map fixtures: open, single room, corridor, dead end, separated rooms, clutter, and maze-like.
-- [ ] Convert formulation counterexamples into deterministic unit-test specifications.
-- [ ] Specify atomic planning-snapshot semantics, including what happens to observations received during movement or selection.
+- [x] Decide 8-neighbor movement with orthogonal cost `1`, diagonal cost `sqrt(2)`, and no corner cutting.
+- [x] Specify and implement fixed supercover traversal, endpoint/corner behavior, UNKNOWN transparency, physical occlusion, and sensing range `R=8`.
+- [x] Specify deterministic candidate generation independently of frontier-only assumptions.
+- [x] Specify immutable coordinate identity, eligibility transitions, and the total tie order.
+- [x] Define deterministic 20x20 fixtures: open, single room, corridor, dead end, separated rooms, clutter, and maze-like.
+- [x] Convert the opaque-UNKNOWN and new-occluder cases into deterministic tests.
+- [x] Specify and test atomic planning snapshots with sensing only at arrival and no sensing while moving.
 - [ ] Freeze metric definitions, coverage targets, failure conditions, run metadata schema, and raw-result storage layout.
 - [ ] Preregister first correctness/efficiency experiment with fixed maps and seeds.
-- [ ] Specify required baselines: exhaustive optimistic NBV, stale-scalar lazy bound, and proposed change-aware cached-set bound.
-- [ ] Specify resource metrics: exact gain evaluations, ray operations, planning wall time, distance time, bound/index maintenance time, peak memory, cached-set size, inverse-index size.
+- [x] Specify required baselines: exhaustive optimistic NBV, stale-scalar lazy bound, and proposed change-aware cached-set bound.
+- [x] Specify resource metrics: exact gain evaluations, ray operations, planning wall time, distance time, bound/index maintenance time, peak memory, cached-set size, inverse-index size.
 
 ## P2 — Minimal Implementation After P1 Approval
 
-- [ ] Implement the smallest deterministic common simulator and theorem-derived correctness tests.
-- [ ] Implement exhaustive optimistic NBV as the reference evaluator.
+- [x] Implement the smallest deterministic common simulator and theorem-derived correctness tests.
+- [x] Implement exhaustive optimistic NBV as the reference evaluator.
+- [x] Pass the full reference correctness suite (29 tests on 2026-09-15).
 - [ ] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
 - [ ] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
 - [ ] Implement tie-aware exact-selection certificate.

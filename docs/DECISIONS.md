@@ -102,6 +102,12 @@ This file records research assumptions and decisions that affect formulation, im
 - **Decision:** Implement only the minimal simulator, theorem-derived tests, and exhaustive optimistic-NBV reference first. Do not implement stale-lazy or Candidate 1 lazy selection until the exhaustive reference passes review.
 - **Rationale:** Later exact-equivalence claims require a trusted oracle.
 
+### D-017 — Concrete Supercover Corner Convention
+
+- **Status:** Accepted for first implementation
+- **Decision:** The supercover contains both endpoints and every cell touched by the closed center-to-center segment. At an exact interior-corner crossing, include both side-adjacent cells before the diagonal cell and order the two side cells lexicographically. The covered-cell set must be direction-symmetric. Any OCCUPIED cell strictly before a visibility target blocks that target, while an OCCUPIED target remains visible.
+- **Rationale:** D-010 required one deterministic supercover but did not determine corner-touch membership or traversal ordering; those details affect visibility, tests, and all future cached sets.
+
 ## Open Decisions
 
 - Benchmark seed sets and randomized-map generators for later empirical scaling experiments.
