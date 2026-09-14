@@ -4,160 +4,167 @@ Last updated: 2026-09-14
 
 ## Scope
 
-Candidate 1 currently investigates whether expensive Next-Best-View (NBV) information-gain evaluations can be skipped while still returning exactly the same deterministic viewpoint as exhaustive NBV.
+Candidate 1 investigates whether expensive Next-Best-View (NBV) information-gain evaluations can be skipped while still returning exactly the same deterministic viewpoint as an explicitly defined exhaustive optimistic-NBV evaluator.
 
-This document records the closest prior work found in a focused literature sweep. It does **not** claim novelty from absence of search results.
+This document records the closest prior work found in focused and citation-chained literature searches. It does **not** claim novelty from absence of search results. A literature search can establish close precedents and weaken claims, but cannot prove that no equivalent method exists anywhere.
 
 ## Current Candidate 1 Baseline Idea
 
-Given a candidate viewpoint `v`, current information gain `G_t(v)`, and current travel distance `d_t(v)`, exhaustive NBV evaluates
+Given candidate viewpoint `v`, current exact planning-time information gain `G_t(v)`, and current travel distance `d_t(v)`, exhaustive NBV evaluates
 
 \[
 S_t(v)=\frac{G_t(v)}{d_t(v)+\epsilon}
 \]
 
-for every candidate and returns a deterministic argmax.
+for every eligible candidate and returns a deterministic argmax.
 
-The initial Candidate 1 idea was to cache a previously computed exact gain and use monotonicity of optimistic information gain as an upper bound in future replanning cycles. Candidates would be reevaluated lazily until the exact score of the current best candidate dominates all remaining upper bounds.
+The refined Candidate 1 caches the exact visible-unknown set at the last exact evaluation time `tau(v)`,
+
+\[
+A_{\tau(v)}(v),
+\]
+
+and maintains the change-aware admissible bound
+
+\[
+\overline G_t(v)=|A_{\tau(v)}(v)\cap U_t|.
+\]
+
+The current exact distance is combined with this gain bound to form a score bound. Candidates are exactly reevaluated only while needed for a tie-aware certificate that the selected viewpoint is the same as the exhaustive evaluator.
 
 ## Closest Prior Work
 
-| Work | Relevant mechanism | Cross-cycle reuse | Uses upper-bound pruning | Exact greedy-equivalent selection | Main overlap / distinction |
-|---|---|---:|---:|---:|---|
-| Minoux, **Accelerated Greedy Algorithms for Maximizing Submodular Set Functions** (1978) | Stores stale marginal gains as upper bounds; reevaluates highest bound first | Across greedy iterations | Yes | Yes, under the lazy-greedy assumptions | Very close algorithmic skeleton. Candidate 1 cannot claim generic stale-value lazy pruning as novel. |
-| Golovin & Krause, **Adaptive Submodularity: Theory and Applications in Active Learning and Stochastic Optimization** (2011) | Extends diminishing-return arguments and lazy evaluation to adaptive partially observed decision problems | Across adaptive observations | Yes | Same adaptive greedy choice under stated conditions | Shows that online/adaptive lazy evaluation itself is not new. Candidate 1 needs an exploration-specific admissible bound or structure. |
-| Satsangi, Whiteson & Oliehoek, **PAC Greedy Maximization with Efficient Bounds on Information Gain for Sensor Selection** (IJCAI 2016) | Uses inexpensive upper/lower confidence bounds to prune expensive information-gain evaluations | During greedy selection | Yes | Not deterministic exact; PAC/approximate guarantee | Strong conceptual precedent for bound-based pruning of expensive information gain. |
-| Selin et al., **Efficient Autonomous Exploration Planning of Large-Scale 3-D Environments** (RA-L 2019) | Sparse gain estimation, caches previously estimated gains, reuses cached points, GP interpolation | Yes | Not the same deterministic certificate | No exact exhaustive-equivalence claim identified | Direct robotics precedent: cross-cycle information-gain caching/reuse is already published. |
-| Batinović et al., **A Shadowcasting-Based Next-Best-View Planner for Autonomous 3D Exploration** (2021/2022) | Replaces expensive dense raycasting with recursive shadowcasting / cuboid evaluation | Not the main contribution | No | Not the Candidate 1 certificate | Direct precedent for accelerating NBV gain computation; faster gain evaluation alone is crowded. |
-| Naazare, Rosas & Schulz, **Online Next-Best-View Planner for 3D-Exploration and Inspection With a Mobile Manipulator Robot** (2022) | Keeps cached candidate nodes, reevaluates high-gain cached nodes, filters cache | Yes | Threshold/filter based | No exact exhaustive-equivalence claim identified | Selective reevaluation and persistent NBV candidates already exist. |
-| Vutetakis & Xiao, **Active Perception Network for Non-Myopic Online Exploration and Visual Surface Coverage** (arXiv 2023) | Difference-aware map updates, memoization, frontier-guided information gain, visibility relations, local reconditioning after map changes | Yes | Uses incremental/local update structure | No exact exhaustive-equivalence certificate identified in the reviewed material | Very close to any generic claim of change-aware incremental visibility/gain maintenance. |
-| **PB-NBV: Efficient Projection-Based Next-Best-View Planning Framework for Reconstruction of Unknown Objects** (2025) | Replaces extensive raycasting with projection/ellipsoid approximation | Iterative NBV | No exact certificate | No | Confirms computationally efficient NBV remains an active and crowded area. |
+| Work | Relevant mechanism | Direct overlap | Important distinction from refined Candidate 1 |
+|---|---|---|---|
+| Minoux, **Accelerated Greedy Algorithms for Maximizing Submodular Set Functions** (1978) | Stale marginal gains are upper bounds; highest bound is reevaluated first; lazy evaluation can reproduce the same greedy choice. | Very high at the generic algorithmic level. | Does not provide the occupancy-revelation-specific cached visible-unknown bound. Generic lazy upper-bound selection itself is not novel. |
+| Golovin & Krause, **Adaptive Submodularity** (2011) | Extends diminishing-return reasoning and lazy evaluation to adaptive partially observed decisions. | High conceptual overlap. | Does not by itself establish the proposed occupancy-grid visibility bound. Adaptive/online lazy evaluation is not novel. |
+| Satsangi, Whiteson & Oliehoek, **PAC Greedy Maximization with Efficient Bounds on Information Gain for Sensor Selection** (IJCAI 2016) | Uses cheap upper/lower confidence bounds to prune expensive information-gain calculations. | Strong precedent for bound-based IG pruning. | Provides probabilistic/approximate guarantees, not the proposed deterministic equality to an exhaustive optimistic-NBV evaluator. |
+| Low & Lastra, **Adaptive Hierarchical NBV / Efficient Constraint Evaluation** (2006) | Exploits spatial hierarchy and coherence to make exhaustive NBV view evaluation much faster. | Strong precedent for accelerating exhaustive NBV without simply replacing it by a learned policy. | Primarily accelerates within-cycle view/constraint evaluation through hierarchy, rather than maintaining a cross-cycle change-aware cached-cell upper-bound certificate. |
+| Selin et al., **Efficient Autonomous Exploration Planning of Large-Scale 3-D Environments** (RA-L 2019, AEP) | Caches previous potential-gain queries, uses GP interpolation, selectively recalculates affected cached points, and explicitly notes that its potential information gain is monotonic decreasing over time under its assumptions. | Very high. Monotone cross-cycle gain and gain caching are explicit prior art. | AEP uses cached measurements/GP estimates and affected-region recomputation. In the reviewed full text, no exact cached-visible-set bound or theorem certifying the same deterministic argmax as exhaustive NBV was identified. |
+| Border & Gammell, **SEE++ / Proactive Estimation of Occlusions and Scene Coverage** (2020/2021) | Maintains a frontier visibility graph, removes invalid frontiers, adds new frontier-view pairs, and locally updates graph connectivity after new measurements. | High for dynamic view↔target visibility maintenance. | Does not match the proposed cached UNKNOWN-cell upper bound or exact exhaustive-NBV selection certificate in the reviewed method. |
+| Batinović et al., **A Shadowcasting-Based Next-Best-View Planner for Autonomous 3D Exploration** (2021/2022) | Replaces expensive dense raycasting with recursive shadowcasting/cuboid gain evaluation. | Shows NBV gain-computation acceleration is crowded. | Focus is faster gain computation, not cross-cycle admissible-bound pruning with exact target equivalence. |
+| Naazare, Rosas & Schulz, **Online Next-Best-View Planner for 3D-Exploration and Inspection** (2022) | Persists cached RRT nodes, reevaluates expected gain of cached nodes, filters and keeps top candidates. | High for persistent candidate caches and selective reevaluation. | Cached nodes are actually reevaluated/thresholded; no matching deterministic admissible-bound certificate was identified in the reviewed material. |
+| Vutetakis & Xiao, **Active Perception Network for Non-Myopic Online Exploration and Visual Surface Coverage** (APN, 2023/2024) | Differential Regulation tracks changed map regions; frontier/view visibility relations are cached and reconditioned incrementally; the method maintains both view-to-frontier and frontier-to-view visibility structures. | Very high for change-aware incremental visibility and inverse incidence-like data structures. | APN aims to maintain current frontier visibility/global planning knowledge. In the reviewed full method, no construction matching `|A_tau(v) ∩ U_t|` as a deliberately conservative admissible bound, nor a lazy certificate of equality to a specified exhaustive optimistic-NBV argmax, was identified. |
+| Sun et al., **FrontierNet: Learning Visual Cues to Explore** (2025) | Predicts an initial frontier information gain and later reduces it by projecting currently known voxels into the candidate view, using `g'_i = g_i - |V_known^i|`; selects by adjusted gain divided by distance. | Extremely close to the intuitive idea "gain decreases as more cells become known." | Its initial gain is learned/predicted and the decrement is an adjustment heuristic. The reviewed method does not establish this adjusted value as an admissible bound on an exact raycast gain, and does not use it to certify identical selection to exhaustive exact NBV. Therefore **known-cell decrement alone is not a novelty claim for Candidate 1**. |
+| Lin et al., **Fast Sampling-Based UAV Exploration of Unknown 3D Environments with Submodular Information Gain Measure** (Measurement Science and Technology, 2026) | Uses submodular gain accounting and branch pruning based on a branch gain upper bound relative to the global best to reduce sampling-tree expansion. | Important recent precedent for upper-bound pruning inside robotic exploration. | The reviewed material concerns branch/cumulative-gain pruning within a sampling-based trajectory tree. An equivalent persistent-candidate cross-cycle cached-cell bound with exact exhaustive pointwise-NBV target equivalence was not identified. It nevertheless weakens any broad claim such as "first upper-bound pruning method for exploration." |
+| **PB-NBV** (2025) and other recent efficiency-focused NBV methods | Replace or approximate expensive raycasting using projection, learned prediction, or alternative representations. | Establish that computational NBV acceleration is highly active/crowded. | They do not make the exact refined claim identified above in the reviewed material. |
 
-## Main Novelty Risk
+## What Is Already Prior Art
 
-The following statements are **not sufficient contributions** for Candidate 1:
+The following are **not sufficient standalone contributions**:
 
-- "We cache previous information gains."
-- "We lazily reevaluate candidate viewpoints."
-- "Previous values are used as upper bounds in the generic lazy-greedy sense."
-- "We update only the locally changed part of the map."
-- "We avoid some raycasts."
-- "We make NBV information-gain computation faster."
+- caching previous information gains;
+- observing that exploration information gain decreases over time under suitable assumptions;
+- lazily reevaluating candidates;
+- using stale values as generic upper bounds;
+- pruning with upper bounds in a generic search/lazy-greedy sense;
+- updating only map regions that changed;
+- maintaining view-to-target or target-to-view visibility relations;
+- decrementing a stored/predicted gain as voxels become known;
+- avoiding or accelerating raycasts;
+- making NBV computation faster in general.
 
-All of these have close precedents in either robotics, submodular optimization, or both.
+Each of these has a close precedent in the reviewed literature.
 
-## Refined Research Direction
+## What Was Not Matched in the Reviewed Literature
 
-A potentially stronger direction is an **exploration-specific, change-aware admissible bound** rather than a stale scalar gain alone.
+The literature review did **not identify an exact match** for the following combined formulation:
 
-Let `tau(v)` denote the last time candidate `v` was evaluated exactly. At that time cache the set
+1. At an exact evaluation of a persistent viewpoint `v`, cache the exact optimistic visible-unknown set `A_tau(v)(v)`.
+2. Under monotone static occupancy revelation and UNKNOWN-transparent planning rays, maintain
 
-\[
-A_{\tau(v)}(v)
-=
-\{c:\; c \text{ was UNKNOWN and optimistically visible from } v\}.
-\]
+   \[
+   \overline G_t(v)=|A_{\tau(v)}(v)\cap U_t|
+   \]
 
-Let `U_t` be the set of currently UNKNOWN cells. Under a static deterministic occupancy map with monotone updates and optimistic visibility in which UNKNOWN cells are transparent for planning-time gain evaluation, the following candidate upper bound is proposed:
+   as a formally admissible upper bound without claiming that it is the current exact gain.
+3. Maintain that cached-intersection count decrementally from cell-state changes, e.g. through an inverse cell-to-candidate incidence structure.
+4. Combine the bound with a valid current travel-cost treatment.
+5. Use the bound only to skip exact evaluations, with a deterministic tie-aware stopping certificate proving that the returned current viewpoint is exactly the one an explicitly defined exhaustive optimistic-NBV evaluator would return.
 
-\[
-\overline G_t(v)
-=
-|A_{\tau(v)}(v)\cap U_t|.
-\]
+This combination is narrower than the original Candidate 1 idea and is the only currently defensible novelty hypothesis.
 
-This is at least as tight as the stale scalar bound
+## Detailed APN Comparison
 
-\[
-G_{\tau(v)}(v)=|A_{\tau(v)}(v)|,
-\]
+APN is the closest match on data-structure philosophy. Its Differential Regulation procedure exploits the fact that sequential map changes occur in a localized region. It caches and incrementally reconditions perception-network state rather than rebuilding global perception information. Its frontier-guided visibility machinery represents which frontiers are visible from views and the inverse relation from frontiers to views.
 
-because cells that have left the UNKNOWN state can be removed from the bound without reraycasting the viewpoint.
+That means Candidate 1 **cannot** claim that inverse visibility mappings, change awareness, memoization, or local visibility updates are new.
 
-### Proof sketch for admissibility
+The distinction retained after full-method comparison is narrower:
 
-Assume `t >= tau(v)`.
+> APN incrementally maintains current exploration/perception information to support sampling, pruning, refinement, and non-myopic planning; refined Candidate 1 would deliberately maintain a possibly loose but provably admissible stale-view upper bound and use it as a certificate to avoid exact evaluations while reproducing a fixed exhaustive optimistic-NBV decision rule exactly.
 
-1. Monotone map updates imply `U_t` is a subset of `U_tau`.
-2. Known occupied cells can only be added, never removed, in the deterministic static model.
-3. Planning-time optimistic visibility is blocked only by known occupied cells; UNKNOWN cells do not block rays.
-4. If a cell `c` is UNKNOWN and visible from `v` at time `t`, then `c` was also UNKNOWN at `tau(v)` and the ray to `c` could not have been blocked by any occupied cell known at `tau(v)`.
-5. Therefore every currently gain-contributing cell must belong to `A_tau(v) ∩ U_t`.
+No equivalent exact-selection theorem or cached UNKNOWN-cell intersection bound was identified in the APN full method reviewed here.
 
-Hence
+## FrontierNet Comparison
 
-\[
-G_t(v)\le |A_{\tau(v)}(v)\cap U_t|.
-\]
+FrontierNet materially narrows Candidate 1's claim. FrontierNet already recognizes that a frontier's initial gain should fall as the world becomes known and uses current known voxels to reduce that gain.
 
-The inequality may be strict because a newly discovered occupied cell can occlude cells that remain UNKNOWN behind it.
+Therefore Candidate 1 must **not** be presented as the first method to update/decrement gain from newly known cells.
 
-## Change-Aware Maintenance Idea
+The current technical distinction is that Candidate 1's cached set is produced by an exact evaluation of the same baseline gain, so every removed cached contribution is tied to that exact earlier gain. The resulting value is proved to remain above the current exact optimistic gain under explicit assumptions. It is then used for safe pruning rather than treated as the current gain itself.
 
-Instead of intersecting every cached set with `U_t` from scratch, maintain an inverse incidence index:
+## 2026 Submodular Branch-Pruning Comparison
 
-\[
-I(c)=\{v:\;c\in A_{\tau(v)}(v)\}.
-\]
+Lin et al. (2026) is important because it shows that robotic exploration already uses an explicit gain upper-bound concept to prune low-potential branches. The paper's figures/descriptions state that branches are retained according to whether their gain upper bound exceeds a threshold relative to the global best.
 
-When a cell changes from UNKNOWN to known FREE or known OCCUPIED, decrement the cached upper-bound count only for candidates listed in `I(c)`.
+Therefore a broad contribution such as "upper-bound pruning for robotic exploration" is not supportable.
 
-This does **not** attempt to maintain each candidate's exact current gain. It only maintains a guaranteed admissible upper bound cheaply. Newly discovered OCCUPIED cells may create additional occlusion, which makes the bound looser but does not invalidate it.
+The remaining distinction is the **object being bounded and the guarantee being targeted**:
 
-## Score Certificate
+- Lin et al.: future/cumulative utility of trajectory-tree branches, using submodular gain accounting to accelerate tree expansion;
+- refined Candidate 1: current exact pointwise NBV gain of persistent candidates across map-revelation cycles, using a cached visible-unknown set and a tie-aware certificate for the same deterministic exhaustive current target.
 
-Travel cost is not monotone in the same way and must be recomputed or otherwise bounded correctly at the current planning cycle.
+A future manuscript would need to state this difference precisely and avoid claiming priority for generic bound-based pruning.
 
-If current exact distance is `d_t(v)`, define
+## Novelty Gate Assessment
 
-\[
-\overline S_t(v)
-=
-\frac{\overline G_t(v)}{d_t(v)+\epsilon}.
-\]
+### Result: **PROVISIONAL PASS — HIGH RISK, NARROW CLAIM ONLY**
 
-A lazy selector evaluates candidates in descending `\overline S_t`. If an exactly reevaluated candidate `v*` satisfies
+Reasoning:
 
-\[
-S_t(v^*)\ge \max_{v\ne v^*}\overline S_t(v),
-\]
+- The original Candidate 1 framing does **not** pass: virtually every ingredient at a broad level has close prior art.
+- Full-method review of APN did not reveal the same admissible cached-intersection bound or exhaustive-NBV equality certificate.
+- FrontierNet is a strong warning that "subtract known voxels from gain" is already published and cannot be the contribution.
+- Lin et al. (2026) is a strong warning that explicit exploration gain upper-bound pruning is already published and cannot be the contribution.
+- The exact combined formulation above was not identified in the reviewed literature, so it remains reasonable to implement and empirically test as a narrowly defined research contribution.
 
-with deterministic tie-breaking consistent with the exhaustive baseline, it can certify that `v*` is the same current greedy NBV that exhaustive evaluation would select.
+This is **not** a proof of global novelty. The approved claim is only that no equivalent formulation was identified in the literature reviewed to date.
 
-## Why This May Be More Defensible
+## Implementation Implication
 
-The proposed gap is **not** generic lazy greedy. The candidate contribution would need to be the combination of:
+Candidate 1 may proceed to a small deterministic implementation **only if** the contribution is framed as certified exact-selection acceleration rather than generic caching or gain decrement.
 
-1. a visibility-structured admissible bound derived specifically from monotone occupancy-map revelation;
-2. cheap decremental maintenance of that bound from map-state changes;
-3. an exact selection certificate against a defined exhaustive NBV baseline despite evolving map knowledge and current travel cost;
-4. explicit treatment of candidate creation/removal, reachability, changing distance, and deterministic ties.
+The first implementation must compare at least:
 
-This is still only a **hypothesis of a defensible research gap**. The reviewed literature did not reveal the exact same formulation, but a broader and citation-chained search is still required before any novelty claim.
+1. exhaustive optimistic NBV;
+2. stale-scalar lazy bound `G_tau(v)`;
+3. change-aware cached-set bound `|A_tau(v) ∩ U_t|`;
+4. optionally an occlusion-tightened extension if the cached-set bound proves too loose.
 
-## Key Distinction to Test Against APN
-
-The closest robotics-side risk is the Active Perception Network's difference-aware visibility and information-gain maintenance.
-
-Candidate 1 must demonstrate a substantive distinction such as:
-
-> APN maintains and incrementally updates view/frontier information to make exploration planning efficient, whereas Candidate 1 would maintain an admissible upper-bound certificate whose purpose is to skip exact viewpoint evaluations while provably returning the same deterministic NBV as an explicitly defined exhaustive evaluator.
-
-This distinction must be checked against the full APN method before being accepted.
+Correctness must be tested before speed: the selected candidate and target sequence must match the exhaustive baseline exactly under the shared tie rule. Evaluation must also measure memory and bound-maintenance overhead, not only raycast count.
 
 ## Current Verdict
 
-**Status: MODIFY / CONTINUE RESEARCH, NOT READY TO IMPLEMENT.**
+**Status: CONDITIONAL GO FOR MINIMAL IMPLEMENTATION.**
 
-The original "cached monotone gain + lazy upper bound" framing is too close to established lazy-greedy theory and existing NBV caching. Candidate 1 remains potentially viable only if the exploration-specific bound and exact-certificate formulation survives full formalization and deeper prior-art comparison.
+Theory gate: passed under explicit assumptions.
 
-## Primary Sources to Revisit
+Novelty gate: provisionally passed only for the narrow combined formulation above, with high prior-art risk and no priority claim.
+
+Empirical-value gate: open. Candidate 1 should be dropped or modified if the bound does not materially reduce exact gain evaluations after accounting for bound maintenance, distance computation, and memory.
+
+## Primary Sources Reviewed
 
 - Michel Minoux, *Accelerated Greedy Algorithms for Maximizing Submodular Set Functions* (1978).
 - Daniel Golovin and Andreas Krause, *Adaptive Submodularity: Theory and Applications in Active Learning and Stochastic Optimization* (JAIR 2011), arXiv:1003.3967.
 - Yash Satsangi, Shimon Whiteson, Frans A. Oliehoek, *PAC Greedy Maximization with Efficient Bounds on Information Gain for Sensor Selection* (IJCAI 2016), arXiv:1602.07860.
+- Kok-Lim Low and Anselmo Lastra, *An Adaptive Hierarchical Next-Best-View Algorithm for 3D Reconstruction of Indoor Scenes* and *Efficient Constraint Evaluation Algorithms for Hierarchical Next-Best-View Planning* (2006).
 - Magnus Selin et al., *Efficient Autonomous Exploration Planning of Large-Scale 3-D Environments* (IEEE RA-L 2019), DOI: 10.1109/LRA.2019.2897343.
+- Rowan Border and Jonathan D. Gammell, *Proactive Estimation of Occlusions and Scene Coverage for Planning Next Best Views in an Unstructured Representation* / SEE++ (2020/2021), arXiv:2009.04515.
 - Ana Batinović et al., *A Shadowcasting-Based Next-Best-View Planner for Autonomous 3D Exploration*, arXiv:2109.09323.
 - Menaka Naazare, Francisco Garcia Rosas, Dirk Schulz, *Online Next-Best-View Planner for 3D-Exploration and Inspection With a Mobile Manipulator Robot*, arXiv:2203.10113.
-- David Vutetakis, Jing Xiao, *Active Perception Network for Non-Myopic Online Exploration and Visual Surface Coverage*, arXiv:2309.11695.
+- David Vutetakis and Jing Xiao, *Active Perception Network for Non-Myopic Online Exploration and Visual Surface Coverage*, arXiv:2309.11695 / later journal version.
+- Boyang Sun et al., *FrontierNet: Learning Visual Cues to Explore*, arXiv:2501.04597 (2025).
+- Yuwen Lin et al., *Fast Sampling-Based UAV Exploration of Unknown 3D Environments with Submodular Information Gain Measure*, Measurement Science and Technology 37(4), 046202 (2026), DOI: 10.1088/1361-6501/ae324d.
 - *PB-NBV: Efficient Projection-Based Next-Best-View Planning Framework for Reconstruction of Unknown Objects*, arXiv:2501.10663.
