@@ -105,3 +105,36 @@ The run metadata needed to reproduce or independently verify these observations 
 - **Unresolved:** This PASS does not establish novelty, useful tightness, runtime improvement, or implementation readiness.
 - **Novelty risk remains high:** Stale-bound priority evaluation and exact-greedy certification are prior art, while APN is close on difference-aware visibility maintenance. Full-method comparison remains required.
 - Full definitions, proofs, counterexamples, lifecycle rules, and prior-art comparison are recorded in `docs/CANDIDATE_1_FORMULATION.md`.
+
+## 2026-09-14 — Candidate 1 Full-Method Novelty Gate
+
+### Additional Verified Prior-Art Findings
+
+- **Verified:** AEP (Selin et al., 2019) goes beyond simple caching: it explicitly treats potential information gain as monotonically decreasing over time under its assumptions, selectively recalculates potentially affected cached points, and uses GP interpolation for unevaluated queries. Therefore monotonic gain, cache reuse, and affected-region refresh are established prior art.
+- **Verified:** Full-method review of APN confirms difference-aware incremental regulation, memoization, view-to-frontier visibility relations, and inverse frontier-to-view visibility relations. Therefore change-aware updates and inverse visibility indexing cannot be claimed as new by themselves.
+- **Verified:** FrontierNet (Sun et al., 2025) explicitly decreases a stored/predicted frontier information gain using currently known voxels, with an update of the form `g'_i = g_i - |V_known^i|`. Therefore the intuitive idea "subtract newly known cells/voxels from old gain" is not a standalone contribution.
+- **Verified:** Lin et al. (Measurement Science and Technology, 2026) use submodular information-gain accounting and branch gain upper bounds to prune low-potential branches during sampling-based UAV exploration. Therefore generic information-gain upper-bound pruning in robotic exploration is not a standalone contribution.
+- **Verified:** Low & Lastra's hierarchical NBV work is a strong earlier precedent for accelerating otherwise exhaustive NBV evaluation while retaining a high-resolution search over view space.
+
+### What Was Not Identified
+
+- **Not identified in reviewed literature:** The exact combination of an exact cached optimistic visible-UNKNOWN set, the bound
+  \[
+  \overline G_t(v)=|A_{\tau(v)}(v)\cap U_t|,
+  \]
+  maintained deliberately as a conservative certificate, followed by lazy exact reevaluation with a deterministic tie-aware theorem guaranteeing the same current target as an explicitly defined exhaustive optimistic-NBV evaluator.
+- **Important qualification:** Failure to identify an equivalent method is not proof that none exists. Any future manuscript must scope its novelty statement to the reviewed literature and avoid absolute "first" claims unless independently justified.
+
+### Novelty Gate Verdict
+
+- **Novelty Gate: PROVISIONAL PASS — HIGH RISK, NARROW CLAIM ONLY.**
+- **Rejected broad claim:** Candidate 1 is not novel as caching, monotone gain, known-cell decrement, changed-region maintenance, inverse visibility mapping, lazy evaluation, or upper-bound pruning individually.
+- **Remaining defensible hypothesis:** the contribution is the exploration-specific admissible cached-set bound plus decremental maintenance plus exact exhaustive-NBV selection certificate as one narrowly specified method.
+- **Implementation status:** CONDITIONAL GO for a minimal deterministic implementation whose purpose is to test correctness and empirical computational value, not to assume the candidate is already a successful final research contribution.
+
+### Empirical Gate Requirements
+
+- Compare exhaustive optimistic NBV, stale-scalar lazy bound, and the proposed change-aware cached-set bound.
+- Require exact argmax and target-sequence equality to exhaustive NBV before making efficiency claims.
+- Measure exact gain-evaluation count, wall-clock planning time, distance-computation time, bound/index maintenance time, and memory usage.
+- **Drop or modify** Candidate 1 if total overhead erases the reduction in exact gain evaluations or if the change-aware bound is not materially tighter than the stale scalar bound.
