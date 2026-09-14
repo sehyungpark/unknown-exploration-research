@@ -24,9 +24,9 @@ This file records research assumptions and decisions that affect formulation, im
 
 ### D-004 — Candidate 1 Before Coding
 
-- **Status:** Accepted
-- **Decision:** Complete mathematical formulation and novelty validation before implementing Candidate 1 or the common simulator.
-- **Rationale:** The monotonicity and exactness claims, plus differentiation from prior lazy/caching work, are central to Candidate 1's research value.
+- **Status:** Superseded after theory/novelty gates
+- **Decision:** Mathematical formulation and novelty validation were required before implementation.
+- **Rationale:** Those gates have now been completed sufficiently for a minimal correctness implementation.
 
 ### D-005 — Scientific Record Integrity
 
@@ -36,23 +36,75 @@ This file records research assumptions and decisions that affect formulation, im
 
 ### D-006 — Refined Candidate 1 Assumption Package
 
-- **Status:** Accepted for the theory gate; empirical instantiation remains open
+- **Status:** Accepted
 - **Decision:** The core bound applies only to a finite fixed grid with static deterministic truth, correct monotone belief updates, UNKNOWN-transparent optimistic planning visibility, immutable full viewpoint identity, fixed sensor/ray geometry, unweighted visible-UNKNOWN cardinality gain, and atomic planning snapshots.
 - **Rationale:** Minimal counterexamples break admissibility when candidate configuration changes, UNKNOWN is opaque, beliefs revert, obstacles are dynamic, or visibility/range rules change.
 
 ### D-007 — Candidate 1 Conditional Theory Verdict
 
-- **Status:** PASS for logical validity; novelty gate remains open
-- **Decision:** Accept the set-intersection gain bound, inverse-incidence decrement invariant, exact-current-distance score bound, and tie-aware exhaustive-NBV certificate under D-006. Do not treat this as approval to claim novelty or begin implementation.
-- **Rationale:** The proofs are valid under the fixed assumptions, but generic lazy certification is prior art and APN remains a close incremental-visibility risk.
+- **Status:** Accepted
+- **Decision:** Accept the set-intersection gain bound, inverse-incidence decrement invariant, exact-current-distance score bound, and tie-aware exhaustive-NBV certificate under D-006.
+- **Rationale:** The proofs are valid under the fixed assumptions.
+
+## 2026-09-15 — Minimal Deterministic Simulator Freeze
+
+### D-008 — Motion Model
+
+- **Status:** Accepted for first implementation
+- **Decision:** Use 8-neighbor movement with orthogonal cost `1` and diagonal cost `sqrt(2)`. Diagonal corner cutting is forbidden; both adjacent orthogonal side cells must be currently known FREE.
+- **Rationale:** Keeps movement simple while avoiding unrealistic diagonal passage through blocked corners.
+
+### D-009 — Exact Distance Computation
+
+- **Status:** Accepted for first implementation
+- **Decision:** Use one Dijkstra search per planning snapshot over currently known FREE cells to obtain exact current distances to all eligible candidates.
+- **Rationale:** The Candidate 1 score certificate requires valid current distances, and one-source Dijkstra avoids per-candidate A* overhead.
+
+### D-010 — Sensor and Visibility Convention
+
+- **Status:** Accepted for first implementation
+- **Decision:** Use a 360-degree finite-range discrete sensor with initial range `R=8` cells. Every target-cell center within Euclidean distance `<=R` is checked with one fixed deterministic supercover grid-line convention. Ground-truth OCCUPIED blocks physical sensing; planning-time UNKNOWN is transparent and known OCCUPIED blocks optimistic visibility.
+- **Rationale:** Avoids arbitrary angular beam-count effects and exactly instantiates the theorem-critical UNKNOWN-transparent visibility assumption.
+
+### D-011 — Planning Snapshot Semantics
+
+- **Status:** Accepted for first implementation
+- **Decision:** Sense only on arrival. Each planning cycle freezes belief and pose after the arrival scan; candidate generation, distance computation, gain evaluation, and target selection use that atomic snapshot. No sensing occurs while traversing the selected path.
+- **Rationale:** Prevents map mutation during a correctness certificate.
+
+### D-012 — Candidate Set
+
+- **Status:** Accepted for first implementation
+- **Decision:** Every currently reachable known-FREE cell except the robot's current cell is an eligible candidate. No frontier-only restriction and no random subsampling are used in the initial correctness implementation.
+- **Rationale:** Candidate 1 accelerates NBV evaluation, not frontier extraction; using the complete reachable known-free set makes the reference behavior deterministic and avoids hiding errors behind sampling.
+
+### D-013 — Candidate Identity
+
+- **Status:** Accepted for first implementation
+- **Decision:** Candidate identity is the immutable grid coordinate `(row,col)` under the globally fixed 360-degree sensor convention. Changing range, FOV, orientation dependence, or ray convention requires a new configuration and cache invalidation.
+- **Rationale:** Candidate 1 admissibility requires viewpoint identity to preserve every property that affects visibility/gain.
+
+### D-014 — Exhaustive NBV Score and Tie Order
+
+- **Status:** Accepted for first implementation
+- **Decision:** Use `S_t(v)=G_t(v)/(d_t(v)+1e-9)`. Deterministic ranking is: larger score, then larger exact gain, then smaller exact distance, then lexicographically smaller `(row,col)`.
+- **Rationale:** Provides a total deterministic order that later lazy methods must reproduce exactly.
+
+### D-015 — Initial Correctness Scale
+
+- **Status:** Accepted
+- **Decision:** Use deterministic maps around 20x20 first; expand to 60x60 and 120x120 only after correctness is established.
+- **Rationale:** Small fixtures make counterexamples and implementation errors easy to inspect before scaling.
+
+### D-016 — First Implementation Gate
+
+- **Status:** GO
+- **Decision:** Implement only the minimal simulator, theorem-derived tests, and exhaustive optimistic-NBV reference first. Do not implement stale-lazy or Candidate 1 lazy selection until the exhaustive reference passes review.
+- **Rationale:** Later exact-equivalence claims require a trusted oracle.
 
 ## Open Decisions
 
-- 4-neighbor versus 8-neighbor movement
-- Exact sensor ray discretization and initial sensing range
-- Concrete ray traversal, sensor footprint/range, and FOV within the fixed theory
-- Concrete Candidate 1 candidate generation and persistent-ID policy
-- Deterministic total tie order
-- Full-method novelty comparison against APN and related work
-- Benchmark map sizes, seed sets, and completion thresholds
-- Raw-result schema and storage location
+- Benchmark seed sets and randomized-map generators for later empirical scaling experiments.
+- Coverage targets and termination reporting for large experiments.
+- Raw-result schema and storage location.
+- Exact resource-measurement methodology for wall time and memory.
