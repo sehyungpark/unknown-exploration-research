@@ -12,6 +12,7 @@ Last updated: 2026-09-15
 - The empirical-value gate remains open.
 - The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented, oracle-hardened, and pass the current correctness suite.
 - Experiment 0 exact-equivalence validation is preregistered but has not been executed because Algorithms B and C do not yet exist.
+- Experiment 0's 60-map random correctness dataset, seed list, hashes, start/acceptance rules, cycle limits, per-cycle logging schema, and failure-artifact convention are frozen.
 - Stale-scalar lazy and proposed change-aware lazy methods have not been implemented.
 
 ## Current Candidate
@@ -83,10 +84,12 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - Exhaustive optimistic-NBV reference with the frozen score and four-level total tie order, structured evaluations, selected path, and deterministic all-zero-gain stop.
 - Atomic arrival-scan/planning/movement cycle with no sensing en route.
 - Seven fixed 20×20 fixtures: open, single room, corridor, dead end, separated rooms, clutter, and maze-like.
-- A 39-test correctness suite covering all required reference behaviors; full suite passed on 2026-09-15.
+- A 59-test correctness suite covering the reference behaviors and frozen Experiment 0 dataset/hash artifact; the full suite passed on 2026-09-15.
 - Set-level admissibility checks over 38,673 deterministic and fixed-seed monotone update transitions.
 - Complete repeated exhaustive runs on all seven fixtures, each reaching explicit `EXPLORATION_COMPLETE` before its safety limit with identical independent-run traces.
 - Corner-occlusion integration coverage at the physical and optimistic planning visibility APIs.
+- Deterministic independent-Bernoulli random-map generation with local RNG state, connected-component/start selection, acceptance/rejection records, map materialization, and frozen config validation.
+- Shared canonical SHA-256 utilities for ground truth (`./#`) and belief (`?/.#`) with fixed row order and final LF.
 - No Candidate 1 cache, inverse-incidence index, stale-lazy selector, or proposed change-aware lazy selector has been implemented.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
@@ -110,14 +113,13 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 - Is the change-aware bound materially tighter than the stale scalar bound on realistic map progress?
 - Can one shortest-path computation per planning snapshot supply current distances cheaply enough that information-gain evaluation remains the dominant bottleneck?
 - Does the corner-inclusive supercover convention create materially different behavior from other fixed supercover conventions in later sensitivity checks?
-- The large-experiment coverage, failure, raw-result, timing, and memory protocols remain unfrozen.
-- Experiment 0's fixed-seed random-map generator, map count, seed list, and acceptance policy remain pending.
+- Large efficiency-experiment coverage, timing, memory, and raw-result protocols remain unfrozen; Experiment 0's correctness logging/failure protocol is now frozen separately.
+- The frozen Experiment 0 seed stream happened to reject zero candidates. The rejection pipeline is tested on deterministic counterexamples, but no rejected random candidate exists in this particular frozen artifact.
 
 ## Next Steps
 
-1. Freeze Experiment 0's small random-map generator, acceptance policy, map count, seed list, and safety limits.
-2. Freeze the cycle-result logging schema and minimal failure-artifact format.
-3. Implement the stale-scalar exact-lazy baseline against the accepted exhaustive oracle.
-4. Implement the change-aware Candidate 1 method only after the stale baseline.
-5. Execute Experiment 0 and require zero target, sequence, bound, tie, and invariant violations.
-6. Do not begin efficiency evaluation until Experiment 0 passes.
+1. Implement the stale-scalar exact-lazy baseline against the accepted exhaustive oracle.
+2. Implement the change-aware Candidate 1 method only after the stale baseline.
+3. Implement the cross-method Experiment 0 runner and immutable failure-artifact writer against the frozen schemas.
+4. Execute Experiment 0 and require zero target, sequence, bound, tie, and invariant violations.
+5. Do not begin efficiency evaluation until Experiment 0 passes.

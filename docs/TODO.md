@@ -24,7 +24,9 @@ Last updated: 2026-09-15
 - [x] Specify and test atomic planning snapshots with sensing only at arrival and no sensing while moving.
 - [ ] Freeze metric definitions, coverage targets, failure conditions, run metadata schema, and raw-result storage layout.
 - [x] Preregister Experiment 0 exact-equivalence correctness endpoints, shared conditions, logging fields, failure rules, and gate.
-- [ ] Freeze Experiment 0's random small-map generator, map count, seed list, acceptance policy, and safety limits.
+- [x] Freeze Experiment 0's 60-map random small-map generator, master/candidate seed list, balanced densities, acceptance policy, starts, hashes, and safety limits.
+- [x] Freeze Experiment 0's per-cycle field schema, canonical belief/map hashes, B/C placeholders, and non-overwriting failure-artifact layout.
+- [x] Add deterministic regeneration and frozen-artifact tests covering the dataset, rejection rules, starts, cycle limits, and hashes.
 - [x] Specify required baselines: exhaustive optimistic NBV, stale-scalar lazy bound, and proposed change-aware cached-set bound.
 - [x] Specify resource metrics: exact gain evaluations, ray operations, planning wall time, distance time, bound/index maintenance time, peak memory, cached-set size, inverse-index size.
 
@@ -37,6 +39,7 @@ Last updated: 2026-09-15
 - [x] Check set-level admissibility across 38,673 deterministic and fixed-seed transitions.
 - [x] Run every deterministic fixture twice to explicit stop with identical traces and invariant checks.
 - [x] Accept the exhaustive reference as the current correctness oracle after the 39-test suite passes.
+- [ ] Implement the Experiment 0 cross-method cycle logger and immutable failure-artifact writer when Algorithms B/C are available.
 - [ ] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
 - [ ] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
 - [ ] Implement tie-aware exact-selection certificate.

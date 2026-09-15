@@ -84,9 +84,16 @@ Each fixture uses its repository-defined fixed FREE start cell. Every run must r
 
 ### Stage 2 — Fixed-seed random small maps
 
-The random-map generator, accepted-map policy, map count, start-selection procedure, seed list, and cycle limits are **pending** and must be frozen before Algorithms B or C are evaluated on random maps. Failed generated maps or runs must not be selectively removed after the seed set is frozen.
+The random-map generator, accepted-map policy, map count, start-selection procedure, seed list, hashes, and cycle limits are frozen in `docs/EXPERIMENT_0_DATASET.md` and `configs/experiment_0_random_maps.json`.
 
-The implementation-level admissibility property suite already uses fixed seed `20260915`; this seed validates monotone bound consistency but is not a substitute for the pending random exploration dataset.
+- Master seed: `20260915`.
+- Accepted maps: 60 total; 20 each at sizes 12×12, 16×16, and 20×20.
+- Density balance within each size: 7 sparse (`p=0.10`), 7 medium (`p=0.20`), and 6 dense (`p=0.30`).
+- Random-map cycle limit: `max(64, 2 * selected_largest_free_component_size)`.
+
+Failed generated maps or runs must not be selectively removed after this freeze. A content or generator change requires a new dataset version and must not silently replace the frozen artifact.
+
+The implementation-level admissibility property suite also uses fixed seed `20260915`, but it remains a separate test workload and is not a substitute for this frozen random exploration dataset.
 
 ## Required Logged Fields per Planning Cycle
 
@@ -107,6 +114,8 @@ The implementation-level admissibility property suite already uses fixed seed `2
 - termination status for each method.
 
 For any failure, also retain the full belief snapshot, candidate evaluations/bounds needed to reproduce the failure, algorithm versions, and failure reason.
+
+The exact field names, canonical belief/map hashes, B/C placeholders, and non-overwriting failure directory layout are frozen in `docs/EXPERIMENT_0_LOGGING.md`.
 
 ## Failure Rule
 
@@ -137,4 +146,4 @@ Until this gate passes, runtime improvement must not be reported as a research r
 
 ## Current Status
 
-**PREREGISTERED, NOT EXECUTED.** Algorithm A exists. Algorithms B and C, the random-map dataset, and the cross-method Experiment 0 runner do not yet exist.
+**PREREGISTERED, DATASET FROZEN, NOT EXECUTED.** Algorithm A and the 60-map random correctness dataset exist. Algorithms B and C and the cross-method Experiment 0 runner do not yet exist.

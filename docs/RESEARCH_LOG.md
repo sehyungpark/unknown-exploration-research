@@ -192,3 +192,27 @@ The run metadata needed to reproduce or independently verify these observations 
 - **Pending before execution:** The random small-map generator, seed list, map count, acceptance policy, and safety limits.
 - **No research experiment executed:** These were oracle/test-hardening runs, so no performance result was appended to `docs/EXPERIMENT_LOG.md`.
 - **Still not implemented:** stale-scalar lazy selection, proposed change-aware lazy selection, and runtime inverse-incidence structures.
+
+## 2026-09-15 — Experiment 0 Random Dataset and Logging Freeze
+
+### Verified Reproducibility Results
+
+- **Verified by tests:** The frozen local-RNG generator reproduces the same map for the same candidate seed without changing Python's global random state; distinct tested seeds produce different map contents.
+- **Verified by tests:** Repeated master-seed materialization produces the same 60 dataset IDs, candidate seeds, and map hashes.
+- **Verified by tests:** The frozen artifact contains exactly 20 accepted maps at each of 12×12, 16×16, and 20×20, with the preregistered 7 sparse / 7 medium / 6 dense split within each size.
+- **Verified by tests:** Every accepted start is FREE, lies in the deterministically selected largest traversable FREE component, and follows the center-distance and lexicographic tie rules.
+- **Verified by tests:** Every frozen map regenerates to its recorded SHA-256 hash; changing ground-truth or belief content changes the corresponding canonical hash.
+- **Verified by tests:** Explicit no-FREE, no-OCCUPIED, fragmented-component, and immediate-initial-stop candidates receive stable rejection reasons.
+- **Full suite:** 59 tests passed on 2026-09-15 (39 existing simulator/oracle tests plus 20 dataset/hash/config tests).
+
+### Specification Resolution
+
+- **Resolved underspecification:** FREE-component connectivity had not been defined. Experiment 0 now uses the existing 8-neighbor/no-diagonal-corner-cutting traversability rule so component membership matches executable motion.
+- **Resolved byte-level ambiguity:** Ground-truth and belief hashes now use row-major UTF-8 ASCII with one LF after every row, including the final row, before SHA-256.
+- **Frozen artifact observation:** Master seed `20260915` produced 60 accepted candidates without a rejection. The empty rejected-candidate list and empty reason summary remain explicit parts of the artifact; deterministic rejection paths are still covered by tests.
+
+### Research Status and Scope
+
+- **Unchanged hypothesis:** No empirical claim about Candidate 1 was tested or changed. This work freezes inputs and diagnostics for the future exact-equivalence experiment.
+- **Not executed:** No A/B/C comparison, exact-equivalence run, performance benchmark, runtime measurement, or research experiment was executed.
+- **Not implemented:** Algorithms B/C, lazy selection, inverse-incidence runtime state, priority queues, and certificate runtime logic remain absent.

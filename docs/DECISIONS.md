@@ -108,6 +108,26 @@ This file records research assumptions and decisions that affect formulation, im
 - **Decision:** The supercover contains both endpoints and every cell touched by the closed center-to-center segment. At an exact interior-corner crossing, include both side-adjacent cells before the diagonal cell and order the two side cells lexicographically. The covered-cell set must be direction-symmetric. Any OCCUPIED cell strictly before a visibility target blocks that target, while an OCCUPIED target remains visible.
 - **Rationale:** D-010 required one deterministic supercover but did not determine corner-touch membership or traversal ordering; those details affect visibility, tests, and all future cached sets.
 
+## 2026-09-15 — Experiment 0 Dataset and Record Freeze
+
+### D-018 — Frozen Random Correctness Dataset
+
+- **Status:** Accepted for Experiment 0
+- **Decision:** Use 60 accepted independent-Bernoulli maps generated from master seed `20260915`: 20 each at sizes 12×12, 16×16, and 20×20, with 7 sparse (`p=0.10`), 7 medium (`p=0.20`), and 6 dense (`p=0.30`) maps per size. Candidate seeds come from `random.Random(master_seed).getrandbits(63)` and each map uses its own `random.Random(candidate_seed)`. Retain every rejected candidate record. Random-map cycle limits are `max(64, 2 * selected_largest_free_component_size)`.
+- **Rationale:** Freezing seeds, quotas, acceptance, and limits before B/C results prevents post-result map selection and makes the correctness gate reproducible.
+
+### D-019 — FREE Component Connectivity and Start Selection
+
+- **Status:** Accepted for Experiment 0
+- **Decision:** Define FREE components using the simulator's 8-neighbor/no-diagonal-corner-cutting traversability rule. Choose the largest component, break component ties by its lexicographically smallest cell, then choose the component cell nearest the geometric grid center by Euclidean distance with a lexicographic tie break.
+- **Rationale:** The request did not specify component adjacency. Matching D-008 prevents a start from being assigned to a component that is connected only under movement the robot cannot execute.
+
+### D-020 — Canonical Hash and Failure Record
+
+- **Status:** Accepted for Experiment 0
+- **Decision:** Hash row-major UTF-8 ASCII with exactly one LF after every row, including the final row, using SHA-256. Ground truth uses `.`/`#`; belief uses `?`/`.`/`#`. Per-cycle correctness fields and append-only failure artifacts use the schema in `docs/EXPERIMENT_0_LOGGING.md` and may not fabricate fields for unimplemented algorithms.
+- **Rationale:** Explicit byte serialization detects map/generator drift and lets failures be reproduced without platform-dependent newline ambiguity.
+
 ## Open Decisions
 
 - Benchmark seed sets and randomized-map generators for later empirical scaling experiments.
