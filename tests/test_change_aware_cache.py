@@ -19,11 +19,14 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
         cache.validate(require_fresh_bounds=True)
 
     @staticmethod
-    def _snapshot(cache: ChangeAwareGainCache) -> tuple[dict, dict, dict]:
+    def _snapshot(
+        cache: ChangeAwareGainCache,
+    ) -> tuple[dict, dict, dict, frozenset]:
         return (
             dict(cache.cached_visible_unknown),
             dict(cache.bound_counts),
             dict(cache.inverse_incidence),
+            cache.reported_known_cells,
         )
 
     def test_fresh_state_is_empty_and_valid(self) -> None:
@@ -32,17 +35,20 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
         self.assertEqual(cache.cached_visible_unknown, {})
         self.assertEqual(cache.bound_counts, {})
         self.assertEqual(cache.inverse_incidence, {})
+        self.assertEqual(cache.reported_known_cells, frozenset())
         cache.validate()
 
-    def test_reset_clears_all_three_state_families(self) -> None:
+    def test_reset_clears_all_state_families(self) -> None:
         cache = ChangeAwareGainCache()
         self._populate_valid_state(cache)
+        cache.apply_newly_known(frozenset({self.cell_a}))
 
         cache.reset()
 
         self.assertEqual(cache.cached_visible_unknown, {})
         self.assertEqual(cache.bound_counts, {})
         self.assertEqual(cache.inverse_incidence, {})
+        self.assertEqual(cache.reported_known_cells, frozenset())
         cache.validate()
 
     def test_reset_is_idempotent_for_empty_and_populated_state(self) -> None:
@@ -57,6 +63,7 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
         self.assertEqual(cache.cached_visible_unknown, {})
         self.assertEqual(cache.bound_counts, {})
         self.assertEqual(cache.inverse_incidence, {})
+        self.assertEqual(cache.reported_known_cells, frozenset())
 
     def test_diagnostics_cannot_mutate_internal_state(self) -> None:
         cache = ChangeAwareGainCache()
@@ -68,6 +75,7 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
         cached = cache.cached_visible_unknown
         bounds = cache.bound_counts
         inverse = cache.inverse_incidence
+        reported = cache.reported_known_cells
 
         with self.assertRaises(TypeError):
             cached[self.other_candidate] = frozenset()
@@ -79,6 +87,8 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
             inverse[self.cell_a] = frozenset()
         with self.assertRaises(AttributeError):
             inverse[self.cell_a].add(self.other_candidate)
+        with self.assertRaises(AttributeError):
+            reported.add(self.cell_a)
 
         self.assertEqual(
             cache.cached_visible_unknown[self.candidate],
@@ -88,6 +98,7 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
         self.assertEqual(
             cache.inverse_incidence[self.cell_a], frozenset({self.candidate})
         )
+        self.assertEqual(cache.reported_known_cells, frozenset())
 
     def test_negative_float_and_bool_bounds_are_rejected(self) -> None:
         for invalid_bound in (-1, 1.5, True):
@@ -173,7 +184,7 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
 
         maintained = ChangeAwareGainCache()
         self._populate_valid_state(maintained)
-        maintained._bound_counts[self.candidate] = 1
+        maintained.apply_newly_known(frozenset({self.cell_a}))
         maintained.validate()
         with self.assertRaisesRegex(RuntimeError, "must equal cached-set size"):
             maintained.validate(require_fresh_bounds=True)
@@ -271,13 +282,11 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
         self.assertEqual(cache.inverse_incidence, {})
         cache.validate(require_fresh_bounds=True)
 
-    def test_reinstall_same_set_is_deterministic_and_restores_fresh_bound(self) -> None:
+    def test_reinstall_same_fresh_set_is_deterministic(self) -> None:
         cache = ChangeAwareGainCache()
         exact_set = frozenset({self.cell_a, self.cell_b})
         cache.install_exact(self.candidate, exact_set)
         fresh_snapshot = self._snapshot(cache)
-        cache._bound_counts[self.candidate] = 1
-        cache.validate()
 
         cache.install_exact(self.candidate, exact_set)
 
@@ -292,7 +301,7 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
             self.candidate,
             frozenset({self.cell_a, self.cell_b, cell_c}),
         )
-        cache._bound_counts[self.candidate] = 1
+        cache.apply_newly_known(frozenset({self.cell_a, cell_c}))
         cache.validate()
 
         cache.install_exact(
@@ -315,9 +324,7 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
             self.candidate,
             frozenset({self.cell_a, self.cell_b, cell_c}),
         )
-        # Future Stage 3 may decrement the bound while retaining every old
-        # cached-set membership, including cells that have become known.
-        cache._bound_counts[self.candidate] = 1
+        cache.apply_newly_known(frozenset({self.cell_a, self.cell_b}))
         cache.validate()
 
         cache.install_exact(
@@ -362,7 +369,7 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
                 self.assertEqual(self._snapshot(cache), original)
                 cache.validate(require_fresh_bounds=True)
 
-    def test_stage_two_has_only_exact_installation_not_future_operations(self) -> None:
+    def test_stage_three_has_no_planner_or_belief_diff_operations(self) -> None:
         cache = ChangeAwareGainCache()
         source = inspect.getsource(cache_module)
 
@@ -370,9 +377,13 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
         self.assertFalse(hasattr(cache, "decrement"))
         self.assertFalse(hasattr(cache, "apply_observations"))
         self.assertFalse(hasattr(cache, "apply_known_cells"))
+        self.assertFalse(hasattr(cache, "apply_belief"))
         self.assertFalse(hasattr(cache, "update_from_belief"))
+        self.assertFalse(hasattr(cache, "update_from_snapshot"))
         self.assertFalse(hasattr(cache, "process_delta"))
         self.assertFalse(hasattr(cache_module, "ChangeAwareNBVResult"))
+        self.assertNotIn("BeliefGrid", source)
+        self.assertNotIn("from src.candidates", source)
         self.assertNotIn("dijkstra", source.lower())
         self.assertNotIn("optimistic_visible_unknown_cells", source)
         self.assertNotIn("candidate_rank_key", source)
@@ -386,8 +397,10 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
             {
                 "bound_counts",
                 "cached_visible_unknown",
+                "apply_newly_known",
                 "install_exact",
                 "inverse_incidence",
+                "reported_known_cells",
                 "reset",
                 "validate",
             },

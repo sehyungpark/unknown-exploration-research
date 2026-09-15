@@ -23,17 +23,23 @@ class ChangeAwareGainCache:
     Sensor geometry and candidate-identity configuration are external to this
     cache object and must remain compatible for the whole episode.
 
-    Stage 2 supports only atomic first installation and exact replacement of
-    an already-computed visible-UNKNOWN set. It deliberately performs no
-    raycasting, observation-delta processing, bound decrement, or selection.
-    The inverse index always represents the complete installed cached set;
-    later bound decrements must not remove those historical memberships.
+    Stage 3 additionally accepts explicit UNKNOWN-to-known revelations and
+    decrements every affected maintained bound exactly once. It deliberately
+    performs no raycasting, belief-delta discovery, or selection. The inverse
+    index always represents the complete installed cached set, so revelation
+    processing never removes historical cache or incidence memberships.
+
+    ``_reported_known_cells`` is the episode-wide set of coordinates whose
+    monotone UNKNOWN-to-known transition has already been reported. This
+    relies on exact installations containing only cells that are UNKNOWN at
+    their snapshot and on known cells never reverting to UNKNOWN.
     """
 
     def __init__(self) -> None:
         self._cached_visible_unknown: dict[Coord, frozenset[Coord]] = {}
         self._bound_counts: dict[Coord, int] = {}
         self._inverse_incidence: dict[Coord, set[Coord]] = {}
+        self._reported_known_cells: set[Coord] = set()
 
     @property
     def cached_visible_unknown(self) -> Mapping[Coord, frozenset[Coord]]:
@@ -57,12 +63,19 @@ class ChangeAwareGainCache:
         }
         return MappingProxyType(detached)
 
+    @property
+    def reported_known_cells(self) -> frozenset[Coord]:
+        """Return the immutable episode-wide revelation-accounting set."""
+
+        return frozenset(self._reported_known_cells)
+
     def reset(self) -> None:
-        """Clear all episode-specific cached sets, bounds, and incidence."""
+        """Clear all episode-specific cache, index, and revelation state."""
 
         self._cached_visible_unknown.clear()
         self._bound_counts.clear()
         self._inverse_incidence.clear()
+        self._reported_known_cells.clear()
 
     def install_exact(
         self,
@@ -74,8 +87,9 @@ class ChangeAwareGainCache:
         ``visible_unknown`` must already have been computed exactly by the
         caller. Replacement removes memberships using the complete old cached
         set, installs the new memberships, and resets the maintained bound to
-        the new exact-set size. Input or state validation failures leave the
-        prior state unchanged.
+        the new exact-set size. Under the monotone contract, it must not
+        contain a cell whose known transition was already reported. Input or
+        state validation failures leave the prior state unchanged.
         """
 
         if not _is_grid_coord(candidate):
@@ -91,6 +105,12 @@ class ChangeAwareGainCache:
         # Work transactionally so callers never observe a half-replaced
         # candidate, even if the pre-existing state is malformed.
         self.validate()
+        already_reported = visible_unknown & self._reported_known_cells
+        if already_reported:
+            raise ValueError(
+                "exact visible-UNKNOWN set contains already reported known "
+                f"cells: {sorted(already_reported)!r}"
+            )
         next_cached = dict(self._cached_visible_unknown)
         next_bounds = dict(self._bound_counts)
         next_inverse = {
@@ -110,7 +130,12 @@ class ChangeAwareGainCache:
         for cell in visible_unknown:
             next_inverse.setdefault(cell, set()).add(candidate)
 
-        self._validate_state(next_cached, next_bounds, next_inverse)
+        self._validate_state(
+            next_cached,
+            next_bounds,
+            next_inverse,
+            self._reported_known_cells,
+        )
         if next_bounds[candidate] != len(next_cached[candidate]):
             raise RuntimeError("exact installation must create a fresh bound")
 
@@ -118,19 +143,63 @@ class ChangeAwareGainCache:
         self._bound_counts = next_bounds
         self._inverse_incidence = next_inverse
 
+    def apply_newly_known(self, cells: frozenset[Coord]) -> None:
+        """Apply explicit UNKNOWN-to-known revelations exactly once.
+
+        Every first report is recorded for this episode, including a cell
+        absent from the current inverse index. Only affected maintained bounds
+        change; cached exact sets and inverse incidence remain historical and
+        untouched. Duplicate reports are idempotent. The caller is responsible
+        for reporting actual transitions; this layer does not inspect belief.
+        """
+
+        if type(cells) is not frozenset:
+            raise TypeError("cells must be a frozenset")
+        for cell in cells:
+            if not _is_grid_coord(cell):
+                raise ValueError(f"invalid newly-known coordinate: {cell!r}")
+
+        self.validate()
+        newly_reported = cells - self._reported_known_cells
+        if not newly_reported:
+            return
+
+        next_bounds = dict(self._bound_counts)
+        next_reported = set(self._reported_known_cells)
+        for cell in sorted(newly_reported):
+            for candidate in sorted(self._inverse_incidence.get(cell, ())):
+                old_bound = next_bounds[candidate]
+                if old_bound == 0:
+                    raise RuntimeError(
+                        "newly-known decrement would underflow bound for "
+                        f"{candidate} at cell {cell}"
+                    )
+                next_bounds[candidate] = old_bound - 1
+            next_reported.add(cell)
+
+        self._validate_state(
+            self._cached_visible_unknown,
+            next_bounds,
+            self._inverse_incidence,
+            next_reported,
+        )
+        self._bound_counts = next_bounds
+        self._reported_known_cells = next_reported
+
     def validate(self, *, require_fresh_bounds: bool = False) -> None:
         """Raise ``RuntimeError`` when stored cache/index state is malformed.
 
         A maintained bound may be smaller than its exact cached-set size after
-        future revelation processing, but it may never be negative or larger.
+        revelation processing, but it may never be negative or larger.
         ``require_fresh_bounds=True`` additionally checks the state immediately
-        after a future exact installation, where both values must be equal.
+        after exact installation, where both values must be equal.
         """
 
         self._validate_state(
             self._cached_visible_unknown,
             self._bound_counts,
             self._inverse_incidence,
+            self._reported_known_cells,
             require_fresh_bounds=require_fresh_bounds,
         )
 
@@ -139,6 +208,7 @@ class ChangeAwareGainCache:
         cached_visible_unknown: dict[Coord, frozenset[Coord]],
         bound_counts: dict[Coord, int],
         inverse_incidence: dict[Coord, set[Coord]],
+        reported_known_cells: set[Coord],
         *,
         require_fresh_bounds: bool = False,
     ) -> None:
@@ -164,6 +234,14 @@ class ChangeAwareGainCache:
                     )
                 expected_inverse.setdefault(cell, set()).add(candidate)
 
+        if type(reported_known_cells) is not set:
+            raise RuntimeError("reported known cells must be a set")
+        for cell in reported_known_cells:
+            if not _is_grid_coord(cell):
+                raise RuntimeError(
+                    f"invalid reported known coordinate: {cell!r}"
+                )
+
         for candidate, bound in bound_counts.items():
             if not _is_grid_coord(candidate):
                 raise RuntimeError(f"invalid bound candidate coordinate: {candidate!r}")
@@ -177,6 +255,14 @@ class ChangeAwareGainCache:
                 raise RuntimeError(
                     f"bound for {candidate} exceeds cached-set size: "
                     f"{bound} > {cached_size}"
+                )
+            expected_bound = len(
+                cached_visible_unknown[candidate] - reported_known_cells
+            )
+            if bound != expected_bound:
+                raise RuntimeError(
+                    f"maintained-bound accounting invariant violated for "
+                    f"{candidate}: {bound} != {expected_bound}"
                 )
             if require_fresh_bounds and bound != cached_size:
                 raise RuntimeError(

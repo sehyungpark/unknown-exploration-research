@@ -294,3 +294,17 @@ The run metadata needed to reproduce or independently verify these observations 
 - **Unchanged baselines:** Algorithm A and Algorithm B source files and semantics were not modified.
 - **Full suite:** **100 tests passed** on 2026-09-15, including unchanged seven-fixture and frozen-v2 60-map A/B regressions plus 22 focused Algorithm C cache tests.
 - **No research experiment executed:** This entry records implementation verification only; no entry was added to `docs/EXPERIMENT_LOG.md`.
+
+## 2026-09-15 — Algorithm C Stage 3 Monotone Revelation Decrements
+
+- **Verified implementation:** `ChangeAwareGainCache.apply_newly_known(cells)` now accepts an explicit strict `frozenset` of UNKNOWN-to-known coordinates. For each first report, it decrements every candidate in that cell's inverse incidence exactly once.
+- **Verified duplicate protection:** The episode-wide `_reported_known_cells` set records all reported transitions, including cells absent from the current inverse index. Repeated reports and mixed batches containing previously reported cells are idempotent.
+- **Verified maintained invariant:** Validation now requires `bound_counts[v] == len(cached_visible_unknown[v] - reported_known_cells)`. Synthetic monotone UNKNOWN-set progressions with overlapping candidate caches matched the explicit cached-set/intersection cardinality after every batch.
+- **Verified historical semantics:** Revelation processing changes only maintained bounds and revelation-accounting state. Cached exact sets and inverse incidence remain unchanged, so `v in I(c)` if and only if `c in A_tau(v)` continues to hold after cells become known.
+- **Verified atomicity and underflow defense:** Inputs and prior state are validated before mutation; decrements occur on a detached bound copy; the complete proposed state is validated before commit. Malformed batches or inconsistent/underflow-prone state raise without partially applying a batch, and bounds are never clamped.
+- **Verified refresh interaction:** Exact refresh after decrements removes complete old historical memberships, installs the new exact set, and resets its bound to the fresh set size. The episode revelation history remains. `install_exact` rejects any already reported known cell in a new exact visible-UNKNOWN set, making the global accounting design depend explicitly on monotone belief, exact fresh sets containing only current UNKNOWN cells, and no known-to-UNKNOWN reversion.
+- **Verified reset:** `reset()` clears cached sets, bounds, inverse incidence, and the complete reported-revelation history; a new episode cannot inherit duplicate-accounting state.
+- **Verified scope:** No belief-snapshot comparison or delta extraction, exact visibility/raycast integration, candidate generation, Dijkstra, lazy selector, Algorithm C result class, A/C regression, Experiment 0 runner, or Experiment 0 execution was added.
+- **Unchanged baselines:** Algorithm A and Algorithm B source files and semantics were not modified.
+- **Full suite:** **116 tests passed** on 2026-09-15, including 38 focused Algorithm C cache/revelation tests and the unchanged seven-fixture and frozen-v2 60-map A/B regressions.
+- **No research experiment executed:** This entry records implementation verification only; no entry was added to `docs/EXPERIMENT_LOG.md`.

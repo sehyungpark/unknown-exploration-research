@@ -45,7 +45,8 @@ Last updated: 2026-09-15
 - [ ] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
 - [x] Implement Algorithm C Stage 1 state-only cache/index representation, safe diagnostics, reset lifecycle, and invariant validation.
 - [x] Implement Algorithm C Stage 2 atomic exact cached-set installation/replacement, complete old inverse-membership removal, shared-membership preservation, empty-key cleanup, and fresh-bound reset.
-- [ ] Implement Algorithm C UNKNOWN-to-known decrement and belief-delta processing in a later stage.
+- [x] Implement Algorithm C Stage 3 explicit UNKNOWN-to-known processing, once-per-revelation bound decrement, duplicate protection, historical-membership preservation, validation, and atomic rollback.
+- [ ] Integrate Algorithm C belief-delta discovery and exact raycast results with the Stage 2-3 cache APIs in a later stage.
 - [ ] Implement and validate the Algorithm C selector only after cache maintenance is complete.
 - [x] Implement and directly test Algorithm B's tie-aware exact-selection certificate against the exhaustive total rank order.
 - [x] Verify A/B 100% argmax agreement through complete runs on all seven fixed fixtures and all 60 frozen v2 random maps.
