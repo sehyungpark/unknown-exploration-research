@@ -12,13 +12,19 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
     cell_b = (8, 9)
 
     def _populate_valid_state(self, cache: ChangeAwareGainCache) -> None:
-        cache._cached_visible_unknown[self.candidate] = frozenset(
-            {self.cell_a, self.cell_b}
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_a, self.cell_b}),
         )
-        cache._bound_counts[self.candidate] = 2
-        cache._inverse_incidence[self.cell_a] = {self.candidate}
-        cache._inverse_incidence[self.cell_b] = {self.candidate}
         cache.validate(require_fresh_bounds=True)
+
+    @staticmethod
+    def _snapshot(cache: ChangeAwareGainCache) -> tuple[dict, dict, dict]:
+        return (
+            dict(cache.cached_visible_unknown),
+            dict(cache.bound_counts),
+            dict(cache.inverse_incidence),
+        )
 
     def test_fresh_state_is_empty_and_valid(self) -> None:
         cache = ChangeAwareGainCache()
@@ -55,6 +61,10 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
     def test_diagnostics_cannot_mutate_internal_state(self) -> None:
         cache = ChangeAwareGainCache()
         self._populate_valid_state(cache)
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_a, self.cell_b}),
+        )
         cached = cache.cached_visible_unknown
         bounds = cache.bound_counts
         inverse = cache.inverse_incidence
@@ -168,11 +178,201 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "must equal cached-set size"):
             maintained.validate(require_fresh_bounds=True)
 
-    def test_stage_one_has_no_selector_or_dynamic_update_operations(self) -> None:
+    def test_first_exact_installation_populates_all_state_families(self) -> None:
+        cache = ChangeAwareGainCache()
+
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_a, self.cell_b}),
+        )
+
+        self.assertEqual(
+            cache.cached_visible_unknown[self.candidate],
+            frozenset({self.cell_a, self.cell_b}),
+        )
+        self.assertEqual(cache.bound_counts[self.candidate], 2)
+        self.assertEqual(
+            cache.inverse_incidence[self.cell_a], frozenset({self.candidate})
+        )
+        self.assertEqual(
+            cache.inverse_incidence[self.cell_b], frozenset({self.candidate})
+        )
+        cache.validate(require_fresh_bounds=True)
+
+    def test_empty_exact_set_initializes_candidate_without_inverse_keys(self) -> None:
+        cache = ChangeAwareGainCache()
+
+        cache.install_exact(self.candidate, frozenset())
+
+        self.assertEqual(cache.cached_visible_unknown[self.candidate], frozenset())
+        self.assertEqual(cache.bound_counts[self.candidate], 0)
+        self.assertEqual(cache.inverse_incidence, {})
+        cache.validate(require_fresh_bounds=True)
+
+    def test_replacement_removes_old_and_installs_new_memberships(self) -> None:
+        cache = ChangeAwareGainCache()
+        cell_c = (10, 11)
+        cell_d = (12, 13)
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_a, self.cell_b, cell_c}),
+        )
+
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_b, cell_d}),
+        )
+
+        self.assertEqual(
+            cache.cached_visible_unknown[self.candidate],
+            frozenset({self.cell_b, cell_d}),
+        )
+        self.assertEqual(cache.bound_counts[self.candidate], 2)
+        self.assertNotIn(self.cell_a, cache.inverse_incidence)
+        self.assertNotIn(cell_c, cache.inverse_incidence)
+        self.assertEqual(
+            cache.inverse_incidence[self.cell_b], frozenset({self.candidate})
+        )
+        self.assertEqual(
+            cache.inverse_incidence[cell_d], frozenset({self.candidate})
+        )
+        cache.validate(require_fresh_bounds=True)
+
+    def test_refresh_preserves_other_candidate_shared_membership(self) -> None:
+        cache = ChangeAwareGainCache()
+        cell_c = (10, 11)
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_a, self.cell_b}),
+        )
+        cache.install_exact(
+            self.other_candidate,
+            frozenset({self.cell_b, cell_c}),
+        )
+
+        cache.install_exact(self.candidate, frozenset({self.cell_a}))
+
+        self.assertEqual(
+            cache.inverse_incidence[self.cell_b],
+            frozenset({self.other_candidate}),
+        )
+        self.assertEqual(
+            cache.inverse_incidence[cell_c], frozenset({self.other_candidate})
+        )
+        cache.validate(require_fresh_bounds=True)
+
+    def test_refresh_removes_inverse_key_when_last_membership_leaves(self) -> None:
+        cache = ChangeAwareGainCache()
+        cache.install_exact(self.candidate, frozenset({self.cell_a}))
+
+        cache.install_exact(self.candidate, frozenset())
+
+        self.assertNotIn(self.cell_a, cache.inverse_incidence)
+        self.assertEqual(cache.inverse_incidence, {})
+        cache.validate(require_fresh_bounds=True)
+
+    def test_reinstall_same_set_is_deterministic_and_restores_fresh_bound(self) -> None:
+        cache = ChangeAwareGainCache()
+        exact_set = frozenset({self.cell_a, self.cell_b})
+        cache.install_exact(self.candidate, exact_set)
+        fresh_snapshot = self._snapshot(cache)
+        cache._bound_counts[self.candidate] = 1
+        cache.validate()
+
+        cache.install_exact(self.candidate, exact_set)
+
+        self.assertEqual(self._snapshot(cache), fresh_snapshot)
+        cache.validate(require_fresh_bounds=True)
+
+    def test_refresh_discards_decremented_bound_and_uses_new_exact_size(self) -> None:
+        cache = ChangeAwareGainCache()
+        cell_c = (10, 11)
+        cell_d = (12, 13)
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_a, self.cell_b, cell_c}),
+        )
+        cache._bound_counts[self.candidate] = 1
+        cache.validate()
+
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_b, cell_d}),
+        )
+
+        self.assertEqual(cache.bound_counts[self.candidate], 2)
+        self.assertEqual(
+            cache.cached_visible_unknown[self.candidate],
+            frozenset({self.cell_b, cell_d}),
+        )
+        cache.validate(require_fresh_bounds=True)
+
+    def test_known_cell_regression_removes_from_complete_old_cached_set(self) -> None:
+        cache = ChangeAwareGainCache()
+        cell_c = (10, 11)
+        cell_d = (12, 13)
+        cache.install_exact(
+            self.candidate,
+            frozenset({self.cell_a, self.cell_b, cell_c}),
+        )
+        # Future Stage 3 may decrement the bound while retaining every old
+        # cached-set membership, including cells that have become known.
+        cache._bound_counts[self.candidate] = 1
+        cache.validate()
+
+        cache.install_exact(
+            self.candidate,
+            frozenset({cell_c, cell_d}),
+        )
+
+        self.assertNotIn(self.cell_a, cache.inverse_incidence)
+        self.assertNotIn(self.cell_b, cache.inverse_incidence)
+        self.assertEqual(
+            cache.cached_visible_unknown[self.candidate],
+            frozenset({cell_c, cell_d}),
+        )
+        self.assertEqual(cache.bound_counts[self.candidate], 2)
+        self.assertEqual(
+            cache.inverse_incidence,
+            {
+                cell_c: frozenset({self.candidate}),
+                cell_d: frozenset({self.candidate}),
+            },
+        )
+        cache.validate(require_fresh_bounds=True)
+
+    def test_invalid_installation_inputs_raise_atomically(self) -> None:
+        cache = ChangeAwareGainCache()
+        self._populate_valid_state(cache)
+        original = self._snapshot(cache)
+        invalid_cases = (
+            ((-1, 3), frozenset({self.cell_a}), ValueError),
+            ((True, 3), frozenset({self.cell_a}), ValueError),
+            ((2.0, 3), frozenset({self.cell_a}), ValueError),
+            ((2,), frozenset({self.cell_a}), ValueError),
+            (self.candidate, {self.cell_a}, TypeError),
+            (self.candidate, frozenset({(-1, 7)}), ValueError),
+            (self.candidate, frozenset({(True, 7)}), ValueError),
+        )
+
+        for candidate, visible_unknown, error_type in invalid_cases:
+            with self.subTest(candidate=candidate, visible_unknown=visible_unknown):
+                with self.assertRaises(error_type):
+                    cache.install_exact(candidate, visible_unknown)
+                self.assertEqual(self._snapshot(cache), original)
+                cache.validate(require_fresh_bounds=True)
+
+    def test_stage_two_has_only_exact_installation_not_future_operations(self) -> None:
         cache = ChangeAwareGainCache()
         source = inspect.getsource(cache_module)
 
         self.assertFalse(hasattr(cache, "plan"))
+        self.assertFalse(hasattr(cache, "decrement"))
+        self.assertFalse(hasattr(cache, "apply_observations"))
+        self.assertFalse(hasattr(cache, "apply_known_cells"))
+        self.assertFalse(hasattr(cache, "update_from_belief"))
+        self.assertFalse(hasattr(cache, "process_delta"))
+        self.assertFalse(hasattr(cache_module, "ChangeAwareNBVResult"))
         self.assertNotIn("dijkstra", source.lower())
         self.assertNotIn("optimistic_visible_unknown_cells", source)
         self.assertNotIn("candidate_rank_key", source)
@@ -186,6 +386,7 @@ class ChangeAwareGainCacheTests(unittest.TestCase):
             {
                 "bound_counts",
                 "cached_visible_unknown",
+                "install_exact",
                 "inverse_incidence",
                 "reset",
                 "validate",

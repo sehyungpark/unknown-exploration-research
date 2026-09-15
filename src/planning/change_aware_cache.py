@@ -1,4 +1,4 @@
-"""Episode-scoped state foundation for the future change-aware NBV method."""
+"""Episode-scoped cache/index state for the future change-aware NBV method."""
 
 from collections.abc import Mapping
 from types import MappingProxyType
@@ -15,17 +15,19 @@ def _is_grid_coord(value: object) -> bool:
 
 
 class ChangeAwareGainCache:
-    """Store Algorithm C cache/index state without selection or update logic.
+    """Store Algorithm C exact cached sets, bounds, and inverse incidence.
 
     State is valid only within one exploration episode under the frozen
     static-world, monotone-belief, and immutable-viewpoint assumptions. Reuse
     for a new environment requires :meth:`reset`, or a new state instance.
     Sensor geometry and candidate-identity configuration are external to this
-    Stage 1 state object and must remain compatible for the whole episode.
+    cache object and must remain compatible for the whole episode.
 
-    Stage 1 deliberately exposes no cache installation, removal, exact
-    refresh, observation-delta, decrement, or selection operation. Later
-    stages must add those operations without exposing raw mutable state.
+    Stage 2 supports only atomic first installation and exact replacement of
+    an already-computed visible-UNKNOWN set. It deliberately performs no
+    raycasting, observation-delta processing, bound decrement, or selection.
+    The inverse index always represents the complete installed cached set;
+    later bound decrements must not remove those historical memberships.
     """
 
     def __init__(self) -> None:
@@ -62,6 +64,60 @@ class ChangeAwareGainCache:
         self._bound_counts.clear()
         self._inverse_incidence.clear()
 
+    def install_exact(
+        self,
+        candidate: Coord,
+        visible_unknown: frozenset[Coord],
+    ) -> None:
+        """Atomically install or replace one candidate's exact cached set.
+
+        ``visible_unknown`` must already have been computed exactly by the
+        caller. Replacement removes memberships using the complete old cached
+        set, installs the new memberships, and resets the maintained bound to
+        the new exact-set size. Input or state validation failures leave the
+        prior state unchanged.
+        """
+
+        if not _is_grid_coord(candidate):
+            raise ValueError(f"invalid candidate coordinate: {candidate!r}")
+        if type(visible_unknown) is not frozenset:
+            raise TypeError("visible_unknown must be a frozenset")
+        for cell in visible_unknown:
+            if not _is_grid_coord(cell):
+                raise ValueError(
+                    f"invalid visible-UNKNOWN coordinate: {cell!r}"
+                )
+
+        # Work transactionally so callers never observe a half-replaced
+        # candidate, even if the pre-existing state is malformed.
+        self.validate()
+        next_cached = dict(self._cached_visible_unknown)
+        next_bounds = dict(self._bound_counts)
+        next_inverse = {
+            cell: set(candidates)
+            for cell, candidates in self._inverse_incidence.items()
+        }
+
+        old_visible_unknown = next_cached.get(candidate, frozenset())
+        for cell in old_visible_unknown:
+            candidates = next_inverse[cell]
+            candidates.remove(candidate)
+            if not candidates:
+                del next_inverse[cell]
+
+        next_cached[candidate] = visible_unknown
+        next_bounds[candidate] = len(visible_unknown)
+        for cell in visible_unknown:
+            next_inverse.setdefault(cell, set()).add(candidate)
+
+        self._validate_state(next_cached, next_bounds, next_inverse)
+        if next_bounds[candidate] != len(next_cached[candidate]):
+            raise RuntimeError("exact installation must create a fresh bound")
+
+        self._cached_visible_unknown = next_cached
+        self._bound_counts = next_bounds
+        self._inverse_incidence = next_inverse
+
     def validate(self, *, require_fresh_bounds: bool = False) -> None:
         """Raise ``RuntimeError`` when stored cache/index state is malformed.
 
@@ -71,15 +127,30 @@ class ChangeAwareGainCache:
         after a future exact installation, where both values must be equal.
         """
 
-        cached_candidates = set(self._cached_visible_unknown)
-        bound_candidates = set(self._bound_counts)
+        self._validate_state(
+            self._cached_visible_unknown,
+            self._bound_counts,
+            self._inverse_incidence,
+            require_fresh_bounds=require_fresh_bounds,
+        )
+
+    @staticmethod
+    def _validate_state(
+        cached_visible_unknown: dict[Coord, frozenset[Coord]],
+        bound_counts: dict[Coord, int],
+        inverse_incidence: dict[Coord, set[Coord]],
+        *,
+        require_fresh_bounds: bool = False,
+    ) -> None:
+        cached_candidates = set(cached_visible_unknown)
+        bound_candidates = set(bound_counts)
         if cached_candidates != bound_candidates:
             raise RuntimeError(
                 "cached-set and bound-count candidate keys must match"
             )
 
         expected_inverse: dict[Coord, set[Coord]] = {}
-        for candidate, visible_unknown in self._cached_visible_unknown.items():
+        for candidate, visible_unknown in cached_visible_unknown.items():
             if not _is_grid_coord(candidate):
                 raise RuntimeError(f"invalid cached candidate coordinate: {candidate!r}")
             if type(visible_unknown) is not frozenset:
@@ -93,7 +164,7 @@ class ChangeAwareGainCache:
                     )
                 expected_inverse.setdefault(cell, set()).add(candidate)
 
-        for candidate, bound in self._bound_counts.items():
+        for candidate, bound in bound_counts.items():
             if not _is_grid_coord(candidate):
                 raise RuntimeError(f"invalid bound candidate coordinate: {candidate!r}")
             if type(bound) is not int or bound < 0:
@@ -101,7 +172,7 @@ class ChangeAwareGainCache:
                     f"invalid bound for {candidate}: expected nonnegative int, "
                     f"got {bound!r}"
                 )
-            cached_size = len(self._cached_visible_unknown[candidate])
+            cached_size = len(cached_visible_unknown[candidate])
             if bound > cached_size:
                 raise RuntimeError(
                     f"bound for {candidate} exceeds cached-set size: "
@@ -114,7 +185,7 @@ class ChangeAwareGainCache:
                 )
 
         actual_inverse: dict[Coord, set[Coord]] = {}
-        for cell, candidates in self._inverse_incidence.items():
+        for cell, candidates in inverse_incidence.items():
             if not _is_grid_coord(cell):
                 raise RuntimeError(f"invalid inverse cell coordinate: {cell!r}")
             if type(candidates) is not set:

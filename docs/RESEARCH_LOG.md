@@ -282,3 +282,15 @@ The run metadata needed to reproduce or independently verify these observations 
 - **Unchanged:** Algorithm A, Algorithm B, simulator, candidate, sensing, motion, score, tie, fixture, dataset, and CI workflow semantics were not modified.
 - **Full suite:** **91 tests passed** on 2026-09-15, including the unchanged seven-fixture and frozen-v2 60-map A/B regressions.
 - **No research experiment executed:** This entry records implementation verification only; Algorithm C remains incomplete.
+
+## 2026-09-15 — Algorithm C Stage 2 Exact Cache Installation and Refresh
+
+- **Verified implementation:** `ChangeAwareGainCache.install_exact(candidate, visible_unknown)` now handles both first exact installation and exact replacement of an already initialized candidate. The operation accepts an already-computed strict `frozenset` of valid grid coordinates and performs no visibility calculation itself.
+- **Verified first-install semantics:** The exact set is stored unchanged, the maintained bound is initialized to its cardinality, and the inverse index receives the candidate for every cached cell. Installing an empty set still initializes the candidate and its zero bound without creating empty inverse entries.
+- **Verified refresh semantics:** Replacement removes the candidate by iterating the complete old cached set, not the old maintained bound or current belief. It then stores the new exact set, resets the bound to the new cardinality, installs all new inverse memberships, preserves other candidates on shared cells, and deletes an inverse cell key only when its membership set becomes empty.
+- **Verified conceptual distinction:** Inverse incidence represents all cells in the installed historical exact set `A_tau(v)`, not merely cells that remain UNKNOWN. A structurally valid future-compatible state with cached-set size 3 and maintained bound 1 is accepted. Refresh from that state removes all old memberships, installs the new exact set, and resets its bound to the new exact size.
+- **Verified atomicity and diagnostics:** Candidate, exact-set type, and cell coordinates are validated before mutation. Replacement is built and structurally validated on detached copies before the three live state families are swapped, so rejected malformed inputs preserve the prior state. Public diagnostics remain detached and immutable after installation.
+- **Verified scope:** No revelation-driven decrement, belief-delta processing, exact visibility/raycast computation, lazy selector, Algorithm C result class, A/C regression, Experiment 0 runner, or Experiment 0 execution was added.
+- **Unchanged baselines:** Algorithm A and Algorithm B source files and semantics were not modified.
+- **Full suite:** **100 tests passed** on 2026-09-15, including unchanged seven-fixture and frozen-v2 60-map A/B regressions plus 22 focused Algorithm C cache tests.
+- **No research experiment executed:** This entry records implementation verification only; no entry was added to `docs/EXPERIMENT_LOG.md`.
