@@ -42,11 +42,12 @@ Last updated: 2026-09-15
 - [x] Accept the exhaustive reference as the current correctness oracle after the 39-test suite passes.
 - [ ] Implement the Experiment 0 cross-method cycle logger and immutable failure-artifact writer when Algorithms B/C are available.
 - [x] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
-- [ ] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
+- [x] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
 - [x] Implement Algorithm C Stage 1 state-only cache/index representation, safe diagnostics, reset lifecycle, and invariant validation.
 - [x] Implement Algorithm C Stage 2 atomic exact cached-set installation/replacement, complete old inverse-membership removal, shared-membership preservation, empty-key cleanup, and fresh-bound reset.
 - [x] Implement Algorithm C Stage 3 explicit UNKNOWN-to-known processing, once-per-revelation bound decrement, duplicate protection, historical-membership preservation, validation, and atomic rollback.
-- [ ] Integrate Algorithm C belief-delta discovery and exact raycast results with the Stage 2-3 cache APIs in a later stage.
+- [x] Integrate Algorithm C immutable belief-snapshot delta discovery, revelation synchronization, and existing optimistic-visibility exact refresh with the Stage 2-3 cache APIs.
+- [x] Verify on actual belief transitions that maintained bounds equal cached-set/current-UNKNOWN intersections, dominate exact current gain, may be strictly loose after a new OCCUPIED blocker, and return to equality after exact refresh.
 - [ ] Implement and validate the Algorithm C selector only after cache maintenance is complete.
 - [x] Implement and directly test Algorithm B's tie-aware exact-selection certificate against the exhaustive total rank order.
 - [x] Verify A/B 100% argmax agreement through complete runs on all seven fixed fixtures and all 60 frozen v2 random maps.

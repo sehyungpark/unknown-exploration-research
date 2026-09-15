@@ -1,6 +1,12 @@
 """Planning algorithms and state foundations."""
 
 from .change_aware_cache import ChangeAwareGainCache
+from .change_aware_integration import (
+    BeliefSnapshot,
+    exact_refresh_candidate,
+    newly_known_cells,
+    synchronize_revelations,
+)
 from .exhaustive_nbv import (
     CandidateEvaluation,
     ExhaustiveNBVResult,
@@ -18,6 +24,7 @@ from .stale_scalar_lazy_nbv import (
 
 __all__ = [
     "CandidateEvaluation",
+    "BeliefSnapshot",
     "ChangeAwareGainCache",
     "DijkstraResult",
     "ExhaustiveNBVResult",
@@ -26,7 +33,10 @@ __all__ = [
     "StaleLazyNBVResult",
     "StaleScalarLazyNBV",
     "dijkstra",
+    "exact_refresh_candidate",
     "exhaustive_nbv",
+    "newly_known_cells",
     "optimistic_rank_state",
+    "synchronize_revelations",
     "tie_aware_rank_certificate",
 ]
