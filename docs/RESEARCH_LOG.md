@@ -262,3 +262,12 @@ The run metadata needed to reproduce or independently verify these observations 
 - **No new pre-existing simulator or exhaustive-oracle bug was found.** The first targeted Algorithm B unit, fixture, and frozen-v2 regression runs completed without a target, bound, sequence, termination, or tie failure, so no outcome-driven algorithm correction was made.
 - This was baseline implementation and development correctness regression, not the preregistered three-method Experiment 0 and not an efficiency experiment. No runtime advantage, speedup, or aggregate performance result is claimed.
 - **Not implemented:** Algorithm C cached visible-UNKNOWN sets, cached-intersection bounds, inverse incidence, decremental maintenance, priority queues, and C comparison.
+
+## 2026-09-15 — Algorithm B Episode Lifecycle Hardening
+
+- **Verified contract:** Algorithm B's scalar cache is valid only within one exploration episode under the frozen static/monotone assumptions. Reusing a planner for a new environment now requires explicit `reset()`; creating a new planner per episode remains valid.
+- **Implemented:** Public `reset()` clears every cached scalar gain while preserving the fixed sensor-range configuration. The operation is idempotent, and the next plan treats eligible coordinates as first-seen candidates requiring exact initialization.
+- **Verified:** A same coordinate with different exact gains in two map-like snapshots cannot inherit the first episode's stale scalar after reset. Same-episode calls without reset continue to reuse valid stale gains.
+- **No algorithmic change:** Selection, stale upper bounds, exact visibility evaluation, current Dijkstra distances, score, deterministic tie certificate, completion certificate, and cache-refresh semantics are unchanged. No heuristic automatic reset was added.
+- **Regression result:** The full **78-test** suite passed. All seven fixed fixtures and all 60 frozen v2 random maps retained exact A/B target and terminal-sequence agreement. Target mismatches: **0**; sequence/termination divergences: **0**; stale-bound violations: **0**.
+- **Scope:** This is lifecycle hardening, not an Algorithm B research-method change or experiment. Algorithm C remains unimplemented.

@@ -66,7 +66,9 @@ class StaleScalarCacheLifecycleTests(unittest.TestCase):
         candidates: tuple[tuple[int, int], ...],
         distances: dict[tuple[int, int], float],
         gains: dict[tuple[int, int], int],
+        belief=None,
     ):
+        planning_belief = self.belief if belief is None else belief
         all_distances = {robot: 0.0, **distances}
         search_result = DijkstraResult(
             source=robot,
@@ -90,11 +92,129 @@ class StaleScalarCacheLifecycleTests(unittest.TestCase):
                 side_effect=visible,
             ) as exact_visibility,
         ):
-            result = planner.plan(self.belief, robot)
+            result = planner.plan(planning_belief, robot)
 
-        search.assert_called_once_with(self.belief, robot)
-        generate.assert_called_once_with(self.belief, robot, all_distances)
+        search.assert_called_once_with(planning_belief, robot)
+        generate.assert_called_once_with(planning_belief, robot, all_distances)
         return result, exact_visibility
+
+    def test_reset_clears_populated_cache(self) -> None:
+        planner = StaleScalarLazyNBV()
+        self._plan_snapshot(
+            planner,
+            robot=self.robot,
+            candidates=(self.a,),
+            distances={self.a: 1.0},
+            gains={self.a: 3},
+        )
+        self.assertEqual(planner.cached_gains, {self.a: 3})
+
+        planner.reset()
+
+        self.assertEqual(planner.cached_gains, {})
+
+    def test_reset_preserves_sensor_configuration(self) -> None:
+        planner = StaleScalarLazyNBV(sensor_range=3.5)
+
+        planner.reset()
+
+        self.assertEqual(planner.sensor_range, 3.5)
+
+    def test_post_reset_candidates_are_exact_initialized_as_first_seen(self) -> None:
+        planner = StaleScalarLazyNBV()
+        self._plan_snapshot(
+            planner,
+            robot=self.robot,
+            candidates=(self.a, self.b),
+            distances={self.a: 1.0, self.b: 2.0},
+            gains={self.a: 5, self.b: 2},
+        )
+        planner.reset()
+
+        result, exact_visibility = self._plan_snapshot(
+            planner,
+            robot=self.robot,
+            candidates=(self.a, self.b),
+            distances={self.a: 1.0, self.b: 2.0},
+            gains={self.a: 4, self.b: 1},
+        )
+
+        self.assertEqual(result.exact_gain_evaluations, 2)
+        self.assertEqual(exact_visibility.call_count, 2)
+        for record in result.candidate_records:
+            self.assertIsNone(record.stale_upper_gain)
+            self.assertTrue(record.exact_evaluated_this_cycle)
+            self.assertTrue(record.cache_refreshed)
+        self.assertEqual(planner.cached_gains, {self.a: 4, self.b: 1})
+
+    def test_reset_prevents_same_coordinate_cache_leak_between_maps(self) -> None:
+        planner = StaleScalarLazyNBV()
+        episode_a = belief_from_ascii(("...",))
+        episode_b = belief_from_ascii(("..??",))
+        self._plan_snapshot(
+            planner,
+            belief=episode_a,
+            robot=self.robot,
+            candidates=(self.a,),
+            distances={self.a: 1.0},
+            gains={self.a: 1},
+        )
+        planner.reset()
+
+        result, _ = self._plan_snapshot(
+            planner,
+            belief=episode_b,
+            robot=self.robot,
+            candidates=(self.a,),
+            distances={self.a: 1.0},
+            gains={self.a: 7},
+        )
+
+        self.assertIsNone(result.candidate_records[0].stale_upper_gain)
+        self.assertEqual(result.candidate_records[0].exact_gain, 7)
+        self.assertEqual(planner.cached_gains, {self.a: 7})
+
+    def test_reset_is_idempotent_for_empty_and_populated_cache(self) -> None:
+        planner = StaleScalarLazyNBV()
+        planner.reset()
+        planner.reset()
+        self.assertEqual(planner.cached_gains, {})
+        self._plan_snapshot(
+            planner,
+            robot=self.robot,
+            candidates=(self.a,),
+            distances={self.a: 1.0},
+            gains={self.a: 2},
+        )
+
+        planner.reset()
+        planner.reset()
+
+        self.assertEqual(planner.cached_gains, {})
+
+    def test_same_episode_does_not_automatically_clear_stale_cache(self) -> None:
+        planner = StaleScalarLazyNBV()
+        self._plan_snapshot(
+            planner,
+            robot=self.robot,
+            candidates=(self.a, self.b),
+            distances={self.a: 1.0, self.b: 2.0},
+            gains={self.a: 5, self.b: 1},
+        )
+
+        result, _ = self._plan_snapshot(
+            planner,
+            robot=self.robot,
+            candidates=(self.a, self.b),
+            distances={self.a: 3.0, self.b: 1.0},
+            gains={self.a: 4, self.b: 1},
+        )
+
+        by_candidate = {record.candidate: record for record in result.candidate_records}
+        self.assertEqual(by_candidate[self.a].stale_upper_gain, 5)
+        self.assertEqual(by_candidate[self.b].stale_upper_gain, 1)
+        self.assertEqual(result.exact_gain_evaluations, 1)
+        self.assertEqual(result.bound_only_candidate_count, 1)
 
     def test_first_seen_candidates_initialize_independent_scalar_entries(self) -> None:
         planner = StaleScalarLazyNBV()

@@ -48,6 +48,7 @@ Last updated: 2026-09-15
 - [x] Verify A/B 100% target-sequence and termination agreement in development regressions before any speed claim.
 - [x] Verify Algorithm B stale-bound admissibility externally against Algorithm A on every shared regression snapshot.
 - [x] Demonstrate at least one deterministic case of safe exact-evaluation skipping without interpreting it as a performance result.
+- [x] Harden Algorithm B's episode lifecycle with explicit idempotent reset, configuration preservation, first-seen reinitialization, and cross-environment leakage tests.
 
 ## P3 — Empirical Value Gate
 

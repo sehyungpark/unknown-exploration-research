@@ -92,9 +92,10 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - Deterministic independent-Bernoulli random-map generation with local RNG state, connected-component/start selection, total-grid-cell component acceptance, acceptance/rejection records, v2 map materialization, and frozen config validation. Corrected v2 retains candidate index 34 as its one rejection; normal seed consumption changes 26 ID-indexed accepted seeds/hashes from invalid v1.
 - Shared canonical SHA-256 utilities for ground truth (`./#`) and belief (`?/.#`) with fixed row order and final LF.
 - Stateful Algorithm B with a scalar-only `candidate coordinate -> last exact gain` cache, exact initialization for first-seen eligible candidates, current-snapshot distances, direct exact visibility evaluation, tie-aware lazy certification, and all-zero-upper-bound completion.
+- Algorithm B's stale cache is explicitly episode-scoped. Public `reset()` clears only cached gains before planner reuse on a new environment while preserving the fixed sensor-range configuration; no heuristic automatic reset is performed.
 - Structured Algorithm B results expose per-cycle exact-evaluation counts, bound-only counts, certificate reasons, selected current-exact values, and candidate-level stale/exact/cache-refresh diagnostics.
 - A/B shared-snapshot development regressions cover complete exploration on all seven fixed fixtures and every accepted map in frozen `experiment-0-random-v2`; stale-bound violations, target mismatches, and sequence/termination divergences were all zero.
-- The 72-test suite passed on 2026-09-15. It includes direct synthetic tie-certificate cases, scalar-cache lifecycle/invariant checks, and a deterministic case where B safely selects the same target with fewer exact evaluations than A. These are correctness checks, not performance results.
+- The 78-test suite passed on 2026-09-15. It includes direct synthetic tie-certificate cases, scalar-cache lifecycle/invariant/reset checks, cross-environment leakage prevention, and a deterministic case where B safely selects the same target with fewer exact evaluations than A. These are correctness checks, not performance results.
 - No cached visible-UNKNOWN sets, inverse-incidence index, decrement-on-revelation maintenance, priority queue, Algorithm C selector, or C comparison has been implemented.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
@@ -122,7 +123,7 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 
 ## Next Steps
 
-1. Review the stale-scalar exact-lazy baseline and retain its A/B development regressions as the correctness baseline.
+1. Retain the stale-scalar exact-lazy baseline, its explicit per-episode reset contract, and its A/B development regressions as the correctness baseline.
 2. Implement the change-aware Candidate 1 method without changing the frozen Algorithm A/B semantics.
 3. Implement the cross-method Experiment 0 runner and immutable failure-artifact writer against the frozen schemas.
 4. Execute Experiment 0 and require zero target, sequence, bound, tie, and invariant violations.

@@ -85,7 +85,14 @@ def tie_aware_rank_certificate(
 
 
 class StaleScalarLazyNBV:
-    """Exact-lazy NBV using only the last exact scalar gain as a cache."""
+    """Exact-lazy NBV using only the last exact scalar gain as a cache.
+
+    A planner cache is valid only within one exploration episode under the
+    frozen static-world and monotone-belief assumptions. Call :meth:`reset`
+    before reusing an instance for a new environment, or create one planner
+    instance per episode. A change to sensor geometry or range requires a new
+    compatible planner/configuration rather than reuse of this stale cache.
+    """
 
     def __init__(self, sensor_range: float = 8) -> None:
         if sensor_range < 0:
@@ -104,6 +111,11 @@ class StaleScalarLazyNBV:
         """Return a detached scalar-only snapshot of the persistent cache."""
 
         return dict(self._cached_gains)
+
+    def reset(self) -> None:
+        """Clear episode-specific stale gains while preserving configuration."""
+
+        self._cached_gains.clear()
 
     def _validate_cache(self) -> None:
         for candidate, gain in self._cached_gains.items():
