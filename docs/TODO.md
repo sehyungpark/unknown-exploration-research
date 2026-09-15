@@ -41,11 +41,13 @@ Last updated: 2026-09-15
 - [x] Run every deterministic fixture twice to explicit stop with identical traces and invariant checks.
 - [x] Accept the exhaustive reference as the current correctness oracle after the 39-test suite passes.
 - [ ] Implement the Experiment 0 cross-method cycle logger and immutable failure-artifact writer when Algorithms B/C are available.
-- [ ] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
+- [x] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
 - [ ] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
-- [ ] Implement tie-aware exact-selection certificate.
-- [ ] Verify 100% argmax agreement with exhaustive NBV on all deterministic correctness tests.
-- [ ] Verify 100% target-sequence agreement on exploratory runs before any speed claim.
+- [x] Implement and directly test Algorithm B's tie-aware exact-selection certificate against the exhaustive total rank order.
+- [x] Verify A/B 100% argmax agreement through complete runs on all seven fixed fixtures and all 60 frozen v2 random maps.
+- [x] Verify A/B 100% target-sequence and termination agreement in development regressions before any speed claim.
+- [x] Verify Algorithm B stale-bound admissibility externally against Algorithm A on every shared regression snapshot.
+- [x] Demonstrate at least one deterministic case of safe exact-evaluation skipping without interpreting it as a performance result.
 
 ## P3 — Empirical Value Gate
 

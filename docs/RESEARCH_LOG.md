@@ -234,3 +234,31 @@ The run metadata needed to reproduce or independently verify these observations 
 - **Full suite:** 60 tests passed on 2026-09-15 (39 existing simulator/oracle tests plus 21 corrected dataset/hash/config tests).
 - **Scope:** This was a dataset correction and test/refreeze operation, not an A/B/C correctness experiment or performance benchmark. The logging/failure-artifact schema did not require a change.
 - **Still not implemented:** Algorithms B/C, inverse-index runtime state, lazy certificates, the cross-method runner, and performance benchmarking remain absent.
+
+## 2026-09-15 — Algorithm B Stale-Scalar Exact-Lazy Baseline
+
+### Implementation and Semantics
+
+- **Implemented:** Algorithm B is now a stateful planner independent of Algorithm A. It does not call `exhaustive_nbv`, read exhaustive evaluations, or obtain skipped exact gains from the oracle.
+- **Cache semantics:** The persistent cache contains only `candidate coordinate -> last exact nonnegative integer gain`. Ineligible coordinates, including the current robot coordinate, retain their entries for valid later reuse; no visible-UNKNOWN sets or inverse incidence are stored.
+- **New-candidate policy:** Every currently eligible candidate without a cache entry is evaluated exactly in that snapshot, and that exact gain initializes its scalar entry.
+- **Current-distance rule:** Every planning call performs one Dijkstra search on the frozen current belief. Stale gains are combined only with current exact distances; distances are never cached across snapshots.
+- **Exact evaluation:** B directly calls the common optimistic visible-UNKNOWN computation. Exact reevaluation refreshes only that candidate's scalar gain.
+- **Tie-aware certificate:** The current best exact candidate is selected only when its exhaustive rank key is strictly earlier than every remaining candidate's optimistic rank key formed from stale upper gain, current distance, score, and immutable coordinate. A numeric score `>=` check alone is not used.
+- **Completion certificate:** B stops only when the eligible set is empty or every current exact/stale gain upper bound is zero.
+
+### Development Correctness Regression
+
+- **Verified:** All seven fixed fixtures matched Algorithm A at every shared frozen snapshot through the same terminal stop event. Target mismatches: **0**. Sequence/termination divergences: **0**.
+- **Verified:** All 60 accepted maps in frozen `experiment-0-random-v2` were regenerated only from their canonical records and rechecked against the recorded seed, map hash, start, and cycle limit. A/B target mismatches: **0**. Sequence/termination divergences: **0**.
+- **Verified:** Every checked persistent stale scalar dominated Algorithm A's independent current exact gain. Stale-bound violations: **0**.
+- **Verified:** Synthetic certificate tests cover clear score dominance; equal-score gain ordering in both directions; equal-score/equal-gain distance ordering; and full numeric ties resolved by coordinate. Tie-certificate violations: **0**.
+- **Verified:** Cache lifecycle tests cover exact first-seen initialization, independent refresh/retention, current-distance recomputation, temporary current-robot exclusion and reuse, zero-bound completion, nonnegative scalar enforcement, and single-entry update isolation.
+- **Verified:** At least one deterministic shared-snapshot run selected the same target as A while safely leaving at least one eligible candidate bound-only for that cycle.
+- **Full suite:** **72 tests passed** on 2026-09-15.
+
+### Bug Findings and Scope
+
+- **No new pre-existing simulator or exhaustive-oracle bug was found.** The first targeted Algorithm B unit, fixture, and frozen-v2 regression runs completed without a target, bound, sequence, termination, or tie failure, so no outcome-driven algorithm correction was made.
+- This was baseline implementation and development correctness regression, not the preregistered three-method Experiment 0 and not an efficiency experiment. No runtime advantage, speedup, or aggregate performance result is claimed.
+- **Not implemented:** Algorithm C cached visible-UNKNOWN sets, cached-intersection bounds, inverse incidence, decremental maintenance, priority queues, and C comparison.

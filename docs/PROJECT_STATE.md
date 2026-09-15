@@ -11,9 +11,10 @@ Last updated: 2026-09-15
 - Candidate 1 has received a **provisional novelty pass with high risk and a narrow claim only** after full-method comparison with major close prior art.
 - The empirical-value gate remains open.
 - The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented, oracle-hardened, and pass the current correctness suite.
-- Experiment 0 exact-equivalence validation is preregistered but has not been executed because Algorithms B and C do not yet exist.
+- Experiment 0 exact-equivalence validation is preregistered but has not been executed because Algorithm C and the full A/B/C runner do not yet exist.
 - Experiment 0's corrected `experiment-0-random-v2` 60-map correctness dataset, seed list, hashes, start/acceptance rules, cycle limits, per-cycle logging schema, and failure-artifact convention are frozen. The invalid v1 denominator was detected and corrected before Algorithms B/C or Experiment 0 execution.
-- Stale-scalar lazy and proposed change-aware lazy methods have not been implemented.
+- Algorithm B, the stale-scalar exact-lazy baseline, is implemented and passes development exact-equivalence regressions against Algorithm A on all seven fixed fixtures and all 60 frozen v2 random maps.
+- Algorithm C, the proposed change-aware cached-set method, has not been implemented.
 
 ## Current Candidate
 
@@ -70,7 +71,7 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - **Theory gate:** PASS, conditional on stated assumptions.
 - **Novelty gate:** PROVISIONAL PASS, HIGH RISK, NARROW CLAIM ONLY.
 - **Empirical-value gate:** OPEN.
-- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. Lazy-method implementation remains deferred.
+- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline is implemented; the change-aware method remains deferred.
 
 ## Implemented Features
 
@@ -84,13 +85,17 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - Exhaustive optimistic-NBV reference with the frozen score and four-level total tie order, structured evaluations, selected path, and deterministic all-zero-gain stop.
 - Atomic arrival-scan/planning/movement cycle with no sensing en route.
 - Seven fixed 20×20 fixtures: open, single room, corridor, dead end, separated rooms, clutter, and maze-like.
-- A 60-test correctness suite covering the reference behaviors and corrected Experiment 0 dataset/hash artifact, including a regression that distinguishes the total-grid-cell denominator from the invalid total-FREE-cell denominator; the full suite passed on 2026-09-15.
+- Reference and dataset/hash coverage includes a regression that distinguishes the total-grid-cell denominator from the invalid total-FREE-cell denominator.
 - Set-level admissibility checks over 38,673 deterministic and fixed-seed monotone update transitions.
 - Complete repeated exhaustive runs on all seven fixtures, each reaching explicit `EXPLORATION_COMPLETE` before its safety limit with identical independent-run traces.
 - Corner-occlusion integration coverage at the physical and optimistic planning visibility APIs.
 - Deterministic independent-Bernoulli random-map generation with local RNG state, connected-component/start selection, total-grid-cell component acceptance, acceptance/rejection records, v2 map materialization, and frozen config validation. Corrected v2 retains candidate index 34 as its one rejection; normal seed consumption changes 26 ID-indexed accepted seeds/hashes from invalid v1.
 - Shared canonical SHA-256 utilities for ground truth (`./#`) and belief (`?/.#`) with fixed row order and final LF.
-- No Candidate 1 cache, inverse-incidence index, stale-lazy selector, or proposed change-aware lazy selector has been implemented.
+- Stateful Algorithm B with a scalar-only `candidate coordinate -> last exact gain` cache, exact initialization for first-seen eligible candidates, current-snapshot distances, direct exact visibility evaluation, tie-aware lazy certification, and all-zero-upper-bound completion.
+- Structured Algorithm B results expose per-cycle exact-evaluation counts, bound-only counts, certificate reasons, selected current-exact values, and candidate-level stale/exact/cache-refresh diagnostics.
+- A/B shared-snapshot development regressions cover complete exploration on all seven fixed fixtures and every accepted map in frozen `experiment-0-random-v2`; stale-bound violations, target mismatches, and sequence/termination divergences were all zero.
+- The 72-test suite passed on 2026-09-15. It includes direct synthetic tie-certificate cases, scalar-cache lifecycle/invariant checks, and a deterministic case where B safely selects the same target with fewer exact evaluations than A. These are correctness checks, not performance results.
+- No cached visible-UNKNOWN sets, inverse-incidence index, decrement-on-revelation maintenance, priority queue, Algorithm C selector, or C comparison has been implemented.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
 ## Required Baselines for Candidate 1
@@ -102,7 +107,7 @@ The first implementation must distinguish the proposed change-aware bound from a
 3. change-aware cached-set bound `|A_tau(v) ∩ U_t|`;
 4. optional tighter occlusion-aware bound only if the third method is too loose.
 
-Only baseline 1 is implemented in the current phase.
+Baselines 1 and 2 are implemented in the current phase. Baseline 3 remains unimplemented.
 
 Correctness is primary: methods 2/3 must match the exhaustive deterministic argmax and target sequence exactly under the shared tie rule whenever they claim exact equivalence.
 
@@ -117,8 +122,8 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 
 ## Next Steps
 
-1. Implement the stale-scalar exact-lazy baseline against the accepted exhaustive oracle.
-2. Implement the change-aware Candidate 1 method only after the stale baseline.
+1. Review the stale-scalar exact-lazy baseline and retain its A/B development regressions as the correctness baseline.
+2. Implement the change-aware Candidate 1 method without changing the frozen Algorithm A/B semantics.
 3. Implement the cross-method Experiment 0 runner and immutable failure-artifact writer against the frozen schemas.
 4. Execute Experiment 0 and require zero target, sequence, bound, tie, and invariant violations.
 5. Do not begin efficiency evaluation until Experiment 0 passes.
