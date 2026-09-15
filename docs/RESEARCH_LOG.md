@@ -160,3 +160,35 @@ The run metadata needed to reproduce or independently verify these observations 
 
 - **Not implemented:** stale-scalar lazy evaluation, Candidate 1 cached sets, inverse-incidence maintenance, and proposed lazy selection.
 - **No research experiment executed:** This entry records implementation verification only, so no experiment result was added to `docs/EXPERIMENT_LOG.md`.
+
+## 2026-09-15 — Exhaustive Oracle Hardening and Experiment 0 Preregistration
+
+### Exhaustive Oracle Bug Found and Corrected
+
+- **Verified bug:** `physical_visible_cells` discarded a blocked target ray without adding the intermediate first-hit OCCUPIED cell encountered on that ray. This violated the frozen physical-sensing rule that the first occupied hit is visible itself.
+- **Observed consequence:** Corner-inclusive wall geometry could leave physically encountered wall cells UNKNOWN, producing persistent optimistic gain and repeated no-progress selections on `separated_rooms`, `clutter`, and `maze_like` during the first end-to-end test attempt.
+- **Correction:** Physical target rays now add traversed cells through and including the first OCCUPIED cell, then stop. No score, candidate, planning-visibility, movement, or tie assumption changed.
+- **Regression coverage:** A blocked corner-crossing ray must retain its intermediate first hit, while its rear target remains occluded.
+
+### Verified Test Results
+
+- **Verified:** Physical corner-touch OCCUPIED side cells are visible and block diagonal targets; FREE corner-touch cells do not spuriously block.
+- **Verified:** Planning-time corner-touch side cells behave as specified: FREE and UNKNOWN transmit, while OCCUPIED blocks a rear UNKNOWN target.
+- **Verified:** The theorem implementation satisfies set inclusion
+
+  \[
+  A_t(v)\subseteq A_{\tau(v)}(v)\cap U_t
+  \]
+
+  across 38,673 checked transitions: complete monotone state-pair enumeration on short 1D rays, all single-cell FREE/OCCUPIED revelations across 3×3 belief states, five 4×4 multi-cell/corner batches, and 512 randomized transitions from fixed seed `20260915` under static consistent truth.
+- **Verified negative regressions:** Increasing sensor range or changing viewpoint coordinate can invalidate an old cached set. The existing opaque-UNKNOWN counterexample remains active.
+- **Verified end to end:** All seven fixtures reached explicit `EXPLORATION_COMPLETE` before their safety limits, and two independent runs per fixture produced identical selected targets, paths, final belief, final pose, scan count, and planning-cycle count.
+- **Fixture results:** `open` 14 selected/15 planning cycles/15 scans; `single_room` 12/13/13; `corridor` 4/5/5; `dead_end` 6/7/7; `separated_rooms` 11/12/12; `clutter` 11/12/12; `maze_like` 24/25/25.
+- **Full suite:** 39 tests passed on 2026-09-15.
+
+### Preregistration and Scope
+
+- **Preregistered, not executed:** `docs/EXPERIMENT_0_PREREGISTRATION.md` freezes zero-tolerance exact target/sequence endpoints, shared conditions, cycle log fields, failure rules, and the correctness gate for Algorithms A/B/C.
+- **Pending before execution:** The random small-map generator, seed list, map count, acceptance policy, and safety limits.
+- **No research experiment executed:** These were oracle/test-hardening runs, so no performance result was appended to `docs/EXPERIMENT_LOG.md`.
+- **Still not implemented:** stale-scalar lazy selection, proposed change-aware lazy selection, and runtime inverse-incidence structures.

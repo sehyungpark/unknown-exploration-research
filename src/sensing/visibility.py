@@ -45,15 +45,13 @@ def physical_visible_cells(
     if ground_truth.state(origin) is not TruthState.FREE:
         raise ValueError("physical sensor origin must be ground-truth FREE")
 
-    visible: set[Coord] = set()
+    visible: set[Coord] = {origin}
     for target in cells_within_range(origin, ground_truth.shape, sensor_range):
         line = supercover_line(origin, target)
-        if any(
-            ground_truth.state(cell) is TruthState.OCCUPIED
-            for cell in line[1:-1]
-        ):
-            continue
-        visible.add(target)
+        for cell in line[1:]:
+            visible.add(cell)
+            if ground_truth.state(cell) is TruthState.OCCUPIED:
+                break
     return frozenset(visible)
 
 

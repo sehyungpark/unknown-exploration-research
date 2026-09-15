@@ -23,7 +23,8 @@ Last updated: 2026-09-15
 - [x] Convert the opaque-UNKNOWN and new-occluder cases into deterministic tests.
 - [x] Specify and test atomic planning snapshots with sensing only at arrival and no sensing while moving.
 - [ ] Freeze metric definitions, coverage targets, failure conditions, run metadata schema, and raw-result storage layout.
-- [ ] Preregister first correctness/efficiency experiment with fixed maps and seeds.
+- [x] Preregister Experiment 0 exact-equivalence correctness endpoints, shared conditions, logging fields, failure rules, and gate.
+- [ ] Freeze Experiment 0's random small-map generator, map count, seed list, acceptance policy, and safety limits.
 - [x] Specify required baselines: exhaustive optimistic NBV, stale-scalar lazy bound, and proposed change-aware cached-set bound.
 - [x] Specify resource metrics: exact gain evaluations, ray operations, planning wall time, distance time, bound/index maintenance time, peak memory, cached-set size, inverse-index size.
 
@@ -31,7 +32,11 @@ Last updated: 2026-09-15
 
 - [x] Implement the smallest deterministic common simulator and theorem-derived correctness tests.
 - [x] Implement exhaustive optimistic NBV as the reference evaluator.
-- [x] Pass the full reference correctness suite (29 tests on 2026-09-15).
+- [x] Correct physical first-hit handling for blocked target rays and retain a regression test.
+- [x] Verify physical/planning corner-occlusion behavior through visibility APIs.
+- [x] Check set-level admissibility across 38,673 deterministic and fixed-seed transitions.
+- [x] Run every deterministic fixture twice to explicit stop with identical traces and invariant checks.
+- [x] Accept the exhaustive reference as the current correctness oracle after the 39-test suite passes.
 - [ ] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
 - [ ] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
 - [ ] Implement tie-aware exact-selection certificate.

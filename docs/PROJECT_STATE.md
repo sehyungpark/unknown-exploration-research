@@ -10,7 +10,8 @@ Last updated: 2026-09-15
 - Candidate 1 has passed a **conditional theory gate**.
 - Candidate 1 has received a **provisional novelty pass with high risk and a narrow claim only** after full-method comparison with major close prior art.
 - The empirical-value gate remains open.
-- The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented and pass the current correctness suite.
+- The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented, oracle-hardened, and pass the current correctness suite.
+- Experiment 0 exact-equivalence validation is preregistered but has not been executed because Algorithms B and C do not yet exist.
 - Stale-scalar lazy and proposed change-aware lazy methods have not been implemented.
 
 ## Current Candidate
@@ -68,7 +69,7 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - **Theory gate:** PASS, conditional on stated assumptions.
 - **Novelty gate:** PROVISIONAL PASS, HIGH RISK, NARROW CLAIM ONLY.
 - **Empirical-value gate:** OPEN.
-- **Implementation:** The reference-oracle subphase is complete; lazy-method implementation remains deferred pending review of the exhaustive reference.
+- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. Lazy-method implementation remains deferred.
 
 ## Implemented Features
 
@@ -82,7 +83,10 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - Exhaustive optimistic-NBV reference with the frozen score and four-level total tie order, structured evaluations, selected path, and deterministic all-zero-gain stop.
 - Atomic arrival-scan/planning/movement cycle with no sensing en route.
 - Seven fixed 20×20 fixtures: open, single room, corridor, dead end, separated rooms, clutter, and maze-like.
-- A 29-test correctness suite covering all required reference behaviors; full suite passed on 2026-09-15.
+- A 39-test correctness suite covering all required reference behaviors; full suite passed on 2026-09-15.
+- Set-level admissibility checks over 38,673 deterministic and fixed-seed monotone update transitions.
+- Complete repeated exhaustive runs on all seven fixtures, each reaching explicit `EXPLORATION_COMPLETE` before its safety limit with identical independent-run traces.
+- Corner-occlusion integration coverage at the physical and optimistic planning visibility APIs.
 - No Candidate 1 cache, inverse-incidence index, stale-lazy selector, or proposed change-aware lazy selector has been implemented.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
@@ -107,13 +111,13 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 - Can one shortest-path computation per planning snapshot supply current distances cheaply enough that information-gain evaluation remains the dominant bottleneck?
 - Does the corner-inclusive supercover convention create materially different behavior from other fixed supercover conventions in later sensitivity checks?
 - The large-experiment coverage, failure, raw-result, timing, and memory protocols remain unfrozen.
+- Experiment 0's fixed-seed random-map generator, map count, seed list, and acceptance policy remain pending.
 
 ## Next Steps
 
-1. Review the deterministic simulator and exhaustive optimistic-NBV reference as the future correctness oracle.
-2. Freeze the first experiment's coverage, failure, raw-result, timing, and memory protocols.
-3. Preregister the first experiment before implementing either lazy method.
-4. Implement the stale-scalar lazy baseline only after the reference is accepted.
-5. Implement the change-aware Candidate 1 method only after the stale baseline.
-6. Require 100% target and target-sequence agreement before runtime/scaling claims.
-7. Measure all bookkeeping overhead and drop or modify Candidate 1 if total savings are weak.
+1. Freeze Experiment 0's small random-map generator, acceptance policy, map count, seed list, and safety limits.
+2. Freeze the cycle-result logging schema and minimal failure-artifact format.
+3. Implement the stale-scalar exact-lazy baseline against the accepted exhaustive oracle.
+4. Implement the change-aware Candidate 1 method only after the stale baseline.
+5. Execute Experiment 0 and require zero target, sequence, bound, tie, and invariant violations.
+6. Do not begin efficiency evaluation until Experiment 0 passes.
