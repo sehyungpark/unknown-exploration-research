@@ -24,7 +24,8 @@ Last updated: 2026-09-15
 - [x] Specify and test atomic planning snapshots with sensing only at arrival and no sensing while moving.
 - [ ] Freeze metric definitions, coverage targets, failure conditions, run metadata schema, and raw-result storage layout.
 - [x] Preregister Experiment 0 exact-equivalence correctness endpoints, shared conditions, logging fields, failure rules, and gate.
-- [x] Freeze Experiment 0's 60-map random small-map generator, master/candidate seed list, balanced densities, acceptance policy, starts, hashes, and safety limits.
+- [x] Complete the initial Experiment 0 v1 random-dataset freeze; later invalidate it before execution because its component-fraction denominator was incorrect.
+- [x] Correct acceptance to largest component / all grid cells, add a denominator-distinguishing counterexample, and refreeze the same master-seed stream as `experiment-0-random-v2`.
 - [x] Freeze Experiment 0's per-cycle field schema, canonical belief/map hashes, B/C placeholders, and non-overwriting failure-artifact layout.
 - [x] Add deterministic regeneration and frozen-artifact tests covering the dataset, rejection rules, starts, cycle limits, and hashes.
 - [x] Specify required baselines: exhaustive optimistic NBV, stale-scalar lazy bound, and proposed change-aware cached-set bound.

@@ -216,3 +216,21 @@ The run metadata needed to reproduce or independently verify these observations 
 - **Unchanged hypothesis:** No empirical claim about Candidate 1 was tested or changed. This work freezes inputs and diagnostics for the future exact-equivalence experiment.
 - **Not executed:** No A/B/C comparison, exact-equivalence run, performance benchmark, runtime measurement, or research experiment was executed.
 - **Not implemented:** Algorithms B/C, lazy selection, inverse-incidence runtime state, priority queues, and certificate runtime logic remain absent.
+
+## 2026-09-15 — Experiment 0 v1 Denominator Mismatch and v2 Refreeze
+
+### Mismatch and Impact
+
+- **Verified specification mismatch:** The v1 code accepted maps using `largest_free_component_size / total_FREE_cell_count >= 0.35`, while the intended preregistered rule was `largest_free_component_size / (height * width) >= 0.35`.
+- **Why it matters:** The old denominator can accept a fragmented or obstacle-heavy map even when its largest traversable component occupies less than 35% of the complete grid. Deterministic counterexample `size=3, p=0.30, seed=8` has component size 2 and four FREE cells: `2/4=0.50` passes the old rule, but `2/9≈0.222` fails the intended rule.
+- **Timing:** The mismatch was detected before Algorithm B or C existed and before any cross-method Experiment 0 execution or result. No lazy outcome informed the correction.
+
+### Correction and Frozen Result
+
+- **Invalidated:** `experiment-0-random-v1` is retained in repository history but is invalid for Experiment 0.
+- **Corrected freeze:** `experiment-0-random-v2` uses the total grid-cell denominator and was regenerated from the unchanged master seed `20260915` using the unchanged candidate-seed derivation and Bernoulli generator.
+- **Verified materialization:** v2 retains 60 accepted maps with 20 per size and 7 sparse / 7 medium / 6 dense per size. It retains one rejected candidate: index 34, size 16, dense, seed `610347355546169441`, reason `largest_component_fraction_below_0.35` because `79/256 < 0.35`.
+- **Verified stream handling:** The rejected seed consumed its normal position. Consequently, 26 of 60 dataset-ID positions have different accepted seeds and hashes from v1.
+- **Full suite:** 60 tests passed on 2026-09-15 (39 existing simulator/oracle tests plus 21 corrected dataset/hash/config tests).
+- **Scope:** This was a dataset correction and test/refreeze operation, not an A/B/C correctness experiment or performance benchmark. The logging/failure-artifact schema did not require a change.
+- **Still not implemented:** Algorithms B/C, inverse-index runtime state, lazy certificates, the cross-method runner, and performance benchmarking remain absent.

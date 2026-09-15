@@ -68,6 +68,14 @@ class Experiment0DatasetTests(unittest.TestCase):
             (item.dataset_id, item.seed, item.map_hash) for item in dataset.accepted
         )
         self.assertEqual(identify(first), identify(second))
+        self.assertEqual(first.rejected, second.rejected)
+        self.assertEqual(len(first.rejected), 1)
+        self.assertEqual(first.rejected[0].candidate_index, 34)
+        self.assertEqual(
+            first.rejected[0].reason,
+            "largest_component_fraction_below_0.35",
+        )
+        self.assertEqual(first.accepted[34].candidate_index, 35)
 
     def test_exactly_sixty_maps_are_accepted(self) -> None:
         self.assertEqual(len(self.dataset.accepted), 60)
@@ -103,11 +111,32 @@ class Experiment0DatasetTests(unittest.TestCase):
 
     def test_accepted_largest_component_fraction_is_at_least_threshold(self) -> None:
         for item in self.dataset.accepted:
-            total_free = sum(
-                item.ground_truth.state(coord) is TruthState.FREE
-                for coord in item.ground_truth.iter_coords()
+            total_cell_count = (
+                item.ground_truth.height * item.ground_truth.width
             )
-            self.assertGreaterEqual(item.free_component_size / total_free, 0.35)
+            self.assertGreaterEqual(
+                item.free_component_size / total_cell_count, 0.35
+            )
+
+    def test_total_cell_denominator_rejects_old_rule_counterexample(self) -> None:
+        grid = generate_ground_truth(3, 0.3, 8)
+        _, component_size, total_free = select_start(grid)
+        total_cell_count = grid.height * grid.width
+        self.assertGreaterEqual(component_size / total_free, 0.35)
+        self.assertLess(component_size / total_cell_count, 0.35)
+
+        result = evaluate_candidate(
+            candidate_index=0,
+            size=3,
+            density_label="test",
+            p=0.3,
+            seed=8,
+        )
+        self.assertIsInstance(result, RejectedMap)
+        assert isinstance(result, RejectedMap)
+        self.assertEqual(
+            result.reason, "largest_component_fraction_below_0.35"
+        )
 
     def test_initial_exhaustive_stop_is_rejected(self) -> None:
         result = evaluate_candidate(
@@ -124,7 +153,7 @@ class Experiment0DatasetTests(unittest.TestCase):
     def test_rejection_reasons_are_specific_and_deterministic(self) -> None:
         cases = (
             (3, 0.1, 0, "no_occupied_cell"),
-            (3, 0.2, 399, "largest_component_fraction_below_0.35"),
+            (3, 0.3, 8, "largest_component_fraction_below_0.35"),
             (3, 0.5, 45, "no_free_cell"),
         )
         for size, p, seed, expected in cases:

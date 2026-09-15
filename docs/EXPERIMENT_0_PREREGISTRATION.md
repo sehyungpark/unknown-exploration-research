@@ -86,12 +86,16 @@ Each fixture uses its repository-defined fixed FREE start cell. Every run must r
 
 The random-map generator, accepted-map policy, map count, start-selection procedure, seed list, hashes, and cycle limits are frozen in `docs/EXPERIMENT_0_DATASET.md` and `configs/experiment_0_random_maps.json`.
 
+- Current dataset version: `experiment-0-random-v2`.
 - Master seed: `20260915`.
 - Accepted maps: 60 total; 20 each at sizes 12×12, 16×16, and 20×20.
 - Density balance within each size: 7 sparse (`p=0.10`), 7 medium (`p=0.20`), and 6 dense (`p=0.30`).
+- Acceptance requires `largest_free_component_size / (height * width) >= 0.35`; the denominator is all grid cells, not only FREE cells.
 - Random-map cycle limit: `max(64, 2 * selected_largest_free_component_size)`.
 
 Failed generated maps or runs must not be selectively removed after this freeze. A content or generator change requires a new dataset version and must not silently replace the frozen artifact.
+
+The previously committed `experiment-0-random-v1` artifact is invalid because its implementation used total FREE cells as the component-fraction denominator. The mismatch was detected before Algorithms B/C and before Experiment 0 execution; v2 was regenerated from the same master seed with rejected seeds consuming their ordinary stream positions.
 
 The implementation-level admissibility property suite also uses fixed seed `20260915`, but it remains a separate test workload and is not a substitute for this frozen random exploration dataset.
 
@@ -146,4 +150,4 @@ Until this gate passes, runtime improvement must not be reported as a research r
 
 ## Current Status
 
-**PREREGISTERED, DATASET FROZEN, NOT EXECUTED.** Algorithm A and the 60-map random correctness dataset exist. Algorithms B and C and the cross-method Experiment 0 runner do not yet exist.
+**PREREGISTERED, CORRECTED V2 DATASET FROZEN, NOT EXECUTED.** Algorithm A and the corrected 60-map random correctness dataset exist. Invalid v1 was never executed. Algorithms B and C and the cross-method Experiment 0 runner do not yet exist.

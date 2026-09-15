@@ -16,7 +16,8 @@ from src.utils import Coord, TruthState, ground_truth_hash
 
 from .simulator import ExplorationSimulator
 
-DATASET_VERSION = "experiment-0-random-v1"
+DATASET_VERSION = "experiment-0-random-v2"
+SUPERSEDED_DATASET_VERSION = "experiment-0-random-v1"
 GENERATOR_VERSION = "independent-bernoulli-occupancy-v1"
 MASTER_SEED = 20260915
 SIZES = (12, 16, 20)
@@ -182,6 +183,8 @@ def evaluate_candidate(
     map_digest = ground_truth_hash(grid)
     start, component_size, total_free = select_start(grid)
     occupied_count = size * size - total_free
+    total_grid_cell_count = grid.height * grid.width
+    component_fraction = component_size / total_grid_cell_count
 
     reason: str | None = None
     if total_free == 0:
@@ -190,7 +193,7 @@ def evaluate_candidate(
         reason = "no_start_cell"
     elif occupied_count == 0:
         reason = "no_occupied_cell"
-    elif component_size / total_free < MIN_LARGEST_COMPONENT_FRACTION:
+    elif component_fraction < MIN_LARGEST_COMPONENT_FRACTION:
         reason = "largest_component_fraction_below_0.35"
     else:
         try:
@@ -199,7 +202,7 @@ def evaluate_candidate(
             ).plan()
             if initial_plan.status is PlanStatus.EXPLORATION_COMPLETE:
                 reason = "initial_scan_exploration_complete"
-        except Exception as exc:  # acceptance protocol retains deterministic failures
+        except Exception as exc:  # acceptance retains deterministic failures
             reason = f"initial_scan_exception:{type(exc).__name__}"
 
     if reason is not None:
@@ -319,6 +322,11 @@ def dataset_config(
     density_counts = Counter(item.density_label for item in dataset.accepted)
     return {
         "dataset_version": DATASET_VERSION,
+        "supersedes": {
+            "dataset_version": SUPERSEDED_DATASET_VERSION,
+            "status": "invalidated before Experiment 0 execution",
+            "reason": "largest-component acceptance used total FREE cells instead of total grid cells",
+        },
         "master_seed": master_seed,
         "generator": {
             "version": GENERATOR_VERSION,
@@ -332,6 +340,7 @@ def dataset_config(
         "acceptance": {
             "connectivity": "8-neighbor with no diagonal corner cutting",
             "minimum_largest_free_component_fraction": MIN_LARGEST_COMPONENT_FRACTION,
+            "component_fraction_denominator": "height * width (total grid-cell count)",
             "requires_free_and_occupied": True,
             "reject_initial_exhaustive_stop": True,
             "sensor_range": SENSOR_RANGE,
@@ -365,6 +374,7 @@ def validate_config_schema(config: Mapping[str, Any]) -> None:
 
     required = {
         "dataset_version",
+        "supersedes",
         "master_seed",
         "generator",
         "acceptance",
@@ -380,6 +390,12 @@ def validate_config_schema(config: Mapping[str, Any]) -> None:
         raise ValueError("dataset config top-level schema mismatch")
     if config["dataset_version"] != DATASET_VERSION:
         raise ValueError("unexpected dataset version")
+    if config["supersedes"] != {
+        "dataset_version": SUPERSEDED_DATASET_VERSION,
+        "status": "invalidated before Experiment 0 execution",
+        "reason": "largest-component acceptance used total FREE cells instead of total grid cells",
+    }:
+        raise ValueError("dataset supersession history mismatch")
     if config["master_seed"] != MASTER_SEED:
         raise ValueError("unexpected master seed")
     generator = config["generator"]
@@ -391,6 +407,14 @@ def validate_config_schema(config: Mapping[str, Any]) -> None:
         or generator.get("accepted_targets_per_size") != dict(DENSITY_TARGETS)
     ):
         raise ValueError("generator schema or parameters differ from the freeze")
+    acceptance = config["acceptance"]
+    if (
+        acceptance.get("minimum_largest_free_component_fraction")
+        != MIN_LARGEST_COMPONENT_FRACTION
+        or acceptance.get("component_fraction_denominator")
+        != "height * width (total grid-cell count)"
+    ):
+        raise ValueError("component acceptance formula differs from the freeze")
     accepted = config["accepted_maps"]
     rejected = config["rejected_candidates"]
     if not isinstance(accepted, list) or not isinstance(rejected, list):
@@ -435,6 +459,12 @@ def validate_config_schema(config: Mapping[str, Any]) -> None:
             raise ValueError(f"out-of-bounds start at {index}")
         if record["cycle_limit"] != random_cycle_limit(record["free_component_size"]):
             raise ValueError(f"invalid cycle limit at {index}")
+        total_grid_cell_count = record["size"] * record["size"]
+        if (
+            record["free_component_size"] / total_grid_cell_count
+            < MIN_LARGEST_COMPONENT_FRACTION
+        ):
+            raise ValueError(f"accepted component fraction below threshold at {index}")
         digest = record["map_hash"]
         if not isinstance(digest, str) or len(digest) != 64:
             raise ValueError(f"invalid map hash at {index}")

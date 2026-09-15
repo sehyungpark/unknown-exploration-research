@@ -1,5 +1,10 @@
 {
-  "dataset_version": "experiment-0-random-v1",
+  "dataset_version": "experiment-0-random-v2",
+  "supersedes": {
+    "dataset_version": "experiment-0-random-v1",
+    "status": "invalidated before Experiment 0 execution",
+    "reason": "largest-component acceptance used total FREE cells instead of total grid cells"
+  },
   "master_seed": 20260915,
   "generator": {
     "version": "independent-bernoulli-occupancy-v1",
@@ -25,6 +30,7 @@
   "acceptance": {
     "connectivity": "8-neighbor with no diagonal corner cutting",
     "minimum_largest_free_component_fraction": 0.35,
+    "component_fraction_denominator": "height * width (total grid-cell count)",
     "requires_free_and_occupied": true,
     "reject_initial_exhaustive_stop": true,
     "sensor_range": 8.0
@@ -46,7 +52,7 @@
   },
   "counts": {
     "accepted_total": 60,
-    "rejected_total": 0,
+    "rejected_total": 1,
     "accepted_by_size": {
       "12": 20,
       "16": 20,
@@ -673,26 +679,8 @@
     },
     {
       "dataset_index": 34,
-      "candidate_index": 34,
-      "dataset_id": "random-034",
-      "size": 16,
-      "density_label": "dense",
-      "p": 0.3,
-      "seed": 610347355546169441,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        7,
-        7
-      ],
-      "free_component_size": 79,
-      "cycle_limit": 158,
-      "map_hash": "104937d295cb13bacea4e678c5d3b1b240e33383c4a2b02d1ac6a74be07d6fa1"
-    },
-    {
-      "dataset_index": 35,
       "candidate_index": 35,
-      "dataset_id": "random-035",
+      "dataset_id": "random-034",
       "size": 16,
       "density_label": "sparse",
       "p": 0.1,
@@ -708,9 +696,9 @@
       "map_hash": "591a182712da6b6e7d9b78a55c4b292474cae6cde5fda0f0f12b1cbb9a837d19"
     },
     {
-      "dataset_index": 36,
+      "dataset_index": 35,
       "candidate_index": 36,
-      "dataset_id": "random-036",
+      "dataset_id": "random-035",
       "size": 16,
       "density_label": "medium",
       "p": 0.2,
@@ -726,9 +714,9 @@
       "map_hash": "6f4810738e5dd2de40f7a1b31b4ffbb13eb5f9ac9a88a7c7c2aa5d619e09ba6a"
     },
     {
-      "dataset_index": 37,
+      "dataset_index": 36,
       "candidate_index": 37,
-      "dataset_id": "random-037",
+      "dataset_id": "random-036",
       "size": 16,
       "density_label": "dense",
       "p": 0.3,
@@ -744,9 +732,9 @@
       "map_hash": "7d1829093dd607b326b80c69082729bd0f30b7981e2c3fb601e1800707c8fcbe"
     },
     {
-      "dataset_index": 38,
+      "dataset_index": 37,
       "candidate_index": 38,
-      "dataset_id": "random-038",
+      "dataset_id": "random-037",
       "size": 16,
       "density_label": "sparse",
       "p": 0.1,
@@ -762,9 +750,9 @@
       "map_hash": "0e91b4e7d8dd32027bcca37323b23fb77e7b4c1cc443066d0160cb811ec5792f"
     },
     {
-      "dataset_index": 39,
+      "dataset_index": 38,
       "candidate_index": 39,
-      "dataset_id": "random-039",
+      "dataset_id": "random-038",
       "size": 16,
       "density_label": "medium",
       "p": 0.2,
@@ -780,30 +768,30 @@
       "map_hash": "d0dc72f511ddfa5ccf8d99cc73b6d0b3b36e503138390ac1bad7708617a6f6b5"
     },
     {
-      "dataset_index": 40,
+      "dataset_index": 39,
       "candidate_index": 40,
-      "dataset_id": "random-040",
-      "size": 20,
-      "density_label": "sparse",
-      "p": 0.1,
+      "dataset_id": "random-039",
+      "size": 16,
+      "density_label": "dense",
+      "p": 0.3,
       "seed": 3401625048423572859,
       "accepted": true,
       "rejection_reason": null,
       "start": [
-        9,
-        9
+        7,
+        7
       ],
-      "free_component_size": 355,
-      "cycle_limit": 710,
-      "map_hash": "3c35ccd7e14eb8fee8a696546c019f3b0fbb1c74f185c90d204a58d10a818445"
+      "free_component_size": 172,
+      "cycle_limit": 344,
+      "map_hash": "3b8f02da3b12ab451c8298dbd65e0bc3d95503ace5e5596f41d22526c07faeca"
     },
     {
-      "dataset_index": 41,
+      "dataset_index": 40,
       "candidate_index": 41,
-      "dataset_id": "random-041",
+      "dataset_id": "random-040",
       "size": 20,
-      "density_label": "medium",
-      "p": 0.2,
+      "density_label": "sparse",
+      "p": 0.1,
       "seed": 3752429512835464017,
       "accepted": true,
       "rejection_reason": null,
@@ -811,17 +799,17 @@
         9,
         9
       ],
-      "free_component_size": 326,
-      "cycle_limit": 652,
-      "map_hash": "876871888493cae8ea80fc4304b8d369f2bbe49aa62430ab6ed94427302151ad"
+      "free_component_size": 364,
+      "cycle_limit": 728,
+      "map_hash": "39119e13c40cf8aa32db618f156216b0798f7e514774f39afa1c5a53c73b87c6"
     },
     {
-      "dataset_index": 42,
+      "dataset_index": 41,
       "candidate_index": 42,
-      "dataset_id": "random-042",
+      "dataset_id": "random-041",
       "size": 20,
-      "density_label": "dense",
-      "p": 0.3,
+      "density_label": "medium",
+      "p": 0.2,
       "seed": 7897086557936856052,
       "accepted": true,
       "rejection_reason": null,
@@ -829,17 +817,17 @@
         9,
         10
       ],
-      "free_component_size": 281,
-      "cycle_limit": 562,
-      "map_hash": "b7b63fbff908005e8c26fd4da4ca6de1b5357fd46cecdaf7e4bf749317a4ec92"
+      "free_component_size": 313,
+      "cycle_limit": 626,
+      "map_hash": "eb800d247e09aa946a55d222c07fccc1cfec54cb311c316e40109759e50475bf"
     },
     {
-      "dataset_index": 43,
+      "dataset_index": 42,
       "candidate_index": 43,
-      "dataset_id": "random-043",
+      "dataset_id": "random-042",
       "size": 20,
-      "density_label": "sparse",
-      "p": 0.1,
+      "density_label": "dense",
+      "p": 0.3,
       "seed": 6789104085363263613,
       "accepted": true,
       "rejection_reason": null,
@@ -847,216 +835,18 @@
         9,
         9
       ],
-      "free_component_size": 356,
-      "cycle_limit": 712,
-      "map_hash": "57c300bb229bef327111c5f1ac0fd08964bf6e2d4d11806293dcaabbbdea2bef"
+      "free_component_size": 272,
+      "cycle_limit": 544,
+      "map_hash": "3e1cf063358e0cda0cd86749bcd47e0181add0987a461c9c8042a7b33c629b31"
     },
     {
-      "dataset_index": 44,
+      "dataset_index": 43,
       "candidate_index": 44,
-      "dataset_id": "random-044",
+      "dataset_id": "random-043",
       "size": 20,
-      "density_label": "medium",
-      "p": 0.2,
+      "density_label": "sparse",
+      "p": 0.1,
       "seed": 7037570802641513515,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 329,
-      "cycle_limit": 658,
-      "map_hash": "2eccae27bbcbb2e6bb93610f96fef8d648cca8a48486b58d61e1aed7b728b494"
-    },
-    {
-      "dataset_index": 45,
-      "candidate_index": 45,
-      "dataset_id": "random-045",
-      "size": 20,
-      "density_label": "dense",
-      "p": 0.3,
-      "seed": 2779123786463267563,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 271,
-      "cycle_limit": 542,
-      "map_hash": "0f0627746c033971e49e4023cab9e2e36ad0f94eb90b5dabcf69de99b77dd29e"
-    },
-    {
-      "dataset_index": 46,
-      "candidate_index": 46,
-      "dataset_id": "random-046",
-      "size": 20,
-      "density_label": "sparse",
-      "p": 0.1,
-      "seed": 3647060634515756289,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        10
-      ],
-      "free_component_size": 371,
-      "cycle_limit": 742,
-      "map_hash": "66816064c733f2f77d539ee26c7caaf7bb04c61725311fdafafb33e6d27428dc"
-    },
-    {
-      "dataset_index": 47,
-      "candidate_index": 47,
-      "dataset_id": "random-047",
-      "size": 20,
-      "density_label": "medium",
-      "p": 0.2,
-      "seed": 524680294426764532,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 306,
-      "cycle_limit": 612,
-      "map_hash": "42a0805fda2080c22b208430568a74892189aa518dff0bf6850162f74f67a7b1"
-    },
-    {
-      "dataset_index": 48,
-      "candidate_index": 48,
-      "dataset_id": "random-048",
-      "size": 20,
-      "density_label": "dense",
-      "p": 0.3,
-      "seed": 5107640096050154906,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        10
-      ],
-      "free_component_size": 256,
-      "cycle_limit": 512,
-      "map_hash": "261ee5e4f5b5f4e720d757dcfd0e8575adc61de22c9dc4176f679de93ee765b7"
-    },
-    {
-      "dataset_index": 49,
-      "candidate_index": 49,
-      "dataset_id": "random-049",
-      "size": 20,
-      "density_label": "sparse",
-      "p": 0.1,
-      "seed": 7210308160815558773,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 359,
-      "cycle_limit": 718,
-      "map_hash": "bbe6e53679e1b1e55c1b16c5a1167987dba44636a3426bd68215dfe7cabb7b9f"
-    },
-    {
-      "dataset_index": 50,
-      "candidate_index": 50,
-      "dataset_id": "random-050",
-      "size": 20,
-      "density_label": "medium",
-      "p": 0.2,
-      "seed": 928323131437836541,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 320,
-      "cycle_limit": 640,
-      "map_hash": "1cfbc6940f1842b0c318294a3611aeef5f8a5574e70a4355c6f5dfb9fd372b69"
-    },
-    {
-      "dataset_index": 51,
-      "candidate_index": 51,
-      "dataset_id": "random-051",
-      "size": 20,
-      "density_label": "dense",
-      "p": 0.3,
-      "seed": 6271593426382089067,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 264,
-      "cycle_limit": 528,
-      "map_hash": "789e57c5e14416ff53b508b79881fc64ad4127f2a280377f315540d30d72735e"
-    },
-    {
-      "dataset_index": 52,
-      "candidate_index": 52,
-      "dataset_id": "random-052",
-      "size": 20,
-      "density_label": "sparse",
-      "p": 0.1,
-      "seed": 7390184556386850754,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 365,
-      "cycle_limit": 730,
-      "map_hash": "13fab7d2907dd0417ddf80abee352108c713aa98218bbab1278cd6136dbb2cc2"
-    },
-    {
-      "dataset_index": 53,
-      "candidate_index": 53,
-      "dataset_id": "random-053",
-      "size": 20,
-      "density_label": "medium",
-      "p": 0.2,
-      "seed": 7079186175911782948,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 313,
-      "cycle_limit": 626,
-      "map_hash": "6a992ab8eaded86d7dac3f438ba5839b6de531c2b8e27c18e29620d9fb3786e0"
-    },
-    {
-      "dataset_index": 54,
-      "candidate_index": 54,
-      "dataset_id": "random-054",
-      "size": 20,
-      "density_label": "dense",
-      "p": 0.3,
-      "seed": 492367480353796936,
-      "accepted": true,
-      "rejection_reason": null,
-      "start": [
-        9,
-        9
-      ],
-      "free_component_size": 277,
-      "cycle_limit": 554,
-      "map_hash": "a29ea7607a7a8b996c6fbc720d4958c4dc605a75c85b849b1e083a86a0ce2ccc"
-    },
-    {
-      "dataset_index": 55,
-      "candidate_index": 55,
-      "dataset_id": "random-055",
-      "size": 20,
-      "density_label": "sparse",
-      "p": 0.1,
-      "seed": 8642220197476521168,
       "accepted": true,
       "rejection_reason": null,
       "start": [
@@ -1065,34 +855,196 @@
       ],
       "free_component_size": 361,
       "cycle_limit": 722,
-      "map_hash": "61dea465a15c2366f4c7c73b4b19f5d2ee5f1564f5a1b331328512e378a07bbd"
+      "map_hash": "45b49d77b28ab67da2fca41a46180a2ae676367adc1da251aff5bec1d22605ea"
     },
     {
-      "dataset_index": 56,
-      "candidate_index": 56,
-      "dataset_id": "random-056",
+      "dataset_index": 44,
+      "candidate_index": 45,
+      "dataset_id": "random-044",
       "size": 20,
       "density_label": "medium",
       "p": 0.2,
-      "seed": 8872522031597770444,
+      "seed": 2779123786463267563,
       "accepted": true,
       "rejection_reason": null,
       "start": [
         9,
         9
       ],
-      "free_component_size": 334,
-      "cycle_limit": 668,
-      "map_hash": "57a8c888f5ae9f95e3bdbeabcda8bc2fb38969f55e6ecd887cf5c685af904f26"
+      "free_component_size": 316,
+      "cycle_limit": 632,
+      "map_hash": "c997316e686e453f97b40e3a1cfcadeb2920dbf1652ef083e1406d3e26073829"
     },
     {
-      "dataset_index": 57,
-      "candidate_index": 57,
-      "dataset_id": "random-057",
+      "dataset_index": 45,
+      "candidate_index": 46,
+      "dataset_id": "random-045",
       "size": 20,
       "density_label": "dense",
       "p": 0.3,
-      "seed": 2111518878601351473,
+      "seed": 3647060634515756289,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        10
+      ],
+      "free_component_size": 280,
+      "cycle_limit": 560,
+      "map_hash": "7d4274afc8a3558c4a602a6a881ee07a2bfd7049be465faa2bf4f02d0c599ee0"
+    },
+    {
+      "dataset_index": 46,
+      "candidate_index": 47,
+      "dataset_id": "random-046",
+      "size": 20,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 524680294426764532,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 352,
+      "cycle_limit": 704,
+      "map_hash": "dede03e5375e3c18a5176c7329e32e04742b1140b2eec4c92d667deb19435c25"
+    },
+    {
+      "dataset_index": 47,
+      "candidate_index": 48,
+      "dataset_id": "random-047",
+      "size": 20,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 5107640096050154906,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        10
+      ],
+      "free_component_size": 307,
+      "cycle_limit": 614,
+      "map_hash": "6b342d5f1c4be36889f261d9cb23027eabea9dab61bb870a3328efb26e165d4b"
+    },
+    {
+      "dataset_index": 48,
+      "candidate_index": 49,
+      "dataset_id": "random-048",
+      "size": 20,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 7210308160815558773,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 263,
+      "cycle_limit": 526,
+      "map_hash": "29fbb15a71e9beaefbc4095fd0d5677adcd3afb86376559eb4c78998c3cbefe3"
+    },
+    {
+      "dataset_index": 49,
+      "candidate_index": 50,
+      "dataset_id": "random-049",
+      "size": 20,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 928323131437836541,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 364,
+      "cycle_limit": 728,
+      "map_hash": "c1d7c41e77e2a812787997550d411fa3c5525e2e8a81cd810ab8056c446e6c1d"
+    },
+    {
+      "dataset_index": 50,
+      "candidate_index": 51,
+      "dataset_id": "random-050",
+      "size": 20,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 6271593426382089067,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 315,
+      "cycle_limit": 630,
+      "map_hash": "00ff58a44612ffa9096fe4520cc771b25514b56aafd314987c809e930da26a4d"
+    },
+    {
+      "dataset_index": 51,
+      "candidate_index": 52,
+      "dataset_id": "random-051",
+      "size": 20,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 7390184556386850754,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 300,
+      "cycle_limit": 600,
+      "map_hash": "91789f46aebdb106f778faa56b1274c3b5058e7e76ec3a81a1aeb7661db71b1c"
+    },
+    {
+      "dataset_index": 52,
+      "candidate_index": 53,
+      "dataset_id": "random-052",
+      "size": 20,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 7079186175911782948,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 356,
+      "cycle_limit": 712,
+      "map_hash": "bf02e58c452d0cd0167aa293d895776034ad93a9edf1824cebfed4cfc69c8c98"
+    },
+    {
+      "dataset_index": 53,
+      "candidate_index": 54,
+      "dataset_id": "random-053",
+      "size": 20,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 492367480353796936,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 324,
+      "cycle_limit": 648,
+      "map_hash": "49c68ced0fbe5c459405b4bbd6e7ccedd8d8bed087994505919e383bc8f520d9"
+    },
+    {
+      "dataset_index": 54,
+      "candidate_index": 55,
+      "dataset_id": "random-054",
+      "size": 20,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 8642220197476521168,
       "accepted": true,
       "rejection_reason": null,
       "start": [
@@ -1101,33 +1053,69 @@
       ],
       "free_component_size": 268,
       "cycle_limit": 536,
-      "map_hash": "8cf995e94c2ad5c3550c2e6a57981ce7ec14e4e910e3fce8dbf2c2f80912b168"
+      "map_hash": "f801740cb75220ebc6675c4163590762fb23ecefb2dfb640d4d2db02f3a5e127"
     },
     {
-      "dataset_index": 58,
-      "candidate_index": 58,
-      "dataset_id": "random-058",
+      "dataset_index": 55,
+      "candidate_index": 56,
+      "dataset_id": "random-055",
       "size": 20,
       "density_label": "sparse",
       "p": 0.1,
-      "seed": 5711399435219062689,
+      "seed": 8872522031597770444,
       "accepted": true,
       "rejection_reason": null,
       "start": [
         9,
         9
       ],
-      "free_component_size": 359,
-      "cycle_limit": 718,
-      "map_hash": "837a9fe19d5cf346f708f4bcde8a3522c885789606174f4821817870bd1b75ea"
+      "free_component_size": 370,
+      "cycle_limit": 740,
+      "map_hash": "a43df844baeb52502d73cf0f3e83118d6e7f5c7634fe1dfa98c73acfe5adb258"
     },
     {
-      "dataset_index": 59,
-      "candidate_index": 59,
-      "dataset_id": "random-059",
+      "dataset_index": 56,
+      "candidate_index": 57,
+      "dataset_id": "random-056",
       "size": 20,
       "density_label": "medium",
       "p": 0.2,
+      "seed": 2111518878601351473,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 322,
+      "cycle_limit": 644,
+      "map_hash": "79c3b40c0202b8c49d80a8a444f1472deebc81975ee3a9815dbda695d66c1e95"
+    },
+    {
+      "dataset_index": 57,
+      "candidate_index": 58,
+      "dataset_id": "random-057",
+      "size": 20,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 5711399435219062689,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        10,
+        10
+      ],
+      "free_component_size": 276,
+      "cycle_limit": 552,
+      "map_hash": "423b829f3977962f5f0f9115f7b0dff31fdff72c1ef84e43e7f922b819db650d"
+    },
+    {
+      "dataset_index": 58,
+      "candidate_index": 59,
+      "dataset_id": "random-058",
+      "size": 20,
+      "density_label": "sparse",
+      "p": 0.1,
       "seed": 8000994055318961516,
       "accepted": true,
       "rejection_reason": null,
@@ -1135,11 +1123,46 @@
         9,
         9
       ],
-      "free_component_size": 319,
-      "cycle_limit": 638,
-      "map_hash": "875b12b2831d2d8f0c96697339277db1c6897de1da4ee080616b5db9c5b804b5"
+      "free_component_size": 356,
+      "cycle_limit": 712,
+      "map_hash": "e2776e428d3d408ad57cd13bbf01ea016ec376decaf8edd09db1e8dc66ef1927"
+    },
+    {
+      "dataset_index": 59,
+      "candidate_index": 60,
+      "dataset_id": "random-059",
+      "size": 20,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 5277239599950553096,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "free_component_size": 286,
+      "cycle_limit": 572,
+      "map_hash": "0a2ec0a79c0778a6de452b473b65526aa6f5ce063fd67e74a13c785add6e230a"
     }
   ],
-  "rejected_candidates": [],
-  "rejected_summary": {}
+  "rejected_candidates": [
+    {
+      "candidate_index": 34,
+      "size": 16,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 610347355546169441,
+      "accepted": false,
+      "rejection_reason": "largest_component_fraction_below_0.35",
+      "start": [
+        7,
+        7
+      ],
+      "map_hash": "104937d295cb13bacea4e678c5d3b1b240e33383c4a2b02d1ac6a74be07d6fa1"
+    }
+  ],
+  "rejected_summary": {
+    "largest_component_fraction_below_0.35": 1
+  }
 }

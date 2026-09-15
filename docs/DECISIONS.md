@@ -112,9 +112,10 @@ This file records research assumptions and decisions that affect formulation, im
 
 ### D-018 — Frozen Random Correctness Dataset
 
-- **Status:** Accepted for Experiment 0
+- **Status:** Invalidated before Experiment 0 execution; superseded by D-021
 - **Decision:** Use 60 accepted independent-Bernoulli maps generated from master seed `20260915`: 20 each at sizes 12×12, 16×16, and 20×20, with 7 sparse (`p=0.10`), 7 medium (`p=0.20`), and 6 dense (`p=0.30`) maps per size. Candidate seeds come from `random.Random(master_seed).getrandbits(63)` and each map uses its own `random.Random(candidate_seed)`. Retain every rejected candidate record. Random-map cycle limits are `max(64, 2 * selected_largest_free_component_size)`.
 - **Rationale:** Freezing seeds, quotas, acceptance, and limits before B/C results prevents post-result map selection and makes the correctness gate reproducible.
+- **Historical defect:** The v1 implementation used `largest_component_size / total_FREE_cell_count` for the 0.35 acceptance threshold. The intended denominator was the total grid-cell count, so the committed v1 artifact is not valid for Experiment 0.
 
 ### D-019 — FREE Component Connectivity and Start Selection
 
@@ -127,6 +128,12 @@ This file records research assumptions and decisions that affect formulation, im
 - **Status:** Accepted for Experiment 0
 - **Decision:** Hash row-major UTF-8 ASCII with exactly one LF after every row, including the final row, using SHA-256. Ground truth uses `.`/`#`; belief uses `?`/`.`/`#`. Per-cycle correctness fields and append-only failure artifacts use the schema in `docs/EXPERIMENT_0_LOGGING.md` and may not fabricate fields for unimplemented algorithms.
 - **Rationale:** Explicit byte serialization detects map/generator drift and lets failures be reproduced without platform-dependent newline ambiguity.
+
+### D-021 — Corrected v2 Component Acceptance and Refreeze
+
+- **Status:** Accepted for Experiment 0
+- **Decision:** Accept a generated map only when `largest_free_component_size / (height * width) >= 0.35`, in addition to the other frozen acceptance rules. Invalidate `experiment-0-random-v1` and use `experiment-0-random-v2`, regenerated from unchanged master seed `20260915` with every rejected candidate seed consuming its normal master-RNG position.
+- **Rationale:** Dividing by total FREE cells admits maps whose traversable component occupies too little of the full grid and contradicts the intended preregistered dataset rule. The mismatch was found before Algorithms B/C or Experiment 0 results existed, so a complete refreeze avoids outcome-dependent selection.
 
 ## Open Decisions
 
