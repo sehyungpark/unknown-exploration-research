@@ -11,10 +11,10 @@ Last updated: 2026-09-15
 - Candidate 1 has received a **provisional novelty pass with high risk and a narrow claim only** after full-method comparison with major close prior art.
 - The empirical-value gate remains open.
 - The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented, oracle-hardened, and pass the current correctness suite.
-- Experiment 0 exact-equivalence validation is preregistered but has not been executed because the Algorithm C selector and full A/B/C runner do not yet exist.
+- Experiment 0 exact-equivalence validation is preregistered but has not been executed because the full A/B/C runner does not yet exist and Algorithm C has not undergone the required full A/C regressions.
 - Experiment 0's corrected `experiment-0-random-v2` 60-map correctness dataset, seed list, hashes, start/acceptance rules, cycle limits, per-cycle logging schema, and failure-artifact convention are frozen. The invalid v1 denominator was detected and corrected before Algorithms B/C or Experiment 0 execution.
 - Algorithm B, the stale-scalar exact-lazy baseline, is implemented and passes development exact-equivalence regressions against Algorithm A on all seven fixed fixtures and all 60 frozen v2 random maps.
-- Algorithm C Stages 1-4 now provide cache/index state, atomic exact cached-set installation/refresh, once-per-cell revelation decrement, immutable belief-snapshot delta discovery, cache synchronization, and exact visibility integration through the common planning API. The proposed change-aware method remains incomplete: no selector, tie-aware lazy certification, or A/C full-exploration regression exists.
+- Algorithm C Stages 1-5 now provide cache/index state, atomic exact cached-set installation/refresh, once-per-cell revelation decrement, immutable belief-snapshot synchronization, common exact visibility integration, and a stateful certified exact-lazy selector. The selector is implemented but awaits full fixed-fixture and 60-map A/C exact-equivalence regressions.
 
 ## Current Candidate
 
@@ -71,7 +71,7 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - **Theory gate:** PASS, conditional on stated assumptions.
 - **Novelty gate:** PROVISIONAL PASS, HIGH RISK, NARROW CLAIM ONLY.
 - **Empirical-value gate:** OPEN.
-- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline is implemented. Algorithm C has cache/index state, atomic exact-set replacement, explicit revelation-driven bound maintenance, belief-snapshot synchronization, and common-visibility exact refresh; selection remains deferred.
+- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline is implemented. Algorithm C now has its stateful change-aware selector and focused snapshot-level correctness coverage, but is not accepted until the full A/C exact-equivalence regression passes.
 
 ## Implemented Features
 
@@ -102,8 +102,12 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - Stage 3 validation enforces `bound_counts[v] == len(cached_visible_unknown[v] - reported_known_cells)`. All mutation is transactional; malformed input, accounting inconsistency, and potential underflow are rejected without partial state changes. Fresh exact installation rejects cells already reported known, relying explicitly on monotone belief, exact fresh sets containing only current UNKNOWN cells, and no known-to-UNKNOWN reversion.
 - Algorithm C Stage 4 uses the existing immutable `BeliefGrid.snapshot()` tuple-of-tuples representation to extract exact legal UNKNOWN-to-FREE/OCCUPIED deltas while rejecting shape mismatch, known-state reversion, and FREE/OCCUPIED switching. `synchronize_revelations` applies each extracted delta through the accepted Stage 3 API, including the initial-scan-before-cache lifecycle and idempotent duplicate synchronization.
 - Stage 4 exact candidate refresh calls the existing `optimistic_visible_unknown_cells` implementation and passes its exact `frozenset` directly to `install_exact`; no second ray traversal or visibility definition was added. Actual belief-transition regressions verify the maintained cached-intersection invariant and `G_t(v) <= q_t(v)` for several persistent viewpoints. A newly OCCUPIED near blocker creates the intended strict conservative slack, and exact refresh restores equality and exact inverse incidence.
-- The 137-test suite passed on 2026-09-15. It includes 21 Stage 4 integration tests in addition to direct synthetic tie-certificate cases, scalar-cache lifecycle/invariant/reset checks, cross-environment leakage prevention, Algorithm C Stage 1-3 regressions, and the unchanged A/B development regressions. These are correctness checks, not performance results.
-- No Algorithm C lazy priority loop, selector, score bound, Dijkstra/ranking/certificate integration, A/C full-exploration comparison, or A/B/C runner has been implemented. No A/C full exploration regression or Experiment 0 run has been performed, and no efficiency claim is made.
+- Algorithm C Stage 5 adds episode-scoped `ChangeAwareLazyNBV` with immutable fixed sensor range, a planner-owned `ChangeAwareGainCache`, last-synchronized belief snapshot state, explicit reset, and all-UNKNOWN first-call synchronization for post-initial-scan beliefs. Every snapshot synchronizes before one current Dijkstra search and candidate generation.
+- First-seen eligible candidates are exact-initialized through the Stage 4 refresh helper. Persistent candidates retain caches while ineligible, and global revelation incidence continues to decrement their maintained bounds. Bound-only scores use `q_t(v)/(d_t(v)+1e-9)` with current distance only.
+- The selector reuses the frozen total rank and tie-aware certificate utilities. It exact-reevaluates the deterministic optimistic-best remaining candidate until a current-exact incumbent strictly dominates every optimistic rank, and it certifies completion from all-zero upper gains. A selected target is defensively required to be current-exact.
+- Structured Stage 5 results retain synchronized deltas, exact/skipped counts, certificate reason, selected path and exact values, plus per-candidate current distance, snapshot-entry change-aware bound/score, exact-evaluation values, and refresh status. Snapshot-entry bounds are not overwritten by later exact refreshes.
+- The 160-test suite passed on 2026-09-15. It includes 23 focused Stage 5 tests covering the A-U requirements, two small frozen-snapshot A/C checks, and the unchanged Stage 1-4 and A/B regressions. These are development correctness checks, not Experiment 0 or performance results.
+- No seven-fixture full A/C exploration regression, 60-map A/C regression, A/B/C runner, or Experiment 0 execution has been performed. No efficiency benchmark or claim is made.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
 ## Required Baselines for Candidate 1
@@ -115,7 +119,7 @@ The first implementation must distinguish the proposed change-aware bound from a
 3. change-aware cached-set bound `|A_tau(v) ∩ U_t|`;
 4. optional tighter occlusion-aware bound only if the third method is too loose.
 
-Baselines 1 and 2 are implemented in the current phase. Baseline 3 has its state representation, exact cached-set installation/refresh lifecycle, explicit revelation decrement, and belief/visibility integration; its selector remains unimplemented.
+Baselines 1 and 2 are implemented in the current phase. Baseline 3 now has its state, belief/visibility integration, and certified exact-lazy selector, but still awaits the required full A/C exact-equivalence regressions before acceptance.
 
 Correctness is primary: methods 2/3 must match the exhaustive deterministic argmax and target sequence exactly under the shared tie rule whenever they claim exact equivalence.
 
@@ -131,8 +135,8 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 ## Next Steps
 
 1. Retain the stale-scalar exact-lazy baseline, its explicit per-episode reset contract, and its A/B development regressions as the correctness baseline.
-2. Preserve the Stage 4 atomic order: freeze the post-scan belief snapshot, synchronize every UNKNOWN-to-known delta, and only then use maintained bounds or exact refreshes.
-3. Implement and validate the Algorithm C selector as Stage 5, reusing the existing current-distance and total-rank semantics without changing Algorithms A/B.
-4. Implement the cross-method Experiment 0 runner and immutable failure-artifact writer against the frozen schemas.
+2. Preserve the Stage 5 ordering and lifecycle contracts while testing the implemented selector: synchronize the post-scan snapshot before the single current Dijkstra and any bound use.
+3. Run the full seven-fixture and frozen 60-map A/C exact-equivalence development regressions in Stage 6, retaining every failure.
+4. Implement the cross-method Experiment 0 runner and immutable failure-artifact writer against the frozen schemas only after the full A/C regressions pass.
 5. Execute Experiment 0 and require zero target, sequence, bound, tie, and invariant violations.
 6. Do not begin efficiency evaluation until Experiment 0 passes.

@@ -7,6 +7,11 @@ from .change_aware_integration import (
     newly_known_cells,
     synchronize_revelations,
 )
+from .change_aware_lazy_nbv import (
+    ChangeAwareLazyCandidateRecord,
+    ChangeAwareLazyNBV,
+    ChangeAwareLazyNBVResult,
+)
 from .exhaustive_nbv import (
     CandidateEvaluation,
     ExhaustiveNBVResult,
@@ -26,6 +31,9 @@ __all__ = [
     "CandidateEvaluation",
     "BeliefSnapshot",
     "ChangeAwareGainCache",
+    "ChangeAwareLazyCandidateRecord",
+    "ChangeAwareLazyNBV",
+    "ChangeAwareLazyNBVResult",
     "DijkstraResult",
     "ExhaustiveNBVResult",
     "PlanStatus",

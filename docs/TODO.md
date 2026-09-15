@@ -48,7 +48,10 @@ Last updated: 2026-09-15
 - [x] Implement Algorithm C Stage 3 explicit UNKNOWN-to-known processing, once-per-revelation bound decrement, duplicate protection, historical-membership preservation, validation, and atomic rollback.
 - [x] Integrate Algorithm C immutable belief-snapshot delta discovery, revelation synchronization, and existing optimistic-visibility exact refresh with the Stage 2-3 cache APIs.
 - [x] Verify on actual belief transitions that maintained bounds equal cached-set/current-UNKNOWN intersections, dominate exact current gain, may be strictly loose after a new OCCUPIED blocker, and return to equality after exact refresh.
-- [ ] Implement and validate the Algorithm C selector only after cache maintenance is complete.
+- [x] Implement the stateful Algorithm C selector with pre-bound belief synchronization, one current Dijkstra, first-seen exact initialization, change-aware upper scores, deterministic optimistic reevaluation, tie-aware certification, current-exact selection, and all-zero-bound completion.
+- [x] Add focused Stage 5 lifecycle, diagnostics, strict-slack, reset, tie-certificate, and small frozen-snapshot A/C checks.
+- [ ] Run the full seven-fixture A/C exact-equivalence development regression.
+- [ ] Run the full frozen-v2 60-map A/C exact-equivalence development regression.
 - [x] Implement and directly test Algorithm B's tie-aware exact-selection certificate against the exhaustive total rank order.
 - [x] Verify A/B 100% argmax agreement through complete runs on all seven fixed fixtures and all 60 frozen v2 random maps.
 - [x] Verify A/B 100% target-sequence and termination agreement in development regressions before any speed claim.
