@@ -11,10 +11,10 @@ Last updated: 2026-09-15
 - Candidate 1 has received a **provisional novelty pass with high risk and a narrow claim only** after full-method comparison with major close prior art.
 - The empirical-value gate remains open.
 - The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented, oracle-hardened, and pass the current correctness suite.
-- Experiment 0 exact-equivalence validation is preregistered but has not been executed because Algorithm C and the full A/B/C runner do not yet exist.
+- Experiment 0 exact-equivalence validation is preregistered but has not been executed because the Algorithm C selector/dynamic maintenance and the full A/B/C runner do not yet exist.
 - Experiment 0's corrected `experiment-0-random-v2` 60-map correctness dataset, seed list, hashes, start/acceptance rules, cycle limits, per-cycle logging schema, and failure-artifact convention are frozen. The invalid v1 denominator was detected and corrected before Algorithms B/C or Experiment 0 execution.
 - Algorithm B, the stale-scalar exact-lazy baseline, is implemented and passes development exact-equivalence regressions against Algorithm A on all seven fixed fixtures and all 60 frozen v2 random maps.
-- Algorithm C, the proposed change-aware cached-set method, has not been implemented.
+- Algorithm C Stage 1 state infrastructure is implemented, but the proposed change-aware method itself remains incomplete: no exact cache installation/refresh, revelation-driven decrement, selector, or A/C regression exists.
 
 ## Current Candidate
 
@@ -71,7 +71,7 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - **Theory gate:** PASS, conditional on stated assumptions.
 - **Novelty gate:** PROVISIONAL PASS, HIGH RISK, NARROW CLAIM ONLY.
 - **Empirical-value gate:** OPEN.
-- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline is implemented; the change-aware method remains deferred.
+- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline is implemented. Algorithm C has state-only cache/index infrastructure; its update and selection behavior remains deferred.
 
 ## Implemented Features
 
@@ -95,8 +95,9 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - Algorithm B's stale cache is explicitly episode-scoped. Public `reset()` clears only cached gains before planner reuse on a new environment while preserving the fixed sensor-range configuration; no heuristic automatic reset is performed.
 - Structured Algorithm B results expose per-cycle exact-evaluation counts, bound-only counts, certificate reasons, selected current-exact values, and candidate-level stale/exact/cache-refresh diagnostics.
 - A/B shared-snapshot development regressions cover complete exploration on all seven fixed fixtures and every accepted map in frozen `experiment-0-random-v2`; stale-bound violations, target mismatches, and sequence/termination divergences were all zero.
-- The 78-test suite passed on 2026-09-15. It includes direct synthetic tie-certificate cases, scalar-cache lifecycle/invariant/reset checks, cross-environment leakage prevention, and a deterministic case where B safely selects the same target with fewer exact evaluations than A. These are correctness checks, not performance results.
-- No cached visible-UNKNOWN sets, inverse-incidence index, decrement-on-revelation maintenance, priority queue, Algorithm C selector, or C comparison has been implemented.
+- Algorithm C Stage 1 provides an episode-scoped `ChangeAwareGainCache` state abstraction with candidate-to-exact-cached-visible-UNKNOWN sets, candidate-to-maintained-bound counts, cell-to-candidate inverse incidence, safe diagnostics, explicit reset, and defensive structural validation.
+- The 91-test suite passed on 2026-09-15. It includes direct synthetic tie-certificate cases, scalar-cache lifecycle/invariant/reset checks, cross-environment leakage prevention, Algorithm C Stage 1 state-invariant checks, and a deterministic case where B safely selects the same target with fewer exact evaluations than A. These are correctness checks, not performance results.
+- No Algorithm C cache installation/removal API, exact refresh, raycasting, UNKNOWN-to-known decrement processing, belief-delta handling, lazy priority loop, selector, A/C comparison, or A/B/C runner has been implemented.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
 ## Required Baselines for Candidate 1
@@ -108,7 +109,7 @@ The first implementation must distinguish the proposed change-aware bound from a
 3. change-aware cached-set bound `|A_tau(v) ∩ U_t|`;
 4. optional tighter occlusion-aware bound only if the third method is too loose.
 
-Baselines 1 and 2 are implemented in the current phase. Baseline 3 remains unimplemented.
+Baselines 1 and 2 are implemented in the current phase. Baseline 3 has only its Stage 1 state representation; its update and selection algorithm remains unimplemented.
 
 Correctness is primary: methods 2/3 must match the exhaustive deterministic argmax and target sequence exactly under the shared tie rule whenever they claim exact equivalence.
 
@@ -124,7 +125,7 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 ## Next Steps
 
 1. Retain the stale-scalar exact-lazy baseline, its explicit per-episode reset contract, and its A/B development regressions as the correctness baseline.
-2. Implement the change-aware Candidate 1 method without changing the frozen Algorithm A/B semantics.
+2. Add Algorithm C exact cache installation/refresh and dynamic bound maintenance in later staged work without changing the frozen Algorithm A/B semantics.
 3. Implement the cross-method Experiment 0 runner and immutable failure-artifact writer against the frozen schemas.
 4. Execute Experiment 0 and require zero target, sequence, bound, tie, and invariant violations.
 5. Do not begin efficiency evaluation until Experiment 0 passes.

@@ -271,3 +271,14 @@ The run metadata needed to reproduce or independently verify these observations 
 - **No algorithmic change:** Selection, stale upper bounds, exact visibility evaluation, current Dijkstra distances, score, deterministic tie certificate, completion certificate, and cache-refresh semantics are unchanged. No heuristic automatic reset was added.
 - **Regression result:** The full **78-test** suite passed. All seven fixed fixtures and all 60 frozen v2 random maps retained exact A/B target and terminal-sequence agreement. Target mismatches: **0**; sequence/termination divergences: **0**; stale-bound violations: **0**.
 - **Scope:** This is lifecycle hardening, not an Algorithm B research-method change or experiment. Algorithm C remains unimplemented.
+
+## 2026-09-15 — Algorithm C Stage 1 Cache/Index State Foundation
+
+- **Implemented infrastructure only:** `ChangeAwareGainCache` explicitly represents candidate-to-exact-cached-visible-UNKNOWN sets, candidate-to-maintained-bound counts, and cell-to-candidate inverse incidence. Cached sets and diagnostic incidence memberships are immutable `frozenset` values at the public boundary.
+- **Verified lifecycle:** All three state families are episode-scoped. Explicit idempotent `reset()` clears them without heuristic environment detection; a new episode must reset the state or use a new instance.
+- **Verified invariants:** Cached-set and bound-count candidate keys must match; coordinates are nonnegative strict-integer pairs; cached sets must be `frozenset`; bounds must be strict nonnegative integers no greater than cached-set size; fresh bounds may be checked for equality with cached-set size; inverse incidence must use unique initialized candidates and exactly match cached membership in both directions.
+- **Verified diagnostics:** Read-only detached mappings and immutable nested memberships prevent external callers from mutating internal state.
+- **Scope boundary:** No public install/remove/update operation, exact refresh, raycasting, observation-delta processing, UNKNOWN-to-known decrement, lazy selection, priority queue, Algorithm C `plan()`, A/C regression, A/B/C runner, or Experiment 0 execution was added.
+- **Unchanged:** Algorithm A, Algorithm B, simulator, candidate, sensing, motion, score, tie, fixture, dataset, and CI workflow semantics were not modified.
+- **Full suite:** **91 tests passed** on 2026-09-15, including the unchanged seven-fixture and frozen-v2 60-map A/B regressions.
+- **No research experiment executed:** This entry records implementation verification only; Algorithm C remains incomplete.

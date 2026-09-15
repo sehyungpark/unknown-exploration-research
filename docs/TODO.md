@@ -43,6 +43,10 @@ Last updated: 2026-09-15
 - [ ] Implement the Experiment 0 cross-method cycle logger and immutable failure-artifact writer when Algorithms B/C are available.
 - [x] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
 - [ ] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
+- [x] Implement Algorithm C Stage 1 state-only cache/index representation, safe diagnostics, reset lifecycle, and invariant validation.
+- [ ] Implement Algorithm C exact cache install/remove/refresh operations in a later stage.
+- [ ] Implement Algorithm C UNKNOWN-to-known decrement and belief-delta processing in a later stage.
+- [ ] Implement and validate the Algorithm C selector only after cache maintenance is complete.
 - [x] Implement and directly test Algorithm B's tie-aware exact-selection certificate against the exhaustive total rank order.
 - [x] Verify A/B 100% argmax agreement through complete runs on all seven fixed fixtures and all 60 frozen v2 random maps.
 - [x] Verify A/B 100% target-sequence and termination agreement in development regressions before any speed claim.

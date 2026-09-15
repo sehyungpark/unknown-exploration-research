@@ -1,5 +1,6 @@
-"""Exact motion and exhaustive optimistic-NBV planning."""
+"""Planning algorithms and state foundations."""
 
+from .change_aware_cache import ChangeAwareGainCache
 from .exhaustive_nbv import (
     CandidateEvaluation,
     ExhaustiveNBVResult,
@@ -17,6 +18,7 @@ from .stale_scalar_lazy_nbv import (
 
 __all__ = [
     "CandidateEvaluation",
+    "ChangeAwareGainCache",
     "DijkstraResult",
     "ExhaustiveNBVResult",
     "PlanStatus",
