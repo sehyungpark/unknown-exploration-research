@@ -50,6 +50,7 @@ Last updated: 2026-09-15
 - [x] Verify on actual belief transitions that maintained bounds equal cached-set/current-UNKNOWN intersections, dominate exact current gain, may be strictly loose after a new OCCUPIED blocker, and return to equality after exact refresh.
 - [x] Implement the stateful Algorithm C selector with pre-bound belief synchronization, one current Dijkstra, first-seen exact initialization, change-aware upper scores, deterministic optimistic reevaluation, tie-aware certification, current-exact selection, and all-zero-bound completion.
 - [x] Add focused Stage 5 lifecycle, diagnostics, strict-slack, reset, tie-certificate, and small frozen-snapshot A/C checks.
+- [x] Harden Stage 5 exact reevaluation to capture the maintained bound before pure exact computation, fail fast before installation on `G_exact > q_before`, preserve the full cache atomically on violation, retain diagnostic context, and keep the independent post-refresh tightness check. The impossible negative case is deliberately fault-injected; no supported-run violation has been observed and no exhaustive fallback is used.
 - [ ] Run the full seven-fixture A/C exact-equivalence development regression.
 - [ ] Run the full frozen-v2 60-map A/C exact-equivalence development regression.
 - [x] Implement and directly test Algorithm B's tie-aware exact-selection certificate against the exhaustive total rank order.

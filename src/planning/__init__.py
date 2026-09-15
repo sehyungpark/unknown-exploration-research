@@ -4,10 +4,12 @@ from .change_aware_cache import ChangeAwareGainCache
 from .change_aware_integration import (
     BeliefSnapshot,
     exact_refresh_candidate,
+    exact_visible_unknown_candidate,
     newly_known_cells,
     synchronize_revelations,
 )
 from .change_aware_lazy_nbv import (
+    ChangeAwareGainBoundViolation,
     ChangeAwareLazyCandidateRecord,
     ChangeAwareLazyNBV,
     ChangeAwareLazyNBVResult,
@@ -31,6 +33,7 @@ __all__ = [
     "CandidateEvaluation",
     "BeliefSnapshot",
     "ChangeAwareGainCache",
+    "ChangeAwareGainBoundViolation",
     "ChangeAwareLazyCandidateRecord",
     "ChangeAwareLazyNBV",
     "ChangeAwareLazyNBVResult",
@@ -42,6 +45,7 @@ __all__ = [
     "StaleScalarLazyNBV",
     "dijkstra",
     "exact_refresh_candidate",
+    "exact_visible_unknown_candidate",
     "exhaustive_nbv",
     "newly_known_cells",
     "optimistic_rank_state",

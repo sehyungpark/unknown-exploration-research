@@ -5,6 +5,7 @@ from src.mapping import BeliefGrid
 from src.planning import (
     ChangeAwareGainCache,
     exact_refresh_candidate,
+    exact_visible_unknown_candidate,
     newly_known_cells,
     synchronize_revelations,
 )
@@ -184,6 +185,24 @@ class ExactVisibilityIntegrationTests(unittest.TestCase):
         )
 
         self.assertEqual(actual, expected)
+
+    def test_pure_exact_computation_does_not_mutate_cache(self) -> None:
+        belief = belief_from_ascii((".???",))
+        cache = ChangeAwareGainCache()
+        exact_refresh_candidate(cache, belief, self.candidate, 8)
+        before = cache_snapshot(cache)
+
+        actual = exact_visible_unknown_candidate(
+            belief,
+            self.candidate,
+            8,
+        )
+
+        self.assertEqual(
+            actual,
+            optimistic_visible_unknown_cells(belief, self.candidate, 8),
+        )
+        self.assertEqual(cache_snapshot(cache), before)
 
     def test_p_exact_refresh_installs_direct_visibility_set(self) -> None:
         belief = belief_from_ascii((".???",))

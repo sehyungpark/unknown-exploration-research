@@ -5,9 +5,9 @@ from unittest.mock import patch
 from src.mapping import BeliefGrid
 from src.planning import (
     CandidateEvaluation,
+    ChangeAwareGainBoundViolation,
     ChangeAwareLazyNBV,
     PlanStatus,
-    exact_refresh_candidate,
     exhaustive_nbv,
     tie_aware_rank_certificate,
 )
@@ -59,16 +59,14 @@ class ChangeAwareLazyPlannerTests(unittest.TestCase):
             predecessors={candidate: planning_robot for candidate in candidates},
         )
 
-        def refresh(cache, actual_belief, candidate, sensor_range):
+        def compute_exact(actual_belief, candidate, sensor_range):
             self.assertIs(actual_belief, planning_belief)
             self.assertEqual(sensor_range, planner.sensor_range)
-            visible = (
+            return (
                 fake_visible_set(candidate, gains[candidate])
                 if exact_sets is None
                 else exact_sets[candidate]
             )
-            cache.install_exact(candidate, visible)
-            return visible
 
         with (
             patch.object(
@@ -83,8 +81,8 @@ class ChangeAwareLazyPlannerTests(unittest.TestCase):
             ) as generate,
             patch.object(
                 change_module,
-                "exact_refresh_candidate",
-                side_effect=refresh,
+                "exact_visible_unknown_candidate",
+                side_effect=compute_exact,
             ) as exact_refresh,
         ):
             result = planner.plan(planning_belief, planning_robot)
@@ -354,12 +352,13 @@ class ChangeAwareLazyPlannerTests(unittest.TestCase):
 
         belief.apply_observations({(0, 2): TruthState.OCCUPIED})
 
-        def observe_refresh(cache, actual_belief, actual_candidate, sensor_range):
+        def observe_refresh(actual_belief, actual_candidate, sensor_range):
             self.assertEqual(actual_candidate, candidate)
-            self.assertEqual(cache.cached_visible_unknown[candidate], historical)
-            self.assertEqual(cache.bound_counts[candidate], 2)
-            return exact_refresh_candidate(
-                cache,
+            self.assertEqual(
+                planner.cache.cached_visible_unknown[candidate], historical
+            )
+            self.assertEqual(planner.cache.bound_counts[candidate], 2)
+            return optimistic_visible_unknown_cells(
                 actual_belief,
                 actual_candidate,
                 sensor_range,
@@ -367,7 +366,7 @@ class ChangeAwareLazyPlannerTests(unittest.TestCase):
 
         with patch.object(
             change_module,
-            "exact_refresh_candidate",
+            "exact_visible_unknown_candidate",
             side_effect=observe_refresh,
         ) as refresh:
             second = planner.plan(belief, self.robot)
@@ -402,6 +401,74 @@ class ChangeAwareLazyPlannerTests(unittest.TestCase):
             len(planner.cache.cached_visible_unknown[self.a]),
             planner.cache.bound_counts[self.a],
         )
+
+    def test_v_equal_old_bound_refreshes_normally(self) -> None:
+        planner = ChangeAwareLazyNBV()
+        self._plan_snapshot(
+            planner,
+            candidates=(self.a,),
+            distances={self.a: 1.0},
+            gains={self.a: 3},
+        )
+
+        result, exact_compute = self._plan_snapshot(
+            planner,
+            candidates=(self.a,),
+            distances={self.a: 1.0},
+            gains={self.a: 3},
+        )
+
+        self.assertEqual(exact_compute.call_count, 1)
+        self.assertEqual(result.candidate_records[0].current_exact_gain, 3)
+        self.assertEqual(planner.cache.bound_counts[self.a], 3)
+
+    def test_w_fault_injected_bound_violation_is_atomic(self) -> None:
+        planner = ChangeAwareLazyNBV()
+        self._plan_snapshot(
+            planner,
+            candidates=(self.a,),
+            distances={self.a: 1.0},
+            gains={self.a: 2},
+        )
+        before = (
+            dict(planner.cache.cached_visible_unknown),
+            dict(planner.cache.bound_counts),
+            dict(planner.cache.inverse_incidence),
+            planner.cache.reported_known_cells,
+        )
+
+        with self.assertRaisesRegex(
+            ChangeAwareGainBoundViolation,
+            r"current exact gain 3 > maintained bound 2",
+        ) as raised:
+            self._plan_snapshot(
+                planner,
+                candidates=(self.a,),
+                distances={self.a: 1.0},
+                gains={self.a: 3},
+            )
+
+        after = (
+            dict(planner.cache.cached_visible_unknown),
+            dict(planner.cache.bound_counts),
+            dict(planner.cache.inverse_incidence),
+            planner.cache.reported_known_cells,
+        )
+        self.assertEqual(after, before)
+        error = raised.exception
+        self.assertEqual(error.candidate, self.a)
+        self.assertEqual(error.old_bound, 2)
+        self.assertEqual(error.exact_gain, 3)
+        self.assertEqual(error.current_distance, 1.0)
+        self.assertEqual(error.sensor_range, planner.sensor_range)
+        self.assertEqual(error.exact_visible_unknown, fake_visible_set(self.a, 3))
+        self.assertEqual(error.previous_synchronized_snapshot, self.belief.snapshot())
+        self.assertEqual(error.current_belief_snapshot, self.belief.snapshot())
+        self.assertEqual(error.newly_known_delta, frozenset())
+        self.assertEqual(dict(error.cached_visible_unknown), before[0])
+        self.assertEqual(dict(error.bound_counts), before[1])
+        self.assertEqual(dict(error.inverse_incidence), before[2])
+        self.assertEqual(error.reported_known_cells, before[3])
 
     def test_p_belief_synchronization_precedes_bound_diagnostics(self) -> None:
         belief = belief_from_ascii(("..?",))
@@ -508,10 +575,11 @@ class ChangeAwareLazyPlannerTests(unittest.TestCase):
         planner = ChangeAwareLazyNBV()
         expected_reported = frozenset({(0, 0), (0, 1)})
 
-        def observe_refresh(cache, actual_belief, candidate, sensor_range):
-            self.assertEqual(cache.reported_known_cells, expected_reported)
-            return exact_refresh_candidate(
-                cache,
+        def observe_refresh(actual_belief, candidate, sensor_range):
+            self.assertEqual(
+                planner.cache.reported_known_cells, expected_reported
+            )
+            return optimistic_visible_unknown_cells(
                 actual_belief,
                 candidate,
                 sensor_range,
@@ -519,7 +587,7 @@ class ChangeAwareLazyPlannerTests(unittest.TestCase):
 
         with patch.object(
             change_module,
-            "exact_refresh_candidate",
+            "exact_visible_unknown_candidate",
             side_effect=observe_refresh,
         ):
             result = planner.plan(belief, self.robot)

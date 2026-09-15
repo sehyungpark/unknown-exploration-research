@@ -9,7 +9,7 @@ from src.utils import BeliefState, Coord
 from .change_aware_cache import ChangeAwareGainCache
 from .change_aware_integration import (
     BeliefSnapshot,
-    exact_refresh_candidate,
+    exact_visible_unknown_candidate,
     synchronize_revelations,
 )
 from .exhaustive_nbv import (
@@ -61,6 +61,49 @@ class ChangeAwareLazyNBVResult:
     candidate_records: tuple[ChangeAwareLazyCandidateRecord, ...]
 
 
+class ChangeAwareGainBoundViolation(RuntimeError):
+    """A supported run produced an exact gain above its maintained bound.
+
+    The detached diagnostic values capture the planning-cycle context while
+    the planner-owned cache remains untouched and available for inspection.
+    """
+
+    def __init__(
+        self,
+        *,
+        candidate: Coord,
+        old_bound: int,
+        exact_visible_unknown: frozenset[Coord],
+        cached_visible_unknown: tuple[tuple[Coord, frozenset[Coord]], ...],
+        bound_counts: tuple[tuple[Coord, int], ...],
+        inverse_incidence: tuple[tuple[Coord, frozenset[Coord]], ...],
+        reported_known_cells: frozenset[Coord],
+        previous_synchronized_snapshot: BeliefSnapshot,
+        current_belief_snapshot: BeliefSnapshot,
+        newly_known_delta: frozenset[Coord],
+        sensor_range: float,
+        current_distance: float,
+    ) -> None:
+        exact_gain = len(exact_visible_unknown)
+        super().__init__(
+            f"change-aware gain bound violated for {candidate}: "
+            f"current exact gain {exact_gain} > maintained bound {old_bound}"
+        )
+        self.candidate = candidate
+        self.old_bound = old_bound
+        self.exact_gain = exact_gain
+        self.exact_visible_unknown = exact_visible_unknown
+        self.cached_visible_unknown = cached_visible_unknown
+        self.bound_counts = bound_counts
+        self.inverse_incidence = inverse_incidence
+        self.reported_known_cells = reported_known_cells
+        self.previous_synchronized_snapshot = previous_synchronized_snapshot
+        self.current_belief_snapshot = current_belief_snapshot
+        self.newly_known_delta = newly_known_delta
+        self.sensor_range = sensor_range
+        self.current_distance = current_distance
+
+
 def _all_unknown_baseline(snapshot: BeliefSnapshot) -> BeliefSnapshot:
     """Return the pre-observation baseline for a planner's first snapshot."""
 
@@ -109,7 +152,10 @@ class ChangeAwareLazyNBV:
         self._cache.reset()
         self._last_synchronized_snapshot = None
 
-    def _synchronize_belief(self, belief: BeliefGrid) -> frozenset[Coord]:
+    def _synchronize_belief(
+        self,
+        belief: BeliefGrid,
+    ) -> tuple[BeliefSnapshot, BeliefSnapshot, frozenset[Coord]]:
         current_snapshot = belief.snapshot()
         previous_snapshot = self._last_synchronized_snapshot
         if previous_snapshot is None:
@@ -120,12 +166,16 @@ class ChangeAwareLazyNBV:
             current_snapshot,
         )
         self._last_synchronized_snapshot = current_snapshot
-        return delta
+        return previous_snapshot, current_snapshot, delta
 
     def plan(self, belief: BeliefGrid, robot: Coord) -> ChangeAwareLazyNBVResult:
         """Select with a tie-aware certificate on one synchronized snapshot."""
 
-        synchronized_delta = self._synchronize_belief(belief)
+        (
+            previous_snapshot,
+            current_snapshot,
+            synchronized_delta,
+        ) = self._synchronize_belief(belief)
         distance_result = dijkstra(belief, robot)
         candidates = reachable_known_free_candidates(
             belief,
@@ -146,13 +196,38 @@ class ChangeAwareLazyNBV:
         refreshed: set[Coord] = set()
 
         def exact_evaluate(candidate: Coord) -> None:
-            visible_unknown = exact_refresh_candidate(
-                self._cache,
+            bounds_before = self._cache.bound_counts
+            old_bound = (
+                bounds_before[candidate]
+                if candidate in bounds_before
+                else None
+            )
+            visible_unknown = exact_visible_unknown_candidate(
                 belief,
                 candidate,
                 self.sensor_range,
             )
             gain = len(visible_unknown)
+            if old_bound is not None and gain > old_bound:
+                raise ChangeAwareGainBoundViolation(
+                    candidate=candidate,
+                    old_bound=old_bound,
+                    exact_visible_unknown=visible_unknown,
+                    cached_visible_unknown=tuple(
+                        sorted(self._cache.cached_visible_unknown.items())
+                    ),
+                    bound_counts=tuple(sorted(self._cache.bound_counts.items())),
+                    inverse_incidence=tuple(
+                        sorted(self._cache.inverse_incidence.items())
+                    ),
+                    reported_known_cells=self._cache.reported_known_cells,
+                    previous_synchronized_snapshot=previous_snapshot,
+                    current_belief_snapshot=current_snapshot,
+                    newly_known_delta=synchronized_delta,
+                    sensor_range=self.sensor_range,
+                    current_distance=distances[candidate],
+                )
+            self._cache.install_exact(candidate, visible_unknown)
             if self._cache.bound_counts[candidate] != gain:
                 raise RuntimeError(
                     f"exact refresh did not produce a tight bound for {candidate}"

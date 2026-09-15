@@ -100,10 +100,24 @@ def exact_refresh_candidate(
 ) -> frozenset[Coord]:
     """Compute current exact optimistic visibility and install it in cache."""
 
-    visible_unknown = optimistic_visible_unknown_cells(
+    visible_unknown = exact_visible_unknown_candidate(
         belief,
         candidate,
         sensor_range,
     )
     cache.install_exact(candidate, visible_unknown)
     return visible_unknown
+
+
+def exact_visible_unknown_candidate(
+    belief: BeliefGrid,
+    candidate: Coord,
+    sensor_range: float = 8,
+) -> frozenset[Coord]:
+    """Compute one candidate's exact set without mutating Algorithm C state."""
+
+    return optimistic_visible_unknown_cells(
+        belief,
+        candidate,
+        sensor_range,
+    )
