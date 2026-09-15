@@ -1,6 +1,6 @@
 # TODO
 
-Last updated: 2026-09-15
+Last updated: 2026-09-16
 
 ## P0 — Research Gates Before Implementation
 
@@ -51,8 +51,8 @@ Last updated: 2026-09-15
 - [x] Implement the stateful Algorithm C selector with pre-bound belief synchronization, one current Dijkstra, first-seen exact initialization, change-aware upper scores, deterministic optimistic reevaluation, tie-aware certification, current-exact selection, and all-zero-bound completion.
 - [x] Add focused Stage 5 lifecycle, diagnostics, strict-slack, reset, tie-certificate, and small frozen-snapshot A/C checks.
 - [x] Harden Stage 5 exact reevaluation to capture the maintained bound before pure exact computation, fail fast before installation on `G_exact > q_before`, preserve the full cache atomically on violation, retain diagnostic context, and keep the independent post-refresh tightness check. The impossible negative case is deliberately fault-injected; no supported-run violation has been observed and no exhaustive fallback is used.
-- [ ] Run the full seven-fixture A/C exact-equivalence development regression.
-- [ ] Run the full frozen-v2 60-map A/C exact-equivalence development regression.
+- [x] Run the full seven-fixture A/C exact-equivalence development regression: 7/7 runs and 89 shared planning snapshots passed with zero target, status/termination, selected-value, path, or maintained-bound mismatch; safe exact-evaluation skipping was observed.
+- [x] Run the full frozen-v2 60-map A/C exact-equivalence development regression: 60/60 runs and 1,096 shared planning snapshots passed after frozen metadata regeneration checks, with zero target, status/termination, selected-value, path, or maintained-bound mismatch; safe exact-evaluation skipping was observed.
 - [x] Implement and directly test Algorithm B's tie-aware exact-selection certificate against the exhaustive total rank order.
 - [x] Verify A/B 100% argmax agreement through complete runs on all seven fixed fixtures and all 60 frozen v2 random maps.
 - [x] Verify A/B 100% target-sequence and termination agreement in development regressions before any speed claim.
