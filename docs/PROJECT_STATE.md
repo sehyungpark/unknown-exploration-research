@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-09-16
+Last updated: 2026-09-17
 
 ## Current Research Stage
 
@@ -125,6 +125,7 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - Experiment 0 is a correctness experiment. It establishes empirical exact-equivalence on the preregistered dataset, not a mathematical proof of global equivalence. No wall-clock, memory, speedup, or efficiency conclusion is drawn from this result.
 - Stage 9 freezes the structurally generated `experiment-1-efficiency-v1` dataset: 27 maps across nine size-density strata, master seed `20260916`, three accepted maps per stratum, and zero rejected attempts. Its regeneration tests use no simulator or planner. No Experiment 1 result directory or empirical measurement exists.
 - Stage 9's 9 focused dataset-regeneration tests and the full 206-test suite passed on 2026-09-16. The full suite exercised only existing regression workloads plus structural Experiment 1 regeneration; it did not execute an Experiment 1 planner workload.
+- Pre-execution Amendment 1, added on 2026-09-17 before any Experiment 1 result was observed, preserves the original Stage 9 wording but supersedes its overlapping GO/MODIFY/DROP language with an ordered deterministic rule: correctness failure reopens correctness; failure of any one of the three aggregate visibility-work inequalities yields DROP; otherwise the C/B timing interval yields GO when wholly below 1, MODIFY when it contains 1 including endpoint equality, and DROP when wholly above 1. Memory and scaling remain required reported tradeoffs but cannot override that classification. No dataset, subset, metric, repetition, bootstrap, simulator, or algorithm specification changed.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
 ## Required Baselines for Candidate 1

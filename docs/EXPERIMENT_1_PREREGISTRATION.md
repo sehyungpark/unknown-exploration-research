@@ -91,6 +91,26 @@ For this decision, "strictly less aggregate exact visibility work" means that C'
 
 A correctness failure is not DROP. It reopens the correctness investigation.
 
+## Pre-execution Amendment 1 — Deterministic Decision Categories
+
+Amended: 2026-09-17, before any Experiment 1 execution. At the time of this amendment, no Experiment 1 timing, memory, deterministic work, bound slack, or planner-performance result had been observed. The original Stage 9 decision wording above remains preserved as preregistered history; this amendment supersedes that wording only where it defines the final Experiment 1 decision classification.
+
+The dataset, maps, timing subset, sensor-range sensitivity subset, metrics, repetitions, timing method orders, paired map-level bootstrap protocol, simulator semantics, and Algorithms A/B/C are unchanged. This amendment only makes the final decision categories mutually exclusive and deterministic. Evaluate the following conditions in exactly this order, with no subjective override after observing the result:
+
+1. **CORRECTNESS_REOPENED.** If any primary `R=8` Experiment 1 correctness requirement fails, including any A/B/C target or sequence disagreement or any required bound, tie-certificate, or cache/index invariant failure, set `decision = CORRECTNESS_REOPENED`. Do not interpret performance results from the invalid run. This classification is not GO, MODIFY, or DROP.
+2. **Visibility-work reduction gate.** Over the complete primary 27-map `R=8` workload, C has reduced deterministic exact-visibility work relative to B if and only if all three aggregate strict inequalities hold: `C_ray < B_ray` AND `C_supercover < B_supercover` AND `C_probe < B_probe`, for `visibility_ray_count`, `visibility_supercover_cell_count`, and `visibility_interior_probe_count`, respectively. If this all-three condition is false, set `decision = DROP`.
+3. **GO.** If correctness is valid, the all-three visibility-work reduction condition is true, and the preregistered paired map-level 95% bootstrap interval `[lower, upper]` for the C/B total planning-time ratio lies entirely below `1.0` (`upper < 1.0`), set `decision = GO`.
+4. **MODIFY.** If correctness is valid, the all-three visibility-work reduction condition is true, and the interval contains `1.0`, including endpoint equality (`lower <= 1.0 <= upper`), set `decision = MODIFY`.
+5. **DROP.** If correctness is valid, the all-three visibility-work reduction condition is true, and the interval lies entirely above `1.0` (`lower > 1.0`), set `decision = DROP`.
+
+After correctness is established and the all-three visibility-work reduction gate passes, the timing boundaries are exhaustive and mutually exclusive:
+
+- `upper < 1.0` → GO
+- `lower <= 1.0 <= upper` → MODIFY
+- `lower > 1.0` → DROP
+
+B structural cache size, C structural cache/index size, separate `tracemalloc` results, and scaling behavior remain required reported tradeoffs and must be discussed when interpreting the result. They do not independently override the deterministic classification. A GO result may therefore carry a substantial memory cost, which must be stated. Candidate-density and sensor-range scaling remain descriptive/secondary analyses; they likewise do not override the primary classification and are not separate DROP triggers.
+
 ## Path and Coverage Sanity
 
 Record path length, coverage trajectory, planning-snapshot count, and 90%, 95%, and 99% coverage step/time indices. These must agree across A/B/C as applicable and are sanity checks only. No path-quality improvement claim is permitted.

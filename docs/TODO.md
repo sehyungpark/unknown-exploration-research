@@ -1,6 +1,6 @@
 # TODO
 
-Last updated: 2026-09-16
+Last updated: 2026-09-17
 
 ## P0 — Research Gates Before Implementation
 
@@ -66,6 +66,7 @@ Last updated: 2026-09-16
 ## P3 — Empirical Value Gate
 
 - [x] Design and preregister Experiment 1 before execution, including the 27-map dataset, seed stream, nine-map timing subset, timing warm-up/order/repetitions, separate memory pass, resource counters, failure handling, raw-result layout, bootstrap, and GO/MODIFY/DROP rules.
+- [x] Add Pre-execution Amendment 1 before observing any Experiment 1 result, preserving the original Stage 9 wording while making CORRECTNESS_REOPENED / GO / MODIFY / DROP mutually exclusive and deterministic; keep memory and scaling as reported tradeoffs rather than decision overrides.
 - [ ] Stage 10: implement the guarded Experiment 1 measurement runner and canonical serializers without changing Algorithms A/B/C or simulator semantics.
 - [ ] Add benchmark-only forwarding instrumentation for exact visibility work and internal time decomposition; prove it preserves canonical decisions and counters on synthetic/nonformal inputs.
 - [ ] Add non-overwriting success/failure writers and schema validation for all six frozen Experiment 1 output files; do not create a formal run during infrastructure validation.
@@ -75,7 +76,7 @@ Last updated: 2026-09-16
 - [ ] Compare total planning wall-clock time including all bookkeeping overhead.
 - [ ] Measure memory scaling versus candidate density and sensing range.
 - [ ] Measure path length and coverage/time to 90%, 95%, and 99% as sanity checks that exact decision equivalence is preserved.
-- [ ] Decide **GO / MODIFY / DROP** for Candidate 1 based on total computational benefit, not raycast count alone.
+- [ ] Apply Pre-execution Amendment 1 exactly, with no post-result override: correctness first, then the all-three aggregate visibility-work gate, then the paired C/B timing-interval boundaries.
 
 ## Deferred
 
