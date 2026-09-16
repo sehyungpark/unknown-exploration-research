@@ -68,4 +68,25 @@ These entries predate this log. Missing values are explicitly marked rather than
 
 ## New Experiments
 
-No new experiments have been executed in the current repository.
+### EXPERIMENT0-FORMAL-20260916-001 — First Formal Preregistered Experiment 0 Execution
+
+- **Execution date:** 2026-09-16
+- **Invocation ID:** `experiment0-formal-20260916-001`
+- **Status:** **PASS**
+- **Execution revision:** `b8597a9453fe2a6e011098c8da2c9a0a96e2fb7a`
+- **Runner version:** `experiment-0-runner-v1`
+- **Dataset:** Seven deterministic fixtures plus 60 frozen `experiment-0-random-v2` maps; 67 total complete runs. Frozen map IDs, seeds, starts, sizes, density targets, acceptance metadata, hashes, and cycle limits are recorded in `configs/experiment_0_random_maps.json` and the formal manifest.
+- **Map conditions:** Static 20×20 deterministic fixtures and frozen 20×20, 30×30, and 40×40 random maps. Agent pose is exact; SLAM and localization error are excluded.
+- **Movement model:** Legal 8-neighbor known-FREE motion with orthogonal cost `1`, diagonal cost `sqrt(2)`, and no diagonal corner cutting.
+- **Sensor configuration:** Fixed range `R=8`; deterministic corner-inclusive, endpoint-inclusive supercover; UNKNOWN-transparent optimistic planning visibility and first-hit OCCUPIED physical occlusion.
+- **Algorithms:** A exhaustive optimistic NBV; B stale-scalar certified exact-lazy NBV; C change-aware cached-set certified exact-lazy NBV. One shared environment and planning snapshot were used per run in A→B→C evaluation order.
+- **Completion target:** Identical A/B/C selected target at every planning snapshot and identical complete target/STOP sequence, with explicit `EXPLORATION_COMPLETE` termination for every map.
+- **Planning snapshots:** **1,185** total; **1,118** selected snapshots and **67** terminal snapshots.
+- **Target agreement:** **100%**. A/B target mismatches: **0**; A/C: **0**; B/C: **0**.
+- **Sequence agreement:** **100%**. Complete sequence divergences: **0**.
+- **Other correctness results:** Termination mismatches: **0**; selected gain/distance/score/path mismatches: **0**; candidate-domain/distance mismatches: **0**; B bound violations: **0**; C bound violations: **0**; B tie-certificate violations: **0**; C tie-certificate violations: **0**; C cache/index invariant violations: **0**; supported `ChangeAwareGainBoundViolation` events: **0**; unsupported assumption/lifecycle failures: **0**; safety-limit exhaustions: **0**; malformed records: **0**; unexpected exceptions: **0**.
+- **Exact-gain evaluation diagnostics:** A **215,939**; B **40,764**; C **20,578**.
+- **Raw result:** `results/experiment_0/runs/experiment0-formal-20260916-001/`
+- **Runtime:** Approximately 21 minutes 35 seconds from formal manifest creation to summary write; retained as execution metadata only.
+- **Failure reason/artifact:** None; `failure_run_id` is null and no failure directory exists for this passing invocation.
+- **Interpretation:** Experiment 0 is a correctness experiment. It establishes empirical exact-equivalence on the preregistered correctness dataset, not a mathematical proof of global equivalence. No wall-clock, memory, speedup, or efficiency conclusion is drawn from this result.

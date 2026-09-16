@@ -43,7 +43,7 @@ Last updated: 2026-09-16
 - [x] Implement the Stage 7 formal shared A/B/C Experiment 0 runner, exact frozen cycle schema/serializer, non-overwriting invocation logs, immutable six-file failure artifacts, stable failure classifications, and guarded single-map reproduction mode.
 - [x] Add direct external B/C bound and tie-certificate validation, C cache/index and membership validation, precise pre-plan inverse-incidence decrement counting, terminal snapshot logging, and fail-fast no-movement-before-agreement behavior.
 - [x] Validate Stage 7 infrastructure only with canonical serialization/writer tests, synthetic `stage7-smoke` shared runs, and fault-injected mismatch/bound/cache/safety/malformed cases in temporary directories; preserve the unexecuted formal-workload guard.
-- [ ] Stage 8: execute the first formal 7-fixture + 60-map Experiment 0 invocation, retain all success/failure output, and require zero target, sequence, selected-value/path, candidate-domain/distance, bound, tie, or cache/index violations.
+- [x] Stage 8: execute the first formal 7-fixture + 60-map Experiment 0 invocation, retain all success/failure output, and require zero target, sequence, selected-value/path, candidate-domain/distance, bound, tie, or cache/index violations. **PASS** on 2026-09-16 at revision `b8597a9453fe2a6e011098c8da2c9a0a96e2fb7a`.
 - [x] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
 - [x] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
 - [x] Implement Algorithm C Stage 1 state-only cache/index representation, safe diagnostics, reset lifecycle, and invariant validation.
@@ -65,6 +65,7 @@ Last updated: 2026-09-16
 
 ## P3 — Empirical Value Gate
 
+- [ ] Design and preregister the efficiency evaluation before executing it, including frozen workloads/seeds, timing warm-up and repetition protocol, memory measurement, resource counters, failure handling, raw-result layout, and analysis rules.
 - [ ] Compare stale-scalar versus change-aware bound tightness over planning cycles.
 - [ ] Compare exact gain evaluation counts and total ray work.
 - [ ] Compare total planning wall-clock time including all bookkeeping overhead.

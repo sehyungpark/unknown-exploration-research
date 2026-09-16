@@ -11,7 +11,7 @@ Last updated: 2026-09-16
 - Candidate 1 has received a **provisional novelty pass with high risk and a narrow claim only** after full-method comparison with major close prior art.
 - The empirical-value gate remains open.
 - The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented, oracle-hardened, and pass the current correctness suite.
-- Experiment 0 exact-equivalence validation is preregistered and its Stage 7 formal shared A/B/C runner, canonical per-cycle logger, and immutable failure-artifact writer are implemented. The real Experiment 0 has not been executed; Stage 8 is the first formal execution.
+- Experiment 0 exact-equivalence validation is preregistered, its Stage 7 formal shared A/B/C runner is implemented, and the first formal preregistered invocation completed successfully in Stage 8. The preserved result is `results/experiment_0/runs/experiment0-formal-20260916-001/`.
 - Experiment 0's corrected `experiment-0-random-v2` 60-map correctness dataset, seed list, hashes, start/acceptance rules, cycle limits, per-cycle logging schema, and failure-artifact convention are frozen. The invalid v1 denominator was detected and corrected before Algorithms B/C or Experiment 0 execution.
 - Algorithm B, the stale-scalar exact-lazy baseline, is implemented and passes development exact-equivalence regressions against Algorithm A on all seven fixed fixtures and all 60 frozen v2 random maps.
 - Algorithm C Stages 1-5 provide cache/index state, atomic exact cached-set installation/refresh, once-per-cell revelation decrement, immutable belief-snapshot synchronization, common exact visibility integration, a stateful certified exact-lazy selector, and fail-fast pre-refresh admissibility checks. Stage 6 passed the full development A/C exact-equivalence regression on all seven fixtures and all 60 frozen-v2 random maps.
@@ -70,8 +70,9 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 
 - **Theory gate:** PASS, conditional on stated assumptions.
 - **Novelty gate:** PROVISIONAL PASS, HIGH RISK, NARROW CLAIM ONLY.
+- **Experiment 0 exact-equivalence correctness gate:** PASS.
 - **Empirical-value gate:** OPEN.
-- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline is implemented. Algorithm C has passed its full development A/C exact-equivalence regression; the formal preregistered A/B/C Experiment 0 gate remains unexecuted.
+- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline and Algorithm C are implemented. Algorithms B and C matched exhaustive Algorithm A on every preregistered planning snapshot and complete target/stop sequence in the formal Experiment 0 dataset.
 
 ## Implemented Features
 
@@ -118,7 +119,9 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - C's logged bound-decrement count is defined exactly as `sum(len(I_pre(cell)) for cell in synchronized_newly_known_cells)`, where `I_pre` is the detached inverse-incidence snapshot captured immediately before C synchronizes and plans. The initial call therefore normally records zero.
 - Stage 7 adds non-overwriting success directories under `results/experiment_0/runs/<invocation_id>/` and immutable six-file failure directories under `results/experiment_0/failures/<failure_run_id>/`. Failure evidence retains canonical ground truth and belief, all available A/B/C candidate diagnostics, B/C cache/index state, detached supported bound-violation diagnostics, and a single-map reproduction command.
 - Stage 7's 32 infrastructure tests use only workspace-local temporary directories and the non-preregistered `stage7-smoke` map. They cover canonical serialization, malformed records, duplicate-artifact refusal and preservation, forced B/C target mismatch with zero pre-agreement movement, direct underbound and cache corruption, supported C bound-violation evidence, safety-limit failure, terminal logging, and the formal-execution CLI guard.
-- The full **197-test suite passed** on 2026-09-16, preserving all prior Algorithm A, A/B, A/C, Stage 5 hardening, dataset, and simulator regressions. The real Experiment 0 was **not** executed, no real `results/experiment_0` research output was written, and no wall-clock, memory, speedup, or efficiency claim is made.
+- Immediately before the first formal invocation, the full **197-test suite passed** on 2026-09-16 with exit code 0, preserving all prior Algorithm A, A/B, A/C, Stage 5 hardening, dataset, and simulator regressions.
+- **Formal Experiment 0 gate:** **PASS** at accepted revision `b8597a9453fe2a6e011098c8da2c9a0a96e2fb7a`. All **67/67** runs completed across **1,185** planning snapshots and **67** terminal snapshots. A/B/C target, status, selected gain/distance/score/path, candidate-domain/distance, and complete target/STOP sequences matched; all mismatch, bound, tie-certificate, cache/index, supported bound-violation, unsupported lifecycle, safety-limit, malformed-record, and unexpected-failure counts were **0**. Exact-gain evaluation totals were A **215,939**, B **40,764**, and C **20,578**.
+- Experiment 0 is a correctness experiment. It establishes empirical exact-equivalence on the preregistered dataset, not a mathematical proof of global equivalence. No wall-clock, memory, speedup, or efficiency conclusion is drawn from this result.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
 ## Required Baselines for Candidate 1
@@ -130,7 +133,7 @@ The first implementation must distinguish the proposed change-aware bound from a
 3. change-aware cached-set bound `|A_tau(v) ∩ U_t|`;
 4. optional tighter occlusion-aware bound only if the third method is too loose.
 
-Baselines 1 and 2 are implemented. Baseline 3 has its state, belief/visibility integration, certified exact-lazy selector, and full development A/C exact-equivalence regression pass, but still awaits the formal preregistered A/B/C Experiment 0 gate.
+Baselines 1-3 are implemented. Baselines 2 and 3 passed the formal preregistered A/B/C Experiment 0 exact-equivalence correctness gate against baseline 1.
 
 Correctness is primary: methods 2/3 must match the exhaustive deterministic argmax and target sequence exactly under the shared tie rule whenever they claim exact equivalence.
 
@@ -148,5 +151,5 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 1. Retain the stale-scalar exact-lazy baseline, its explicit per-episode reset contract, and its A/B development regressions as the correctness baseline.
 2. Preserve the accepted Stage 5 ordering, lifecycle, no-fallback admissibility guard, and Stage 6 shared-snapshot A/C development regression.
 3. Preserve the accepted Stage 7 formal runner, canonical logging, immutable failure evidence, direct external validations, and explicit execution guard without changing frozen algorithms or artifacts.
-4. In Stage 8, execute the first formal Experiment 0 invocation and require zero target, sequence, bound, tie, and invariant violations.
-5. Do not interpret Stage 7 smoke/development regressions as Experiment 0 results, and do not begin efficiency evaluation until the formal Stage 8 gate passes.
+4. Preserve the first formal Experiment 0 result unchanged as correctness evidence and keep its empirical conclusion separate from the conditional theorem.
+5. Design and preregister the efficiency evaluation, including workloads, timing protocol, memory protocol, resource metrics, failure handling, and raw-result layout, before executing any efficiency benchmark.
