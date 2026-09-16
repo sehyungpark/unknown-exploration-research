@@ -1,0 +1,648 @@
+{
+  "experiment_name": "Experiment 1 \u2014 Efficiency and Scaling Evaluation",
+  "dataset_version": "experiment-1-efficiency-v1",
+  "status": "frozen and preregistered; not executed",
+  "master_seed": 20260916,
+  "generator": {
+    "version": "independent-bernoulli-occupancy-v1",
+    "rng": "random.Random",
+    "seed_derivation": "master_rng.getrandbits(63) per candidate attempt; rejected candidates consume stream positions",
+    "cell_rule": "OCCUPIED iff local_rng.random() < p, row-major",
+    "generation_order": "size ascending, then density sparse/medium/dense, until three accepted per stratum",
+    "sizes": [
+      20,
+      30,
+      40
+    ],
+    "densities": {
+      "sparse": 0.1,
+      "medium": 0.2,
+      "dense": 0.3
+    },
+    "accepted_per_stratum": 3
+  },
+  "acceptance": {
+    "kind": "structural only; no sensing or planner execution",
+    "connectivity": "8-neighbor with no diagonal corner cutting",
+    "minimum_largest_free_component_fraction": 0.35,
+    "component_fraction_denominator": "height * width (total grid-cell count)",
+    "component_tie": "lexicographically smallest cell in component"
+  },
+  "start_selection": {
+    "component": "deterministically selected largest FREE component",
+    "cell": "minimum squared Euclidean distance to geometric grid center; lexicographic tie"
+  },
+  "cycle_limit": "max(64, 2 * largest_free_component_size)",
+  "hashing": {
+    "algorithm": "SHA-256",
+    "ground_truth_symbols": {
+      "FREE": ".",
+      "OCCUPIED": "#"
+    },
+    "encoding": "UTF-8",
+    "row_order": "top-to-bottom, left-to-right",
+    "line_ending": "LF after every row, including the final row"
+  },
+  "counts": {
+    "accepted_total": 27,
+    "rejected_total": 0,
+    "accepted_by_stratum": {
+      "20x20/dense": 3,
+      "20x20/medium": 3,
+      "20x20/sparse": 3,
+      "30x30/dense": 3,
+      "30x30/medium": 3,
+      "30x30/sparse": 3,
+      "40x40/dense": 3,
+      "40x40/medium": 3,
+      "40x40/sparse": 3
+    }
+  },
+  "timing_subset_map_ids": [
+    "efficiency-20x20-sparse-01",
+    "efficiency-20x20-medium-01",
+    "efficiency-20x20-dense-01",
+    "efficiency-30x30-sparse-01",
+    "efficiency-30x30-medium-01",
+    "efficiency-30x30-dense-01",
+    "efficiency-40x40-sparse-01",
+    "efficiency-40x40-medium-01",
+    "efficiency-40x40-dense-01"
+  ],
+  "sensitivity_subset_map_ids": [
+    "efficiency-30x30-sparse-01",
+    "efficiency-30x30-medium-01",
+    "efficiency-30x30-dense-01"
+  ],
+  "accepted_maps": [
+    {
+      "dataset_index": 0,
+      "candidate_index": 0,
+      "dataset_id": "efficiency-20x20-sparse-01",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 1,
+      "size": 20,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 396206647092525091,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "largest_free_component_size": 350,
+      "largest_free_component_fraction": 0.875,
+      "cycle_limit": 700,
+      "map_hash": "34ad5320eebf26d65321338119cff933c3879e877fd13bec5723db54fb025904"
+    },
+    {
+      "dataset_index": 1,
+      "candidate_index": 1,
+      "dataset_id": "efficiency-20x20-sparse-02",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 2,
+      "size": 20,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 3527776923142455108,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "largest_free_component_size": 353,
+      "largest_free_component_fraction": 0.8825,
+      "cycle_limit": 706,
+      "map_hash": "6a81cb8f799124381257e56c0b8f93eb3b1b93821e4916c652fa30aa27af4e67"
+    },
+    {
+      "dataset_index": 2,
+      "candidate_index": 2,
+      "dataset_id": "efficiency-20x20-sparse-03",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 3,
+      "size": 20,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 1468113507645515565,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "largest_free_component_size": 353,
+      "largest_free_component_fraction": 0.8825,
+      "cycle_limit": 706,
+      "map_hash": "dfd5a44396b2fd41bf65168c832a5342ed85061c5d9af96f70ffead14157df2b"
+    },
+    {
+      "dataset_index": 3,
+      "candidate_index": 3,
+      "dataset_id": "efficiency-20x20-medium-01",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 1,
+      "size": 20,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 5936414117056364106,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "largest_free_component_size": 326,
+      "largest_free_component_fraction": 0.815,
+      "cycle_limit": 652,
+      "map_hash": "423a21b9069e84a5151341e25a632f07bc537bb9fee99b1005ba90fb2c4c0e57"
+    },
+    {
+      "dataset_index": 4,
+      "candidate_index": 4,
+      "dataset_id": "efficiency-20x20-medium-02",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 2,
+      "size": 20,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 3408303682260391401,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        10
+      ],
+      "largest_free_component_size": 312,
+      "largest_free_component_fraction": 0.78,
+      "cycle_limit": 624,
+      "map_hash": "bed97e5d0c80c5889f8bab65af94516e3e7fabb950a8512053a3d8b5a85c87d1"
+    },
+    {
+      "dataset_index": 5,
+      "candidate_index": 5,
+      "dataset_id": "efficiency-20x20-medium-03",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 3,
+      "size": 20,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 2224974927589785815,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "largest_free_component_size": 331,
+      "largest_free_component_fraction": 0.8275,
+      "cycle_limit": 662,
+      "map_hash": "ccc75821d9edbe87eac0f0a83d0b4e1bdd178550e07dd422ec711b6ccf508490"
+    },
+    {
+      "dataset_index": 6,
+      "candidate_index": 6,
+      "dataset_id": "efficiency-20x20-dense-01",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 1,
+      "size": 20,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 7027758812962882640,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        10
+      ],
+      "largest_free_component_size": 212,
+      "largest_free_component_fraction": 0.53,
+      "cycle_limit": 424,
+      "map_hash": "1854e6164ea7bd88a28e99e6d73c8958dc06ffd822b61f227a57a6d9f9f8b7b2"
+    },
+    {
+      "dataset_index": 7,
+      "candidate_index": 7,
+      "dataset_id": "efficiency-20x20-dense-02",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 2,
+      "size": 20,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 4039263727621906482,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "largest_free_component_size": 267,
+      "largest_free_component_fraction": 0.6675,
+      "cycle_limit": 534,
+      "map_hash": "8f066f44c7a624b5cbe37b99510550403e57d95d2a49a6837eefadb42d9d43cc"
+    },
+    {
+      "dataset_index": 8,
+      "candidate_index": 8,
+      "dataset_id": "efficiency-20x20-dense-03",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 3,
+      "size": 20,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 5285506591182865045,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        9,
+        9
+      ],
+      "largest_free_component_size": 270,
+      "largest_free_component_fraction": 0.675,
+      "cycle_limit": 540,
+      "map_hash": "ad44a6f6538030fc75e25011dbe9460cee24f8fcc540d53edb1bb13e39c9b959"
+    },
+    {
+      "dataset_index": 9,
+      "candidate_index": 9,
+      "dataset_id": "efficiency-30x30-sparse-01",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 1,
+      "size": 30,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 4620242291655990225,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        14
+      ],
+      "largest_free_component_size": 814,
+      "largest_free_component_fraction": 0.9044444444444445,
+      "cycle_limit": 1628,
+      "map_hash": "eb10eaf609dfed2273f0016b176590396239b2622381a825467a1fbbb0192bfd"
+    },
+    {
+      "dataset_index": 10,
+      "candidate_index": 10,
+      "dataset_id": "efficiency-30x30-sparse-02",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 2,
+      "size": 30,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 5179885829496081708,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        14
+      ],
+      "largest_free_component_size": 806,
+      "largest_free_component_fraction": 0.8955555555555555,
+      "cycle_limit": 1612,
+      "map_hash": "62a6893c2f2b7bcb9e85171bddf93e550d223648319ad7933622b9a35b5556b8"
+    },
+    {
+      "dataset_index": 11,
+      "candidate_index": 11,
+      "dataset_id": "efficiency-30x30-sparse-03",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 3,
+      "size": 30,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 4933659159231084536,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        14
+      ],
+      "largest_free_component_size": 820,
+      "largest_free_component_fraction": 0.9111111111111111,
+      "cycle_limit": 1640,
+      "map_hash": "8a7634f5baa246f589b2c8f8e68b3c92172c47b7b655b2cb80b31af4f9966274"
+    },
+    {
+      "dataset_index": 12,
+      "candidate_index": 12,
+      "dataset_id": "efficiency-30x30-medium-01",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 1,
+      "size": 30,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 2292651632388389521,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        14
+      ],
+      "largest_free_component_size": 682,
+      "largest_free_component_fraction": 0.7577777777777778,
+      "cycle_limit": 1364,
+      "map_hash": "e1b97defba5274ac19327717de91d389034f8a8e8ecce6afc6a466ed0468e175"
+    },
+    {
+      "dataset_index": 13,
+      "candidate_index": 13,
+      "dataset_id": "efficiency-30x30-medium-02",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 2,
+      "size": 30,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 4019378740215595271,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        15
+      ],
+      "largest_free_component_size": 736,
+      "largest_free_component_fraction": 0.8177777777777778,
+      "cycle_limit": 1472,
+      "map_hash": "d20f5978d1b6f30cdebeb1685579e7f93d71a149404b084390ab2628ab2e872d"
+    },
+    {
+      "dataset_index": 14,
+      "candidate_index": 14,
+      "dataset_id": "efficiency-30x30-medium-03",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 3,
+      "size": 30,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 4985532690424040885,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        14
+      ],
+      "largest_free_component_size": 734,
+      "largest_free_component_fraction": 0.8155555555555556,
+      "cycle_limit": 1468,
+      "map_hash": "081967fa2c56546201300b79e29a7ef274cce0658c240b17b814c0f0f315892c"
+    },
+    {
+      "dataset_index": 15,
+      "candidate_index": 15,
+      "dataset_id": "efficiency-30x30-dense-01",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 1,
+      "size": 30,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 4181227871730347873,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        15
+      ],
+      "largest_free_component_size": 627,
+      "largest_free_component_fraction": 0.6966666666666667,
+      "cycle_limit": 1254,
+      "map_hash": "e266ced2a6bc22d585135a66eaf4c2af7d2166a297032070804c99d9356765f5"
+    },
+    {
+      "dataset_index": 16,
+      "candidate_index": 16,
+      "dataset_id": "efficiency-30x30-dense-02",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 2,
+      "size": 30,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 3798701923071634959,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        14
+      ],
+      "largest_free_component_size": 627,
+      "largest_free_component_fraction": 0.6966666666666667,
+      "cycle_limit": 1254,
+      "map_hash": "c113b6f0cac0ece63707ec259e4aae9eeeaf14aaa83cab920ea5a9c30476da6a"
+    },
+    {
+      "dataset_index": 17,
+      "candidate_index": 17,
+      "dataset_id": "efficiency-30x30-dense-03",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 3,
+      "size": 30,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 3845252968367052491,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        14,
+        14
+      ],
+      "largest_free_component_size": 567,
+      "largest_free_component_fraction": 0.63,
+      "cycle_limit": 1134,
+      "map_hash": "12999eba5c33888588eb33feebd101dcae691d37becb150f3c32306368cc08d2"
+    },
+    {
+      "dataset_index": 18,
+      "candidate_index": 18,
+      "dataset_id": "efficiency-40x40-sparse-01",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 1,
+      "size": 40,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 7525947285253146464,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        19
+      ],
+      "largest_free_component_size": 1457,
+      "largest_free_component_fraction": 0.910625,
+      "cycle_limit": 2914,
+      "map_hash": "b2783267351f59db229ff5f99406775ba324d758c1d8d0169d771d4abe6c666c"
+    },
+    {
+      "dataset_index": 19,
+      "candidate_index": 19,
+      "dataset_id": "efficiency-40x40-sparse-02",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 2,
+      "size": 40,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 8480785709378275510,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        19
+      ],
+      "largest_free_component_size": 1456,
+      "largest_free_component_fraction": 0.91,
+      "cycle_limit": 2912,
+      "map_hash": "d0eda0c88a18f87c8ae3bf60754fa3ee96d153b030ce9adf97ed26bbd7573708"
+    },
+    {
+      "dataset_index": 20,
+      "candidate_index": 20,
+      "dataset_id": "efficiency-40x40-sparse-03",
+      "stratum_index": 0,
+      "accepted_index_in_stratum": 3,
+      "size": 40,
+      "density_label": "sparse",
+      "p": 0.1,
+      "seed": 6900275667820993594,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        19
+      ],
+      "largest_free_component_size": 1427,
+      "largest_free_component_fraction": 0.891875,
+      "cycle_limit": 2854,
+      "map_hash": "7a9d73c2ce7cc4eb714d696d3e1ae5646cb374b82417d3fcb50e0376eb2aeb71"
+    },
+    {
+      "dataset_index": 21,
+      "candidate_index": 21,
+      "dataset_id": "efficiency-40x40-medium-01",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 1,
+      "size": 40,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 426262264825024557,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        19
+      ],
+      "largest_free_component_size": 1257,
+      "largest_free_component_fraction": 0.785625,
+      "cycle_limit": 2514,
+      "map_hash": "5f2a5d3548d5e21e3375ee89eba002761109618666eaee012e3766202bd46f1b"
+    },
+    {
+      "dataset_index": 22,
+      "candidate_index": 22,
+      "dataset_id": "efficiency-40x40-medium-02",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 2,
+      "size": 40,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 7282332034119835923,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        19
+      ],
+      "largest_free_component_size": 1278,
+      "largest_free_component_fraction": 0.79875,
+      "cycle_limit": 2556,
+      "map_hash": "56923445693b45a2cf817436276b4c35dfacc74206d06af70e147c9f563a6859"
+    },
+    {
+      "dataset_index": 23,
+      "candidate_index": 23,
+      "dataset_id": "efficiency-40x40-medium-03",
+      "stratum_index": 1,
+      "accepted_index_in_stratum": 3,
+      "size": 40,
+      "density_label": "medium",
+      "p": 0.2,
+      "seed": 7606866061046530457,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        20
+      ],
+      "largest_free_component_size": 1271,
+      "largest_free_component_fraction": 0.794375,
+      "cycle_limit": 2542,
+      "map_hash": "65ed717b42dc10a2a21e7f38edebd253956db6600442feabb0109c00204e5afc"
+    },
+    {
+      "dataset_index": 24,
+      "candidate_index": 24,
+      "dataset_id": "efficiency-40x40-dense-01",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 1,
+      "size": 40,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 8734162765531759123,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        20
+      ],
+      "largest_free_component_size": 1119,
+      "largest_free_component_fraction": 0.699375,
+      "cycle_limit": 2238,
+      "map_hash": "519c4edfad998e8f8b62cf8a566675992c02b141d9fce43bab00f3711ebe95d3"
+    },
+    {
+      "dataset_index": 25,
+      "candidate_index": 25,
+      "dataset_id": "efficiency-40x40-dense-02",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 2,
+      "size": 40,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 2768749553237946917,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        20
+      ],
+      "largest_free_component_size": 1111,
+      "largest_free_component_fraction": 0.694375,
+      "cycle_limit": 2222,
+      "map_hash": "ab47b0d9917f6ae8a979faf70d285b6101144f190c99c340c01627917a0b8e45"
+    },
+    {
+      "dataset_index": 26,
+      "candidate_index": 26,
+      "dataset_id": "efficiency-40x40-dense-03",
+      "stratum_index": 2,
+      "accepted_index_in_stratum": 3,
+      "size": 40,
+      "density_label": "dense",
+      "p": 0.3,
+      "seed": 4882629557860671764,
+      "accepted": true,
+      "rejection_reason": null,
+      "start": [
+        19,
+        19
+      ],
+      "largest_free_component_size": 1063,
+      "largest_free_component_fraction": 0.664375,
+      "cycle_limit": 2126,
+      "map_hash": "1862e5de9ebf1c4514dbabdb8c02d1d13b62b8d2afb800f0e46d7b8e6b9d90c6"
+    }
+  ],
+  "rejected_candidates": [],
+  "rejected_summary": {}
+}

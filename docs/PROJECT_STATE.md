@@ -13,6 +13,7 @@ Last updated: 2026-09-16
 - The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented, oracle-hardened, and pass the current correctness suite.
 - Experiment 0 exact-equivalence validation is preregistered, its Stage 7 formal shared A/B/C runner is implemented, and the first formal preregistered invocation completed successfully in Stage 8. The preserved result is `results/experiment_0/runs/experiment0-formal-20260916-001/`.
 - Experiment 0's corrected `experiment-0-random-v2` 60-map correctness dataset, seed list, hashes, start/acceptance rules, cycle limits, per-cycle logging schema, and failure-artifact convention are frozen. The invalid v1 denominator was detected and corrected before Algorithms B/C or Experiment 0 execution.
+- Experiment 1 — Efficiency and Scaling Evaluation is preregistered but **has not been executed**. Its `experiment-1-efficiency-v1` 27-map primary dataset, nine-map timing/memory subset, three-map sensor-range subset, metrics, timing protocol, analysis, decision rule, raw schema, and failure handling are frozen.
 - Algorithm B, the stale-scalar exact-lazy baseline, is implemented and passes development exact-equivalence regressions against Algorithm A on all seven fixed fixtures and all 60 frozen v2 random maps.
 - Algorithm C Stages 1-5 provide cache/index state, atomic exact cached-set installation/refresh, once-per-cell revelation decrement, immutable belief-snapshot synchronization, common exact visibility integration, a stateful certified exact-lazy selector, and fail-fast pre-refresh admissibility checks. Stage 6 passed the full development A/C exact-equivalence regression on all seven fixtures and all 60 frozen-v2 random maps.
 
@@ -122,6 +123,8 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - Immediately before the first formal invocation, the full **197-test suite passed** on 2026-09-16 with exit code 0, preserving all prior Algorithm A, A/B, A/C, Stage 5 hardening, dataset, and simulator regressions.
 - **Formal Experiment 0 gate:** **PASS** at accepted revision `b8597a9453fe2a6e011098c8da2c9a0a96e2fb7a`. All **67/67** runs completed across **1,185** planning snapshots and **67** terminal snapshots. A/B/C target, status, selected gain/distance/score/path, candidate-domain/distance, and complete target/STOP sequences matched; all mismatch, bound, tie-certificate, cache/index, supported bound-violation, unsupported lifecycle, safety-limit, malformed-record, and unexpected-failure counts were **0**. Exact-gain evaluation totals were A **215,939**, B **40,764**, and C **20,578**.
 - Experiment 0 is a correctness experiment. It establishes empirical exact-equivalence on the preregistered dataset, not a mathematical proof of global equivalence. No wall-clock, memory, speedup, or efficiency conclusion is drawn from this result.
+- Stage 9 freezes the structurally generated `experiment-1-efficiency-v1` dataset: 27 maps across nine size-density strata, master seed `20260916`, three accepted maps per stratum, and zero rejected attempts. Its regeneration tests use no simulator or planner. No Experiment 1 result directory or empirical measurement exists.
+- Stage 9's 9 focused dataset-regeneration tests and the full 206-test suite passed on 2026-09-16. The full suite exercised only existing regression workloads plus structural Experiment 1 regeneration; it did not execute an Experiment 1 planner workload.
 - `docs/RESEARCH_CONTEXT.md` contains earlier toy-prototype observations, but their code/configurations/seeds/raw outputs are unavailable and remain preliminary evidence only.
 
 ## Required Baselines for Candidate 1
@@ -144,7 +147,7 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 - Is the change-aware bound materially tighter than the stale scalar bound on realistic map progress?
 - Can one shortest-path computation per planning snapshot supply current distances cheaply enough that information-gain evaluation remains the dominant bottleneck?
 - Does the corner-inclusive supercover convention create materially different behavior from other fixed supercover conventions in later sensitivity checks?
-- Large efficiency-experiment coverage, timing, memory, and raw-result protocols remain unfrozen; Experiment 0's correctness logging/failure protocol is now frozen separately.
+- The Experiment 1 protocol is frozen, but its measurement harness is not implemented and no formal workload has run; whether deterministic visibility-work savings outweigh C's bookkeeping and memory remains unresolved.
 
 ## Next Steps
 
@@ -152,4 +155,5 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 2. Preserve the accepted Stage 5 ordering, lifecycle, no-fallback admissibility guard, and Stage 6 shared-snapshot A/C development regression.
 3. Preserve the accepted Stage 7 formal runner, canonical logging, immutable failure evidence, direct external validations, and explicit execution guard without changing frozen algorithms or artifacts.
 4. Preserve the first formal Experiment 0 result unchanged as correctness evidence and keep its empirical conclusion separate from the conditional theorem.
-5. Design and preregister the efficiency evaluation, including workloads, timing protocol, memory protocol, resource metrics, failure handling, and raw-result layout, before executing any efficiency benchmark.
+5. Implement the Stage 10 Experiment 1 measurement harness against the frozen documents without changing A/B/C or simulator semantics; validate instrumentation and writers only on synthetic/nonformal inputs.
+6. Run the formal Experiment 1 workload only after the Stage 10 harness, guard, and full test suite are accepted; preserve the first result and apply the frozen GO/MODIFY/DROP rule.

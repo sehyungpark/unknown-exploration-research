@@ -22,7 +22,7 @@ Last updated: 2026-09-16
 - [x] Define deterministic 20x20 fixtures: open, single room, corridor, dead end, separated rooms, clutter, and maze-like.
 - [x] Convert the opaque-UNKNOWN and new-occluder cases into deterministic tests.
 - [x] Specify and test atomic planning snapshots with sensing only at arrival and no sensing while moving.
-- [ ] Freeze metric definitions, coverage targets, failure conditions, run metadata schema, and raw-result storage layout.
+- [x] Freeze Experiment 1 metric definitions, coverage targets, failure conditions, run metadata schema, raw-result storage layout, timing/memory protocols, and analysis rules before execution.
 - [x] Preregister Experiment 0 exact-equivalence correctness endpoints, shared conditions, logging fields, failure rules, and gate.
 - [x] Complete the initial Experiment 0 v1 random-dataset freeze; later invalidate it before execution because its component-fraction denominator was incorrect.
 - [x] Correct acceptance to largest component / all grid cells, add a denominator-distinguishing counterexample, and refreeze the same master-seed stream as `experiment-0-random-v2`.
@@ -65,7 +65,11 @@ Last updated: 2026-09-16
 
 ## P3 — Empirical Value Gate
 
-- [ ] Design and preregister the efficiency evaluation before executing it, including frozen workloads/seeds, timing warm-up and repetition protocol, memory measurement, resource counters, failure handling, raw-result layout, and analysis rules.
+- [x] Design and preregister Experiment 1 before execution, including the 27-map dataset, seed stream, nine-map timing subset, timing warm-up/order/repetitions, separate memory pass, resource counters, failure handling, raw-result layout, bootstrap, and GO/MODIFY/DROP rules.
+- [ ] Stage 10: implement the guarded Experiment 1 measurement runner and canonical serializers without changing Algorithms A/B/C or simulator semantics.
+- [ ] Add benchmark-only forwarding instrumentation for exact visibility work and internal time decomposition; prove it preserves canonical decisions and counters on synthetic/nonformal inputs.
+- [ ] Add non-overwriting success/failure writers and schema validation for all six frozen Experiment 1 output files; do not create a formal run during infrastructure validation.
+- [ ] Execute the first formal Experiment 1 invocation only after Stage 10 acceptance and a clean full suite/CI; retain every raw repetition and failure.
 - [ ] Compare stale-scalar versus change-aware bound tightness over planning cycles.
 - [ ] Compare exact gain evaluation counts and total ray work.
 - [ ] Compare total planning wall-clock time including all bookkeeping overhead.
