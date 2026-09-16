@@ -76,7 +76,7 @@ These entries predate this log. Missing values are explicitly marked rather than
 - **Execution revision:** `b8597a9453fe2a6e011098c8da2c9a0a96e2fb7a`
 - **Runner version:** `experiment-0-runner-v1`
 - **Dataset:** Seven deterministic fixtures plus 60 frozen `experiment-0-random-v2` maps; 67 total complete runs. Frozen map IDs, seeds, starts, sizes, density targets, acceptance metadata, hashes, and cycle limits are recorded in `configs/experiment_0_random_maps.json` and the formal manifest.
-- **Map conditions:** Static 20×20 deterministic fixtures and frozen 20×20, 30×30, and 40×40 random maps. Agent pose is exact; SLAM and localization error are excluded.
+- **Map conditions:** Static 20×20 deterministic fixtures and frozen 12×12, 16×16, and 20×20 random maps, with 20 accepted maps per random-map size. Agent pose is exact; SLAM and localization error are excluded.
 - **Movement model:** Legal 8-neighbor known-FREE motion with orthogonal cost `1`, diagonal cost `sqrt(2)`, and no diagonal corner cutting.
 - **Sensor configuration:** Fixed range `R=8`; deterministic corner-inclusive, endpoint-inclusive supercover; UNKNOWN-transparent optimistic planning visibility and first-hit OCCUPIED physical occlusion.
 - **Algorithms:** A exhaustive optimistic NBV; B stale-scalar certified exact-lazy NBV; C change-aware cached-set certified exact-lazy NBV. One shared environment and planning snapshot were used per run in A→B→C evaluation order.
