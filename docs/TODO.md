@@ -40,7 +40,10 @@ Last updated: 2026-09-16
 - [x] Check set-level admissibility across 38,673 deterministic and fixed-seed transitions.
 - [x] Run every deterministic fixture twice to explicit stop with identical traces and invariant checks.
 - [x] Accept the exhaustive reference as the current correctness oracle after the 39-test suite passes.
-- [ ] Implement the Experiment 0 cross-method cycle logger and immutable failure-artifact writer when Algorithms B/C are available.
+- [x] Implement the Stage 7 formal shared A/B/C Experiment 0 runner, exact frozen cycle schema/serializer, non-overwriting invocation logs, immutable six-file failure artifacts, stable failure classifications, and guarded single-map reproduction mode.
+- [x] Add direct external B/C bound and tie-certificate validation, C cache/index and membership validation, precise pre-plan inverse-incidence decrement counting, terminal snapshot logging, and fail-fast no-movement-before-agreement behavior.
+- [x] Validate Stage 7 infrastructure only with canonical serialization/writer tests, synthetic `stage7-smoke` shared runs, and fault-injected mismatch/bound/cache/safety/malformed cases in temporary directories; preserve the unexecuted formal-workload guard.
+- [ ] Stage 8: execute the first formal 7-fixture + 60-map Experiment 0 invocation, retain all success/failure output, and require zero target, sequence, selected-value/path, candidate-domain/distance, bound, tie, or cache/index violations.
 - [x] Implement stale-scalar lazy evaluation using the last exact gain as an upper bound.
 - [x] Implement Candidate 1 cached visible-unknown sets and inverse-incidence bound maintenance.
 - [x] Implement Algorithm C Stage 1 state-only cache/index representation, safe diagnostics, reset lifecycle, and invariant validation.
