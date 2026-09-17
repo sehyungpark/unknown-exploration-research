@@ -67,9 +67,9 @@ Last updated: 2026-09-17
 
 - [x] Design and preregister Experiment 1 before execution, including the 27-map dataset, seed stream, nine-map timing subset, timing warm-up/order/repetitions, separate memory pass, resource counters, failure handling, raw-result layout, bootstrap, and GO/MODIFY/DROP rules.
 - [x] Add Pre-execution Amendment 1 before observing any Experiment 1 result, preserving the original Stage 9 wording while making CORRECTNESS_REOPENED / GO / MODIFY / DROP mutually exclusive and deterministic; keep memory and scaling as reported tradeoffs rather than decision overrides.
-- [ ] Stage 10: implement the guarded Experiment 1 measurement runner and canonical serializers without changing Algorithms A/B/C or simulator semantics.
-- [ ] Add benchmark-only forwarding instrumentation for exact visibility work and internal time decomposition; prove it preserves canonical decisions and counters on synthetic/nonformal inputs.
-- [ ] Add non-overwriting success/failure writers and schema validation for all six frozen Experiment 1 output files; do not create a formal run during infrastructure validation.
+- [x] Stage 10: implement the guarded `experiment-1-runner-v1` measurement runner and canonical serializers without changing Algorithms A/B/C or simulator semantics; formal Experiment 1 remains NOT EXECUTED.
+- [x] Add benchmark-only forwarding instrumentation for exact visibility work and internal time decomposition; prove it preserves canonical decisions and counters on synthetic/nonformal inputs.
+- [x] Add non-overwriting success/failure writers and schema validation for all six frozen Experiment 1 output files; no formal run was created during infrastructure validation.
 - [ ] Execute the first formal Experiment 1 invocation only after Stage 10 acceptance and a clean full suite/CI; retain every raw repetition and failure.
 - [ ] Compare stale-scalar versus change-aware bound tightness over planning cycles.
 - [ ] Compare exact gain evaluation counts and total ray work.
