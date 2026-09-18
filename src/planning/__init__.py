@@ -14,6 +14,14 @@ from .change_aware_lazy_nbv import (
     ChangeAwareLazyNBV,
     ChangeAwareLazyNBVResult,
 )
+from .change_aware_star_nbv import (
+    CStarAuditReport,
+    CStarCacheEntry,
+    CStarCandidateRecord,
+    CStarCycleCounters,
+    CStarNBVResult,
+    ChangeAwareStarNBV,
+)
 from .exhaustive_nbv import (
     CandidateEvaluation,
     ExhaustiveNBVResult,
@@ -37,6 +45,12 @@ __all__ = [
     "ChangeAwareLazyCandidateRecord",
     "ChangeAwareLazyNBV",
     "ChangeAwareLazyNBVResult",
+    "CStarAuditReport",
+    "CStarCacheEntry",
+    "CStarCandidateRecord",
+    "CStarCycleCounters",
+    "CStarNBVResult",
+    "ChangeAwareStarNBV",
     "DijkstraResult",
     "ExhaustiveNBVResult",
     "PlanStatus",
