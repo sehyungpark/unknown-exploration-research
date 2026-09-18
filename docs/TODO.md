@@ -1,6 +1,6 @@
 # TODO
 
-Last updated: 2026-09-17
+Last updated: 2026-09-19
 
 ## P0 — Research Gates Before Implementation
 
@@ -77,6 +77,21 @@ Last updated: 2026-09-17
 - [ ] Measure memory scaling versus candidate density and sensing range.
 - [ ] Measure path length and coverage/time to 90%, 95%, and 99% as sanity checks that exact decision equivalence is preserved.
 - [ ] Apply Pre-execution Amendment 1 exactly, with no post-result override: correctness first, then the all-three aggregate visibility-work gate, then the paired C/B timing-interval boundaries.
+
+## P4 — Algorithm C* Redesign
+
+- [x] Implement C* as a separate planner without changing historical A/B/C semantics or Experiment 0/1 artifacts.
+- [x] Replace eager per-revelation candidate-bound decrements with stale admissible bounds and top-only lazy change-aware refresh.
+- [x] Replace persistent visible-UNKNOWN sets and current UNKNOWN state with exact row-major Python-int bitmasks.
+- [x] Add exact sensor-range-mask upper bounds so first-seen candidates can be pruned before any exact visibility evaluation.
+- [x] Remove inverse-incidence/reported-known/full-snapshot-diff maintenance from the C* production path; require explicit revelation deltas after initialization.
+- [x] Preserve one current Dijkstra per planning snapshot, the frozen score/tie order, canonical exact visibility, and the invariant that every selected C* target is current-exact.
+- [x] Separate C* production/core timing from full debug/audit verification timing; never estimate core time by subtracting audit overhead after the fact.
+- [x] Add bitmask/range-bound/lifecycle/timing unit coverage plus complete A/C* shared-snapshot regressions on all seven fixtures and all 60 frozen `experiment-0-random-v2` maps.
+- [x] Verify the full GitHub Actions CI suite passes on the C* branch (`10eb22f065b8a6f534f600c591acd66c0acc2a3f`).
+- [ ] Add focused behavioral regressions that explicitly force first-seen range-only pruning and stale-bound refresh/reinsert paths, in addition to the full A/C* regressions.
+- [ ] Preregister a new C* efficiency experiment before observing formal C* timing results; use fresh holdout maps rather than treating already-seen Experiment 1 maps as an unbiased final test set.
+- [ ] In the follow-up experiment, compare A/B/C/C* exact work, range-bound work, lazy-refresh counts, core planner time, audit time, memory, and scaling while preserving exact A-equivalence as a hard gate.
 
 ## Deferred
 
