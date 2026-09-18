@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-09-17
+Last updated: 2026-09-19
 
 ## Current Research Stage
 
@@ -17,6 +17,7 @@ Last updated: 2026-09-17
 - Stage 10 Experiment 1 measurement infrastructure is implemented as guarded `experiment-1-runner-v1`, with canonical raw schemas/writers, immutable failure evidence, exact visibility-work instrumentation, separate timing/decomposition/memory passes, deterministic analysis/bootstrap, and the exact Pre-execution Amendment 1 classifier. Formal Experiment 1 remains **NOT EXECUTED** and the empirical-value gate remains **OPEN**.
 - Algorithm B, the stale-scalar exact-lazy baseline, is implemented and passes development exact-equivalence regressions against Algorithm A on all seven fixed fixtures and all 60 frozen v2 random maps.
 - Algorithm C Stages 1-5 provide cache/index state, atomic exact cached-set installation/refresh, once-per-cell revelation decrement, immutable belief-snapshot synchronization, common exact visibility integration, a stateful certified exact-lazy selector, and fail-fast pre-refresh admissibility checks. Stage 6 passed the full development A/C exact-equivalence regression on all seven fixtures and all 60 frozen-v2 random maps.
+- Algorithm C* is implemented separately on the `algorithm-c-star` branch as a development-only redesign of C. It keeps the same admissible cached-visible-set theorem and exact A decision semantics, but replaces eager per-revelation bound maintenance with top-only lazy refresh, stores visible/UNKNOWN sets as Python-int bitmasks, gives first-seen candidates an exact sensor-range-mask upper bound, removes inverse-incidence maintenance from the hot path, and separates production/core timing from full debug/audit timing. C* intentionally does **not** include the proposed occlusion exactness certificate or shadow repair. Shared A/C* complete-run regressions cover all seven fixtures and all 60 frozen-v2 maps, and branch CI passed at `10eb22f065b8a6f534f600c591acd66c0acc2a3f`. C* has no formal efficiency result yet and does not replace or reinterpret Algorithm C's Experiment 1 evidence.
 
 ## Current Candidate
 
@@ -74,7 +75,7 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - **Novelty gate:** PROVISIONAL PASS, HIGH RISK, NARROW CLAIM ONLY.
 - **Experiment 0 exact-equivalence correctness gate:** PASS.
 - **Empirical-value gate:** OPEN.
-- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline and Algorithm C are implemented. Algorithms B and C matched exhaustive Algorithm A on every preregistered planning snapshot and complete target/stop sequence in the formal Experiment 0 dataset.
+- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline and historical Algorithm C are implemented. Algorithms B and C matched exhaustive Algorithm A on every preregistered planning snapshot and complete target/stop sequence in the formal Experiment 0 dataset. Algorithm C* is additionally implemented on its development branch and has passed the 7-fixture + 60-map A/C* development regression and CI, but it has not yet received a preregistered formal efficiency evaluation.
 
 ## Implemented Features
 
@@ -160,4 +161,5 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 3. Preserve the accepted Stage 7 formal runner, canonical logging, immutable failure evidence, direct external validations, and explicit execution guard without changing frozen algorithms or artifacts.
 4. Preserve the first formal Experiment 0 result unchanged as correctness evidence and keep its empirical conclusion separate from the conditional theorem.
 5. Preserve the accepted Stage 10 Experiment 1 measurement infrastructure, execution guard, exact schemas, instrumentation semantics, and synthetic fault-injection coverage without changing frozen inputs or A/B/C.
-6. In a separate explicit Stage 11, run the first formal Experiment 1 workload only after Stage 10 CI is accepted; preserve the first result and apply Pre-execution Amendment 1 without override.
+6. Preserve Algorithm C* as a separate development implementation; do not rewrite historical Algorithm C or Experiment 0/1 artifacts around C*.
+7. Before making any C* efficiency claim, preregister a separate follow-up experiment with fresh holdout maps and explicit A/B/C/C* comparisons, core-vs-audit timing separation, work counters, memory, and failure rules.
