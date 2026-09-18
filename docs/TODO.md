@@ -88,8 +88,8 @@ Last updated: 2026-09-19
 - [x] Preserve one current Dijkstra per planning snapshot, the frozen score/tie order, canonical exact visibility, and the invariant that every selected C* target is current-exact.
 - [x] Separate C* production/core timing from full debug/audit verification timing; never estimate core time by subtracting audit overhead after the fact.
 - [x] Add bitmask/range-bound/lifecycle/timing unit coverage plus complete A/C* shared-snapshot regressions on all seven fixtures and all 60 frozen `experiment-0-random-v2` maps.
-- [x] Verify the full GitHub Actions CI suite passes on the C* branch (`10eb22f065b8a6f534f600c591acd66c0acc2a3f`).
-- [ ] Add focused behavioral regressions that explicitly force first-seen range-only pruning and stale-bound refresh/reinsert paths, in addition to the full A/C* regressions.
+- [x] Verify the full GitHub Actions CI suite passes on the C* branch (`59cdf4530859ee3f432b7b5175185f5bb828a148`).
+- [x] Add focused behavioral regressions that explicitly force first-seen range-only pruning and stale-bound refresh/reinsert paths, in addition to the full A/C* regressions.
 - [ ] Preregister a new C* efficiency experiment before observing formal C* timing results; use fresh holdout maps rather than treating already-seen Experiment 1 maps as an unbiased final test set.
 - [ ] In the follow-up experiment, compare A/B/C/C* exact work, range-bound work, lazy-refresh counts, core planner time, audit time, memory, and scaling while preserving exact A-equivalence as a hard gate.
 
