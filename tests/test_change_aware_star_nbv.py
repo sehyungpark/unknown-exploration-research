@@ -152,6 +152,77 @@ class CStarPlannerTests(unittest.TestCase):
         self.assertFalse(hasattr(planner, "_inverse_incidence"))
         planner.audit(belief)
 
+    def test_first_seen_range_only_candidates_can_be_pruned_without_exact(self) -> None:
+        belief = belief_from_ascii(
+            (
+                ".......",
+                ".....?.",
+                ".......",
+            )
+        )
+        planner = ChangeAwareStarNBV(sensor_range=1)
+        result = planner.plan(belief, (1, 0))
+
+        self.assertIs(result.status, PlanStatus.SELECTED)
+        self.assertGreater(
+            result.counters.first_seen_pruned_without_exact_count,
+            0,
+        )
+        pruned = [
+            record
+            for record in result.candidate_records
+            if not record.was_cached_at_entry
+            and not record.exact_evaluated_this_cycle
+        ]
+        self.assertTrue(pruned)
+        self.assertTrue(
+            any(record.range_upper_gain == 0 for record in pruned),
+            msg="at least one first-seen zero-range-bound candidate must be pruned",
+        )
+
+    def test_stale_cached_bound_is_refreshed_and_reinserted_on_demand(self) -> None:
+        belief = belief_from_ascii(
+            (
+                ".......",
+                "..??...",
+                ".......",
+            )
+        )
+        planner = ChangeAwareStarNBV(sensor_range=2)
+        first = planner.plan(belief, (1, 0))
+        self.assertIs(first.status, PlanStatus.SELECTED)
+        self.assertIsNotNone(first.selected_candidate)
+
+        changed = belief.apply_observations({(1, 2): TruthState.OCCUPIED})
+        second = planner.plan(
+            belief,
+            (1, 0),
+            newly_known=changed,
+        )
+
+        self.assertGreater(second.counters.stale_bound_pop_count, 0)
+        self.assertGreater(second.counters.lazy_bound_refresh_count, 0)
+        self.assertGreater(
+            second.counters.stale_bound_refresh_reinsert_count,
+            0,
+        )
+        refreshed = [
+            record
+            for record in second.candidate_records
+            if record.lazy_bound_refreshed
+        ]
+        self.assertTrue(refreshed)
+        self.assertTrue(
+            any(
+                record.stale_upper_gain_at_entry is not None
+                and record.change_upper_gain_after_refresh is not None
+                and record.change_upper_gain_after_refresh
+                <= record.stale_upper_gain_at_entry
+                for record in refreshed
+            )
+        )
+        planner.audit(belief)
+
     def test_reset_clears_episode_state(self) -> None:
         belief = belief_from_ascii(("...", ".?.", "..."))
         planner = ChangeAwareStarNBV(sensor_range=2)
