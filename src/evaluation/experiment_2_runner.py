@@ -490,6 +490,7 @@ def _emit_failure(
     planner_star: ChangeAwareStarNBV,
     description: FailureDescription,
     results: Mapping[str, Any],
+    belief_before: BeliefGrid | None = None,
     method: str | None = None,
     method_order: Sequence[str] | None = None,
     method_order_position: int | None = None,
@@ -504,6 +505,7 @@ def _emit_failure(
         cycle_index=cycle_index,
         classification=description.classification,
     )
+    evidence_belief = belief_before or simulator.world.belief
     metadata = {
         "experiment_version": EXPERIMENT_VERSION,
         "dataset_version": DATASET_VERSION,
@@ -519,7 +521,7 @@ def _emit_failure(
         "cycle_index": cycle_index,
         "robot_coordinate": _coordinate(simulator.world.robot),
         "map_hash": case.map_hash,
-        "belief_hash": belief_hash(simulator.world.belief),
+        "belief_hash": belief_hash(evidence_belief),
         "repository_revision": revision,
         "failure_classification": description.classification,
     }
@@ -528,7 +530,7 @@ def _emit_failure(
         failure_run_id=failure_id,
         metadata=metadata,
         ground_truth=case.ground_truth,
-        belief_before=simulator.world.belief,
+        belief_before=evidence_belief,
         candidates=_candidate_artifact(results),
         algorithm_state=_algorithm_state(planner_b, planner_c, planner_star),
         description=description,
@@ -575,7 +577,9 @@ def run_shared_structural(
 
     for cycle in range(case.cycle_limit):
         robot = simulator.world.robot
-        frozen_hash = belief_hash(simulator.world.belief)
+        frozen_snapshot = simulator.world.belief.snapshot()
+        frozen_belief = BeliefGrid([list(row) for row in frozen_snapshot])
+        frozen_hash = belief_hash(frozen_belief)
         results: dict[str, Any] = {}
         works: dict[str, Any] = {}
         pre_inverse = planner_c.cache.inverse_incidence
@@ -618,6 +622,7 @@ def run_shared_structural(
                         exception_message=str(exc),
                     ),
                     results=results,
+                    belief_before=frozen_belief,
                     method=method,
                 )
             results[method] = result
@@ -663,6 +668,7 @@ def run_shared_structural(
                         "candidate domain/order or current distance differs",
                     ),
                     results=results,
+                    belief_before=frozen_belief,
                     method=method,
                 )
             if _decision_tuple(result) != _decision_tuple(oracle):
@@ -697,6 +703,7 @@ def run_shared_structural(
                         observed=_decision_tuple(result),
                     ),
                     results=results,
+                    belief_before=frozen_belief,
                     method=method,
                 )
         for method in METHODS:
@@ -739,6 +746,7 @@ def run_shared_structural(
                             exception_message=str(exc),
                         ),
                         results=results,
+                        belief_before=frozen_belief,
                         method=method,
                     )
 
@@ -844,6 +852,7 @@ def run_shared_structural(
                 "case reached cycle limit without terminal decision",
             ),
             results={},
+            belief_before=frozen_belief,
         )
     raise RuntimeError(f"cycle limit exhausted for {case.map_id}")
 
@@ -875,6 +884,9 @@ def run_method_episode(
 
     try:
         for expected in reference.decisions:
+            belief_before = BeliefGrid(
+                [list(row) for row in simulator.world.belief.snapshot()]
+            )
             if (
                 simulator.world.robot != expected.robot
                 or belief_hash(simulator.world.belief) != expected.belief_hash
@@ -897,6 +909,7 @@ def run_method_episode(
                             "method episode entered a different frozen snapshot",
                         ),
                         results={},
+                        belief_before=belief_before,
                         method=method,
                         method_order=method_order,
                         method_order_position=method_order_position,
@@ -948,6 +961,7 @@ def run_method_episode(
                         exception_message=str(exc),
                     ),
                     results={},
+                    belief_before=belief_before,
                     method=method,
                     method_order=method_order,
                     method_order_position=method_order_position,
@@ -982,6 +996,7 @@ def run_method_episode(
                             observed=_decision_tuple(result),
                         ),
                         results={method: result},
+                        belief_before=belief_before,
                         method=method,
                         method_order=method_order,
                         method_order_position=method_order_position,
@@ -1018,6 +1033,7 @@ def run_method_episode(
                             exception_message=str(exc),
                         ),
                         results={method: result},
+                        belief_before=belief_before,
                         method=method,
                     )
 
