@@ -69,7 +69,9 @@ git commit -m "Freeze Experiment 2 C-star holdout dataset"
 git push origin main
 ```
 
-Wait for GitHub CI to pass.  Do not edit the config after this point.
+Wait for GitHub CI to pass. Do not edit the config after this point. The
+formal runner independently regenerates the full seed-20260919 config before
+execution and refuses to run if any field differs.
 
 ## Phase C — prepare the laptop for primary timing
 
@@ -111,6 +113,11 @@ The runner performs:
 - R=4/8/12 sensitivity.
 
 Do not stop and rerun because a result looks unfavorable.
+
+Primary timing still measures only the planner call. Dataset preflight,
+reference checks, detailed failure-artifact generation, decomposition,
+tracemalloc, structural instrumentation, serialization, and C* audit are
+outside that timing boundary.
 
 ## Phase E — results
 
