@@ -47,7 +47,9 @@ from .experiment_2_analysis import BOOTSTRAP_RESAMPLES, BOOTSTRAP_SEED
 from .experiment_2_dataset import (
     DATASET_VERSION,
     MASTER_SEED,
+    dataset_config,
     load_config,
+    materialize_dataset,
     regenerate_record,
 )
 from .experiment_2_failure import (
@@ -173,6 +175,26 @@ def require_clean_worktree() -> None:
         raise RuntimeError(
             "formal Experiment 2 requires a clean git worktree before execution"
         )
+
+
+def require_exact_frozen_config(
+    config_path: str | Path = DEFAULT_CONFIG_PATH,
+) -> dict[str, Any]:
+    """Require byte-independent semantic equality with canonical materialization.
+
+    This preflight is outside every timing boundary.  It prevents formal
+    execution if the committed JSON differs in any field from the deterministic
+    master-seed materialization.
+    """
+
+    config = load_config(config_path)
+    expected = dataset_config(materialize_dataset())
+    if config != expected:
+        raise RuntimeError(
+            "Experiment 2 frozen config differs from canonical master-seed "
+            "materialization"
+        )
+    return config
 
 
 def build_cases(config_path: str | Path = DEFAULT_CONFIG_PATH) -> tuple[Experiment2Case, ...]:
@@ -1071,6 +1093,7 @@ def timing_schedule(
                 invocation_id=invocation_id, phase="primary_timing",
                 repetition_index=repetition, method_order=order,
                 method_order_position=position, writer=writer,
+                output_root=output_root, revision=revision,
             )
 
 
@@ -1192,7 +1215,7 @@ def run_preregistered_experiment(
 ) -> dict[str, Any]:
     require_clean_worktree()
     revision = repository_revision()
-    config = load_config(config_path)
+    config = require_exact_frozen_config(config_path)
     cases = build_cases(config_path)
     by_id = {case.map_id: case for case in cases}
     writer = Experiment2InvocationWriter(
