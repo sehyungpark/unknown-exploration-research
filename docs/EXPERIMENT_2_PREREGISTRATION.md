@@ -1,6 +1,6 @@
 # Experiment 2 — C* Efficiency and Scaling Evaluation
 
-Status: **PREREGISTRATION DRAFT — DO NOT EXECUTE FORMAL RUN UNTIL DATASET CONFIG IS COMMITTED**
+Status: **PREREGISTERED — FORMAL RUN REQUIRES THE FROZEN DATASET CONFIG TO BE COMMITTED**
 
 ## Purpose
 
@@ -90,5 +90,13 @@ sensitivity are required reported tradeoffs but do not override this rule.
 ## Integrity
 
 The frozen dataset config must be committed before formal execution.
-The formal runner rejects a dirty git worktree before creating output.
-The first formal invocation is retained whether favorable or unfavorable.
+Before any planner workload, the formal runner regenerates the complete config
+from master seed 20260919 and requires semantic equality with the committed
+config. The formal runner also rejects a dirty git worktree before creating
+output.
+
+E1-style detailed failure evidence is written outside every primary timing
+boundary. Reference validation, failure serialization, structural work
+instrumentation, tracemalloc, decomposition, and C* audit are never added to
+the primary planner wall/process time. The first formal invocation is retained
+whether favorable or unfavorable.

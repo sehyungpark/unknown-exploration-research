@@ -69,7 +69,9 @@ git commit -m "Freeze Experiment 2 C-star holdout dataset"
 git push origin main
 ```
 
-Wait for GitHub CI to pass.  Do not edit the config after this point.
+Wait for GitHub CI to pass. Do not edit the config after this point. The
+formal runner independently regenerates the full seed-20260919 config before
+execution and refuses to run if any field differs.
 
 ## Phase C — prepare the laptop for primary timing
 
@@ -112,6 +114,11 @@ The runner performs:
 
 Do not stop and rerun because a result looks unfavorable.
 
+Primary timing still measures only the planner call. Dataset preflight,
+reference checks, detailed failure-artifact generation, decomposition,
+tracemalloc, structural instrumentation, serialization, and C* audit are
+outside that timing boundary.
+
 ## Phase E — results
 
 The run is written under:
@@ -130,6 +137,18 @@ Files are deliberately compact and Git-friendly:
 - audit.jsonl
 - summary.json
 - failure.json only if a failure occurs
+
+Science-critical planner/correctness failures also preserve E1-style immutable
+six-file evidence under:
+
+```text
+results/experiment_2/failures/<failure_run_id>/
+```
+
+containing `metadata.json`, `ground_truth.txt`, `belief_before.txt`,
+`candidates.json`, `algorithm_state.json`, and `failure.txt`. Failure
+serialization occurs only after the measured planner call has ended and is
+never included in primary timing.
 
 No giant per-snapshot dump is produced by Experiment 2.
 

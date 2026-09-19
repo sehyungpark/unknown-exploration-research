@@ -41,6 +41,8 @@ FAILURE_CLASSIFICATIONS = (
     "b_tie_certificate_violation",
     "c_tie_certificate_violation",
     "c_cache_index_invariant_failure",
+    "cstar_bound_violation",
+    "cstar_audit_failure",
     "supported_change_aware_gain_bound_violation",
     "unsupported_lifecycle_or_configuration",
     "cycle_limit_exhaustion",

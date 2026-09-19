@@ -24,6 +24,7 @@ import os
 from pathlib import Path
 import platform
 import subprocess
+import sys
 import time
 import tracemalloc
 from typing import Any, Callable, Mapping, Sequence
@@ -46,8 +47,15 @@ from .experiment_2_analysis import BOOTSTRAP_RESAMPLES, BOOTSTRAP_SEED
 from .experiment_2_dataset import (
     DATASET_VERSION,
     MASTER_SEED,
+    dataset_config,
     load_config,
+    materialize_dataset,
     regenerate_record,
+)
+from .experiment_2_failure import (
+    FailureDescription,
+    deterministic_failure_run_id,
+    write_failure_artifact,
 )
 from .experiment_2_instrumentation import (
     decomposition,
@@ -70,6 +78,15 @@ DEFAULT_CONFIG_PATH = REPOSITORY_ROOT / "configs" / "experiment_2_cstar_maps.jso
 DEFAULT_OUTPUT_ROOT = REPOSITORY_ROOT / "results" / "experiment_2"
 PRIMARY_SENSOR_RANGE = 8.0
 SENSITIVITY_RANGES = (4.0, 8.0, 12.0)
+ANCHOR_ORDER = (
+    "open",
+    "single_room",
+    "corridor",
+    "dead_end",
+    "separated_rooms",
+    "clutter",
+    "maze_like",
+)
 
 ALGORITHM_IMPLEMENTATION_IDS: Mapping[str, str] = {
     "A": "src.planning.exhaustive_nbv:exhaustive_nbv",
@@ -113,14 +130,37 @@ class EpisodeReference:
     decisions: tuple[ReferenceDecision, ...]
 
 
+class Experiment2RunFailure(RuntimeError):
+    def __init__(
+        self,
+        classification: str,
+        artifact_path: Path,
+        phase: str,
+    ) -> None:
+        super().__init__(
+            f"Experiment 2 failed: {classification}; artifact={artifact_path}"
+        )
+        self.classification = classification
+        self.artifact_path = artifact_path
+        self.failure_run_id = artifact_path.name
+        self.phase = phase
+
+
+def _coordinate(value: Coord | None) -> list[int] | None:
+    return None if value is None else [value[0], value[1]]
+
+
 def repository_revision() -> str:
-    return subprocess.run(
+    revision = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         cwd=REPOSITORY_ROOT,
         check=True,
         capture_output=True,
         text=True,
     ).stdout.strip()
+    if len(revision) != 40:
+        raise RuntimeError("git rev-parse HEAD did not return a full revision")
+    return revision
 
 
 def require_clean_worktree() -> None:
@@ -135,6 +175,26 @@ def require_clean_worktree() -> None:
         raise RuntimeError(
             "formal Experiment 2 requires a clean git worktree before execution"
         )
+
+
+def require_exact_frozen_config(
+    config_path: str | Path = DEFAULT_CONFIG_PATH,
+) -> dict[str, Any]:
+    """Require byte-independent semantic equality with canonical materialization.
+
+    This preflight is outside every timing boundary.  It prevents formal
+    execution if the committed JSON differs in any field from the deterministic
+    master-seed materialization.
+    """
+
+    config = load_config(config_path)
+    expected = dataset_config(materialize_dataset())
+    if config != expected:
+        raise RuntimeError(
+            "Experiment 2 frozen config differs from canonical master-seed "
+            "materialization"
+        )
+    return config
 
 
 def build_cases(config_path: str | Path = DEFAULT_CONFIG_PATH) -> tuple[Experiment2Case, ...]:
@@ -164,6 +224,9 @@ def build_cases(config_path: str | Path = DEFAULT_CONFIG_PATH) -> tuple[Experime
 
 
 def build_anchor_cases() -> tuple[Experiment2Case, ...]:
+    fixtures = deterministic_fixtures()
+    if tuple(fixture.name for fixture in fixtures) != ANCHOR_ORDER:
+        raise ValueError("fixture order differs from frozen anchor order")
     return tuple(
         Experiment2Case(
             dataset_kind="fixture",
@@ -177,7 +240,7 @@ def build_anchor_cases() -> tuple[Experiment2Case, ...]:
             start=fixture.start,
             cycle_limit=FIXTURE_CYCLE_LIMITS[fixture.name],
         )
-        for fixture in deterministic_fixtures()
+        for fixture in fixtures
     )
 
 
@@ -345,6 +408,136 @@ def _slack_stats(values: Sequence[int]) -> dict[str, Any]:
     }
 
 
+
+def _candidate_artifact(results: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Compact cross-method candidate evidence for an invalid run."""
+
+    rows: dict[Coord, dict[str, Any]] = {}
+    oracle = results.get("A")
+    if oracle is not None:
+        for item in oracle.evaluations:
+            rows[item.candidate] = {
+                "candidate": _coordinate(item.candidate),
+                "a_exact_gain": item.gain,
+                "a_distance": item.distance,
+                "a_score": item.score,
+            }
+    for method in ("B", "C", "C*"):
+        result = results.get(method)
+        if result is None:
+            continue
+        for record in result.candidate_records:
+            row = rows.setdefault(
+                record.candidate,
+                {"candidate": _coordinate(record.candidate)},
+            )
+            row[f"{method}_current_distance"] = record.current_distance
+            if method == "B":
+                row["b_stale_upper_gain"] = record.stale_upper_gain
+                row["b_exact_evaluated"] = record.exact_evaluated_this_cycle
+            elif method == "C":
+                row["c_change_upper_gain"] = (
+                    record.change_aware_upper_gain_at_entry
+                )
+                row["c_exact_evaluated"] = record.exact_evaluated_this_cycle
+            else:
+                row["cstar_range_upper_gain"] = record.range_upper_gain
+                row["cstar_stale_upper_gain"] = record.stale_upper_gain_at_entry
+                row["cstar_change_upper_gain_after_refresh"] = (
+                    record.change_upper_gain_after_refresh
+                )
+                row["cstar_exact_evaluated"] = (
+                    record.exact_evaluated_this_cycle
+                )
+    return [rows[cell] for cell in sorted(rows)]
+
+
+def _algorithm_state(
+    planner_b: StaleScalarLazyNBV,
+    planner_c: ChangeAwareLazyNBV,
+    planner_star: ChangeAwareStarNBV,
+) -> dict[str, Any]:
+    cache = planner_c.cache
+    return {
+        "b_cached_gains": {
+            f"{cell[0]},{cell[1]}": value
+            for cell, value in sorted(planner_b.cached_gains.items())
+        },
+        "c_bound_counts": {
+            f"{cell[0]},{cell[1]}": value
+            for cell, value in sorted(cache.bound_counts.items())
+        },
+        "c_cached_candidate_count": len(cache.cached_visible_unknown),
+        "c_inverse_key_count": len(cache.inverse_incidence),
+        "c_reported_known_count": len(cache.reported_known_cells),
+        "cstar_map_revision": planner_star.map_revision,
+        "cstar_storage": planner_star.storage_counters(),
+    }
+
+
+def _emit_failure(
+    *,
+    case: Experiment2Case,
+    invocation_id: str,
+    output_root: str | Path,
+    revision: str,
+    phase: str,
+    sensor_range: float,
+    cycle_index: int,
+    simulator: ExplorationSimulator,
+    planner_b: StaleScalarLazyNBV,
+    planner_c: ChangeAwareLazyNBV,
+    planner_star: ChangeAwareStarNBV,
+    description: FailureDescription,
+    results: Mapping[str, Any],
+    belief_before: BeliefGrid | None = None,
+    method: str | None = None,
+    method_order: Sequence[str] | None = None,
+    method_order_position: int | None = None,
+    repetition_index: int | None = None,
+) -> None:
+    failure_id = deterministic_failure_run_id(
+        invocation_id=invocation_id,
+        phase=phase,
+        map_id=case.map_id,
+        method=method,
+        repetition_index=repetition_index,
+        cycle_index=cycle_index,
+        classification=description.classification,
+    )
+    evidence_belief = belief_before or simulator.world.belief
+    metadata = {
+        "experiment_version": EXPERIMENT_VERSION,
+        "dataset_version": DATASET_VERSION,
+        "invocation_id": invocation_id,
+        "failure_run_id": failure_id,
+        "phase": phase,
+        "map_id": case.map_id,
+        "method": method,
+        "method_order": list(method_order) if method_order is not None else None,
+        "method_order_position": method_order_position,
+        "repetition_index": repetition_index,
+        "sensor_range": sensor_range,
+        "cycle_index": cycle_index,
+        "robot_coordinate": _coordinate(simulator.world.robot),
+        "map_hash": case.map_hash,
+        "belief_hash": belief_hash(evidence_belief),
+        "repository_revision": revision,
+        "failure_classification": description.classification,
+    }
+    path = write_failure_artifact(
+        output_root=output_root,
+        failure_run_id=failure_id,
+        metadata=metadata,
+        ground_truth=case.ground_truth,
+        belief_before=evidence_belief,
+        candidates=_candidate_artifact(results),
+        algorithm_state=_algorithm_state(planner_b, planner_c, planner_star),
+        description=description,
+    )
+    raise Experiment2RunFailure(description.classification, path, phase)
+
+
 def run_shared_structural(
     *,
     case: Experiment2Case,
@@ -352,6 +545,8 @@ def run_shared_structural(
     phase: str,
     sensor_range: float,
     writer: Experiment2InvocationWriter | None,
+    output_root: str | Path | None = None,
+    revision: str | None = None,
 ) -> EpisodeReference:
     simulator = ExplorationSimulator(case.ground_truth, case.start, sensor_range)
     planner_b, planner_c, planner_star = _planners(sensor_range)
@@ -382,27 +577,134 @@ def run_shared_structural(
 
     for cycle in range(case.cycle_limit):
         robot = simulator.world.robot
-        frozen_hash = belief_hash(simulator.world.belief)
+        frozen_snapshot = simulator.world.belief.snapshot()
+        frozen_belief = BeliefGrid([list(row) for row in frozen_snapshot])
+        frozen_hash = belief_hash(frozen_belief)
         results: dict[str, Any] = {}
         works: dict[str, Any] = {}
         pre_inverse = planner_c.cache.inverse_incidence
         for method in METHODS:
-            with visibility_work() as work:
-                result = _call(
-                    method, simulator, planner_b, planner_c, planner_star,
-                    pending_delta_star,
+            try:
+                with visibility_work() as work:
+                    result = _call(
+                        method, simulator, planner_b, planner_c, planner_star,
+                        pending_delta_star,
+                    )
+                require_exact_call_match(work, result.exact_gain_evaluations)
+                if (
+                    simulator.world.robot != robot
+                    or belief_hash(simulator.world.belief) != frozen_hash
+                ):
+                    raise RuntimeError(
+                        f"{method} mutated shared planning snapshot"
+                    )
+            except Exception as exc:
+                if output_root is None or revision is None:
+                    raise
+                _emit_failure(
+                    case=case,
+                    invocation_id=invocation_id,
+                    output_root=output_root,
+                    revision=revision,
+                    phase=phase,
+                    sensor_range=sensor_range,
+                    cycle_index=cycle,
+                    simulator=simulator,
+                    planner_b=planner_b,
+                    planner_c=planner_c,
+                    planner_star=planner_star,
+                    description=FailureDescription(
+                        "instrumentation_mismatch"
+                        if "instrumentation mismatch" in str(exc)
+                        else "unexpected_exception",
+                        f"{method} planner/instrumentation failed",
+                        exception_class=type(exc).__name__,
+                        exception_message=str(exc),
+                    ),
+                    results=results,
+                    belief_before=frozen_belief,
+                    method=method,
                 )
-            require_exact_call_match(work, result.exact_gain_evaluations)
-            if simulator.world.robot != robot or belief_hash(simulator.world.belief) != frozen_hash:
-                raise RuntimeError(f"{method} mutated shared planning snapshot")
             results[method] = result
             works[method] = work
 
         oracle = results["A"]
+        oracle_domain = tuple(item.candidate for item in oracle.evaluations)
+        oracle_distance = {
+            item.candidate: item.distance for item in oracle.evaluations
+        }
         for method in METHODS[1:]:
-            if _decision_tuple(results[method]) != _decision_tuple(oracle):
-                raise RuntimeError(
-                    f"correctness mismatch {case.map_id} cycle={cycle} method={method}"
+            result = results[method]
+            domain = tuple(record.candidate for record in result.candidate_records)
+            distances_match = all(
+                record.candidate in oracle_distance
+                and record.current_distance == oracle_distance[record.candidate]
+                for record in result.candidate_records
+            )
+            if (
+                domain != oracle_domain
+                or result.eligible_candidate_count != len(oracle_domain)
+                or not distances_match
+            ):
+                if output_root is None or revision is None:
+                    raise RuntimeError(
+                        f"candidate domain/distance mismatch {case.map_id} "
+                        f"cycle={cycle} method={method}"
+                    )
+                _emit_failure(
+                    case=case,
+                    invocation_id=invocation_id,
+                    output_root=output_root,
+                    revision=revision,
+                    phase=phase,
+                    sensor_range=sensor_range,
+                    cycle_index=cycle,
+                    simulator=simulator,
+                    planner_b=planner_b,
+                    planner_c=planner_c,
+                    planner_star=planner_star,
+                    description=FailureDescription(
+                        "candidate_domain_or_distance_mismatch",
+                        "candidate domain/order or current distance differs",
+                    ),
+                    results=results,
+                    belief_before=frozen_belief,
+                    method=method,
+                )
+            if _decision_tuple(result) != _decision_tuple(oracle):
+                classification = (
+                    "sequence_or_termination_mismatch"
+                    if result.status is not oracle.status
+                    else "target_mismatch"
+                    if result.selected_candidate != oracle.selected_candidate
+                    else "selected_value_or_path_mismatch"
+                )
+                if output_root is None or revision is None:
+                    raise RuntimeError(
+                        f"correctness mismatch {case.map_id} cycle={cycle} "
+                        f"method={method}"
+                    )
+                _emit_failure(
+                    case=case,
+                    invocation_id=invocation_id,
+                    output_root=output_root,
+                    revision=revision,
+                    phase=phase,
+                    sensor_range=sensor_range,
+                    cycle_index=cycle,
+                    simulator=simulator,
+                    planner_b=planner_b,
+                    planner_c=planner_c,
+                    planner_star=planner_star,
+                    description=FailureDescription(
+                        classification,
+                        "A/B/C/C* selected decision differs",
+                        expected=_decision_tuple(oracle),
+                        observed=_decision_tuple(result),
+                    ),
+                    results=results,
+                    belief_before=frozen_belief,
+                    method=method,
                 )
         for method in METHODS:
             sequences[method].append(
@@ -414,7 +716,39 @@ def run_shared_structural(
             work_totals[method]["visibility_supercover_cell_count"] += works[method].visibility_supercover_cell_count
             work_totals[method]["visibility_interior_probe_count"] += works[method].visibility_interior_probe_count
             if method != "A":
-                slacks[method].extend(_bound_slacks(method, oracle, results[method]))
+                try:
+                    slacks[method].extend(
+                        _bound_slacks(method, oracle, results[method])
+                    )
+                except RuntimeError as exc:
+                    if output_root is None or revision is None:
+                        raise
+                    _emit_failure(
+                        case=case,
+                        invocation_id=invocation_id,
+                        output_root=output_root,
+                        revision=revision,
+                        phase=phase,
+                        sensor_range=sensor_range,
+                        cycle_index=cycle,
+                        simulator=simulator,
+                        planner_b=planner_b,
+                        planner_c=planner_c,
+                        planner_star=planner_star,
+                        description=FailureDescription(
+                            "b_bound_violation"
+                            if method == "B"
+                            else "c_bound_violation"
+                            if method == "C"
+                            else "cstar_bound_violation",
+                            f"{method} upper bound is inadmissible",
+                            exception_class=type(exc).__name__,
+                            exception_message=str(exc),
+                        ),
+                        results=results,
+                        belief_before=frozen_belief,
+                        method=method,
+                    )
 
         c_result = results["C"]
         c_maintenance["synchronized_newly_known_count"] += len(c_result.synchronized_newly_known_cells)
@@ -500,6 +834,26 @@ def run_shared_structural(
             if coverage_steps[threshold] is None and coverage >= threshold / 100:
                 coverage_steps[threshold] = cycle + 1
 
+    if output_root is not None and revision is not None:
+        _emit_failure(
+            case=case,
+            invocation_id=invocation_id,
+            output_root=output_root,
+            revision=revision,
+            phase=phase,
+            sensor_range=sensor_range,
+            cycle_index=case.cycle_limit,
+            simulator=simulator,
+            planner_b=planner_b,
+            planner_c=planner_c,
+            planner_star=planner_star,
+            description=FailureDescription(
+                "cycle_limit_exhaustion",
+                "case reached cycle limit without terminal decision",
+            ),
+            results={},
+            belief_before=frozen_belief,
+        )
     raise RuntimeError(f"cycle limit exhausted for {case.map_id}")
 
 
@@ -514,6 +868,8 @@ def run_method_episode(
     method_order: Sequence[str] | None = None,
     method_order_position: int | None = None,
     writer: Experiment2InvocationWriter | None = None,
+    output_root: str | Path | None = None,
+    revision: str | None = None,
 ) -> dict[str, Any]:
     simulator = ExplorationSimulator(case.ground_truth, case.start, reference.sensor_range)
     planner_b, planner_c, planner_star = _planners(reference.sensor_range)
@@ -528,40 +884,158 @@ def run_method_episode(
 
     try:
         for expected in reference.decisions:
+            belief_before = BeliefGrid(
+                [list(row) for row in simulator.world.belief.snapshot()]
+            )
             if (
                 simulator.world.robot != expected.robot
                 or belief_hash(simulator.world.belief) != expected.belief_hash
             ):
+                if output_root is not None and revision is not None:
+                    _emit_failure(
+                        case=case,
+                        invocation_id=invocation_id,
+                        output_root=output_root,
+                        revision=revision,
+                        phase=phase,
+                        sensor_range=reference.sensor_range,
+                        cycle_index=expected.cycle_index,
+                        simulator=simulator,
+                        planner_b=planner_b,
+                        planner_c=planner_c,
+                        planner_star=planner_star,
+                        description=FailureDescription(
+                            "timing_protocol_violation",
+                            "method episode entered a different frozen snapshot",
+                        ),
+                        results={},
+                        belief_before=belief_before,
+                        method=method,
+                        method_order=method_order,
+                        method_order_position=method_order_position,
+                        repetition_index=repetition_index,
+                    )
                 raise RuntimeError("method episode diverged before planning")
             call = lambda: _call(
                 method, simulator, planner_b, planner_c, planner_star,
                 pending_delta_star,
             )
-            if phase in {"timing_warmup", "primary_timing"}:
-                wall_start = time.perf_counter_ns()
-                process_start = time.process_time_ns()
-                result = call()
-                process_total += time.process_time_ns() - process_start
-                wall_total += time.perf_counter_ns() - wall_start
-            elif phase == "decomposition":
-                with decomposition() as measured:
-                    outcome = measured.measure(call)
-                result = outcome.result
-                distance_total += outcome.distance_time_ns
-                visibility_total += outcome.visibility_time_ns
-                maintenance_total += outcome.maintenance_time_ns
-                other_total += outcome.other_time_ns
-            else:
-                result = call()
+            try:
+                if phase in {"timing_warmup", "primary_timing"}:
+                    # Frozen primary boundary: planner call only.  All reference
+                    # validation and failure evidence occur after the timer.
+                    wall_start = time.perf_counter_ns()
+                    process_start = time.process_time_ns()
+                    result = call()
+                    process_total += time.process_time_ns() - process_start
+                    wall_total += time.perf_counter_ns() - wall_start
+                elif phase == "decomposition":
+                    with decomposition() as measured:
+                        outcome = measured.measure(call)
+                    result = outcome.result
+                    distance_total += outcome.distance_time_ns
+                    visibility_total += outcome.visibility_time_ns
+                    maintenance_total += outcome.maintenance_time_ns
+                    other_total += outcome.other_time_ns
+                else:
+                    result = call()
+            except Exception as exc:
+                if output_root is None or revision is None:
+                    raise
+                _emit_failure(
+                    case=case,
+                    invocation_id=invocation_id,
+                    output_root=output_root,
+                    revision=revision,
+                    phase=phase,
+                    sensor_range=reference.sensor_range,
+                    cycle_index=expected.cycle_index,
+                    simulator=simulator,
+                    planner_b=planner_b,
+                    planner_c=planner_c,
+                    planner_star=planner_star,
+                    description=FailureDescription(
+                        "unexpected_exception",
+                        f"{method} planner call failed",
+                        exception_class=type(exc).__name__,
+                        exception_message=str(exc),
+                    ),
+                    results={},
+                    belief_before=belief_before,
+                    method=method,
+                    method_order=method_order,
+                    method_order_position=method_order_position,
+                    repetition_index=repetition_index,
+                )
 
             if not _matches_reference(result, expected):
+                if output_root is not None and revision is not None:
+                    _emit_failure(
+                        case=case,
+                        invocation_id=invocation_id,
+                        output_root=output_root,
+                        revision=revision,
+                        phase=phase,
+                        sensor_range=reference.sensor_range,
+                        cycle_index=expected.cycle_index,
+                        simulator=simulator,
+                        planner_b=planner_b,
+                        planner_c=planner_c,
+                        planner_star=planner_star,
+                        description=FailureDescription(
+                            "selected_value_or_path_mismatch",
+                            f"{method} diverged from structural reference",
+                            expected=(
+                                expected.status,
+                                expected.candidate,
+                                expected.gain,
+                                expected.distance,
+                                expected.score,
+                                expected.path,
+                            ),
+                            observed=_decision_tuple(result),
+                        ),
+                        results={method: result},
+                        belief_before=belief_before,
+                        method=method,
+                        method_order=method_order,
+                        method_order_position=method_order_position,
+                        repetition_index=repetition_index,
+                    )
                 raise RuntimeError(
-                    f"{method} diverged from structural reference at cycle {expected.cycle_index}"
+                    f"{method} diverged from structural reference at cycle "
+                    f"{expected.cycle_index}"
                 )
             if phase == "audit" and method == "C*":
-                start = time.perf_counter_ns()
-                planner_star.audit(simulator.world.belief)
-                audit_total += time.perf_counter_ns() - start
+                try:
+                    start = time.perf_counter_ns()
+                    planner_star.audit(simulator.world.belief)
+                    audit_total += time.perf_counter_ns() - start
+                except Exception as exc:
+                    if output_root is None or revision is None:
+                        raise
+                    _emit_failure(
+                        case=case,
+                        invocation_id=invocation_id,
+                        output_root=output_root,
+                        revision=revision,
+                        phase=phase,
+                        sensor_range=reference.sensor_range,
+                        cycle_index=expected.cycle_index,
+                        simulator=simulator,
+                        planner_b=planner_b,
+                        planner_c=planner_c,
+                        planner_star=planner_star,
+                        description=FailureDescription(
+                            "cstar_audit_failure",
+                            "C* descriptive audit failed",
+                            exception_class=type(exc).__name__,
+                            exception_message=str(exc),
+                        ),
+                        results={method: result},
+                        belief_before=belief_before,
+                        method=method,
+                    )
 
             if result.status is PlanStatus.EXPLORATION_COMPLETE:
                 break
@@ -617,6 +1091,8 @@ def timing_schedule(
     reference: EpisodeReference,
     invocation_id: str,
     writer: Experiment2InvocationWriter | None,
+    output_root: str | Path | None = None,
+    revision: str | None = None,
 ) -> None:
     for position, method in enumerate(WARMUP_ORDER):
         run_method_episode(
@@ -624,6 +1100,7 @@ def timing_schedule(
             invocation_id=invocation_id, phase="timing_warmup",
             repetition_index=0, method_order=WARMUP_ORDER,
             method_order_position=position, writer=writer,
+            output_root=output_root, revision=revision,
         )
     for repetition, order in enumerate(TIMING_ORDERS, start=1):
         for position, method in enumerate(order):
@@ -632,18 +1109,82 @@ def timing_schedule(
                 invocation_id=invocation_id, phase="primary_timing",
                 repetition_index=repetition, method_order=order,
                 method_order_position=position, writer=writer,
+                output_root=output_root, revision=revision,
             )
 
 
+def _physical_cpu_count() -> int | None:
+    if sys.platform.startswith("linux"):
+        try:
+            pairs = set()
+            physical = core = None
+            for line in Path("/proc/cpuinfo").read_text(
+                encoding="utf-8"
+            ).splitlines():
+                if line.startswith("physical id"):
+                    physical = line.split(":", 1)[1].strip()
+                elif line.startswith("core id"):
+                    core = line.split(":", 1)[1].strip()
+                    if physical is not None:
+                        pairs.add((physical, core))
+            return len(pairs) or None
+        except OSError:
+            return None
+    return None
+
+
+def _ram_bytes() -> int | None:
+    try:
+        if hasattr(os, "sysconf"):
+            return int(os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES"))
+    except (OSError, ValueError):
+        pass
+    return None
+
+
 def machine_metadata() -> dict[str, Any]:
+    cpu_model = platform.processor() or None
+    if cpu_model is None and sys.platform.startswith("linux"):
+        try:
+            cpu_model = next(
+                line.split(":", 1)[1].strip()
+                for line in Path("/proc/cpuinfo").read_text(
+                    encoding="utf-8"
+                ).splitlines()
+                if line.startswith("model name")
+            )
+        except (OSError, StopIteration):
+            cpu_model = None
+    affinity = None
+    if hasattr(os, "sched_getaffinity"):
+        try:
+            affinity = sorted(os.sched_getaffinity(0))
+        except OSError:
+            affinity = None
+    frequency = None
+    governor = Path(
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
+    )
+    try:
+        frequency = (
+            governor.read_text(encoding="utf-8").strip()
+            if governor.exists()
+            else None
+        )
+    except OSError:
+        frequency = None
     return {
-        "os": platform.system(),
-        "os_version": platform.version(),
-        "cpu_model": platform.processor() or None,
+        "os": platform.system() or None,
+        "os_version": platform.version() or None,
+        "cpu_model": cpu_model,
         "logical_cpu_count": os.cpu_count(),
-        "python_version": platform.python_version(),
+        "physical_cpu_count": _physical_cpu_count(),
+        "ram_bytes": _ram_bytes(),
         "python_implementation": platform.python_implementation(),
+        "python_version": platform.python_version(),
         "process_architecture": platform.architecture()[0],
+        "cpu_affinity": affinity,
+        "frequency_control_state": frequency,
     }
 
 
@@ -662,6 +1203,7 @@ def build_manifest(
         "primary_sensor_range": PRIMARY_SENSOR_RANGE,
         "sensitivity_sensor_ranges": list(SENSITIVITY_RANGES),
         "primary_map_ids": [record["dataset_id"] for record in config["accepted_maps"]],
+        "anchor_fixture_ids": list(ANCHOR_ORDER),
         "timing_subset_map_ids": list(config["timing_subset_map_ids"]),
         "sensitivity_subset_map_ids": list(config["sensitivity_subset_map_ids"]),
         "methods": list(METHODS),
@@ -675,6 +1217,7 @@ def build_manifest(
         "movement_semantics": "8-neighbor known-FREE; orthogonal=1; diagonal=sqrt(2); no corner cutting",
         "visibility_semantics": "corner-inclusive supercover; UNKNOWN-transparent optimistic; first-hit OCCUPIED physical",
         "sensing_semantics": "initial and arrival only; none while moving",
+        "score_and_tie_rule_version": "candidate-rank-key-v1",
         "primary_decision_comparison": "C*/B",
         **machine_metadata(),
     }
@@ -688,7 +1231,7 @@ def run_preregistered_experiment(
 ) -> dict[str, Any]:
     require_clean_worktree()
     revision = repository_revision()
-    config = load_config(config_path)
+    config = require_exact_frozen_config(config_path)
     cases = build_cases(config_path)
     by_id = {case.map_id: case for case in cases}
     writer = Experiment2InvocationWriter(
@@ -701,18 +1244,19 @@ def run_preregistered_experiment(
             references[case.map_id] = run_shared_structural(
                 case=case, invocation_id=invocation_id,
                 phase="primary_structural", sensor_range=PRIMARY_SENSOR_RANGE,
-                writer=writer,
+                writer=writer, output_root=output_root, revision=revision,
             )
         for case in build_anchor_cases():
             run_shared_structural(
                 case=case, invocation_id=invocation_id,
                 phase="anchor_structural", sensor_range=PRIMARY_SENSOR_RANGE,
-                writer=writer,
+                writer=writer, output_root=output_root, revision=revision,
             )
         for map_id in config["timing_subset_map_ids"]:
             timing_schedule(
                 case=by_id[map_id], reference=references[map_id],
                 invocation_id=invocation_id, writer=writer,
+                output_root=output_root, revision=revision,
             )
         for map_id in config["timing_subset_map_ids"]:
             case = by_id[map_id]
@@ -721,7 +1265,7 @@ def run_preregistered_experiment(
                 run_method_episode(
                     case=case, method=method, reference=reference,
                     invocation_id=invocation_id, phase="decomposition",
-                    writer=writer,
+                    writer=writer, output_root=output_root, revision=revision,
                 )
         for map_id in config["timing_subset_map_ids"]:
             case = by_id[map_id]
@@ -730,12 +1274,13 @@ def run_preregistered_experiment(
                 run_method_episode(
                     case=case, method=method, reference=reference,
                     invocation_id=invocation_id, phase="memory",
-                    writer=writer,
+                    writer=writer, output_root=output_root, revision=revision,
                 )
         for map_id in config["timing_subset_map_ids"]:
             run_method_episode(
                 case=by_id[map_id], method="C*", reference=references[map_id],
                 invocation_id=invocation_id, phase="audit", writer=writer,
+                output_root=output_root, revision=revision,
             )
         for map_id in config["sensitivity_subset_map_ids"]:
             case = by_id[map_id]
@@ -743,9 +1288,23 @@ def run_preregistered_experiment(
                 run_shared_structural(
                     case=case, invocation_id=invocation_id,
                     phase="range_sensitivity", sensor_range=sensor_range,
-                    writer=writer,
+                    writer=writer, output_root=output_root, revision=revision,
                 )
         return writer.finalize("PASS")
+    except Experiment2RunFailure as exc:
+        writer.write_failure(
+            {
+                "invocation_id": invocation_id,
+                "repository_commit": revision,
+                "exception_class": type(exc).__name__,
+                "message": str(exc),
+                "failure_run_id": exc.failure_run_id,
+                "failure_artifact_path": str(exc.artifact_path),
+                "failure_classification": exc.classification,
+            }
+        )
+        writer.finalize("FAILED")
+        raise
     except Exception as exc:
         writer.write_failure(
             {
@@ -768,11 +1327,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if not args.execute_preregistered:
         parser.error("formal Experiment 2 requires --execute-preregistered")
-    run_preregistered_experiment(
-        invocation_id=args.invocation_id,
-        output_root=args.output_root,
-        config_path=args.config,
-    )
+    try:
+        run_preregistered_experiment(
+            invocation_id=args.invocation_id,
+            output_root=args.output_root,
+            config_path=args.config,
+        )
+    except Experiment2RunFailure as exc:
+        print(str(exc))
+        return 1
     return 0
 
 
