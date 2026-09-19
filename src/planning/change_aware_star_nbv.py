@@ -159,6 +159,24 @@ class ChangeAwareStarNBV:
         self._cache.clear()
         self._range_masks.clear()
 
+    def storage_counters(self) -> dict[str, int]:
+        """Return deterministic structural storage counters for research logging.
+
+        This diagnostic traversal is intentionally outside the production timing
+        boundary. It does not mutate planner state.
+        """
+
+        return {
+            "cached_candidate_count": len(self._cache),
+            "cached_visible_membership_count": sum(
+                entry.visible_mask.bit_count() for entry in self._cache.values()
+            ),
+            "range_mask_count": len(self._range_masks),
+            "range_mask_membership_count": sum(
+                mask.bit_count() for mask in self._range_masks.values()
+            ),
+        }
+
     def cached_entry(self, candidate: Coord) -> CStarCacheEntry | None:
         """Return a detached diagnostic copy without copying the whole cache."""
 

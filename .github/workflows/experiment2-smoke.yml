@@ -1,0 +1,36 @@
+name: Experiment 2 Smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/evaluation/experiment_2_*.py"
+      - "src/planning/change_aware_star_nbv.py"
+      - "tests/test_experiment_2_cstar.py"
+      - "docs/EXPERIMENT_2_*.md"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Generate holdout config in temporary location
+        run: python -m src.evaluation.experiment_2_dataset --output /tmp/experiment_2_cstar_maps.json
+
+      - name: Run Experiment 2 smoke tests
+        run: python -m unittest tests.test_experiment_2_cstar -v
+
+      - name: Do not run formal performance benchmark on GitHub-hosted runner
+        run: echo "Primary Experiment 2 wall-clock timing is intentionally laptop-only."
