@@ -409,7 +409,7 @@ def run_shared_structural(
                 None if oracle.status is PlanStatus.EXPLORATION_COMPLETE
                 else results[method].selected_candidate
             )
-            work_totals[method]["exact_gain_evaluation_count"] += result.exact_gain_evaluations if False else results[method].exact_gain_evaluations
+            work_totals[method]["exact_gain_evaluation_count"] += results[method].exact_gain_evaluations
             work_totals[method]["visibility_ray_count"] += works[method].visibility_ray_count
             work_totals[method]["visibility_supercover_cell_count"] += works[method].visibility_supercover_cell_count
             work_totals[method]["visibility_interior_probe_count"] += works[method].visibility_interior_probe_count
@@ -431,11 +431,7 @@ def run_shared_structural(
             and record.change_aware_upper_gain_at_entry is not None
             for record in c_result.candidate_records
         )
-        for name in c_result.candidate_records[:0]:
-            pass
-        for name, value in vars(results["C*"].counters).items() if hasattr(results["C*"].counters, "__dict__") else []:
-            cstar_counters[name] = cstar_counters.get(name, 0) + int(value)
-        # slots dataclass has no __dict__; enumerate declared fields deterministically.
+        # slots dataclass: enumerate declared counter fields deterministically.
         for name in results["C*"].counters.__dataclass_fields__:
             value = getattr(results["C*"].counters, name)
             cstar_counters[name] = cstar_counters.get(name, 0) + int(value)
