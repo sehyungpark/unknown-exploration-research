@@ -17,6 +17,7 @@ from src.utils import Coord
 _exhaustive = importlib.import_module("src.planning.exhaustive_nbv")
 _stale = importlib.import_module("src.planning.stale_scalar_lazy_nbv")
 _change = importlib.import_module("src.planning.change_aware_lazy_nbv")
+_star = importlib.import_module("src.planning.change_aware_star_nbv")
 _integration = importlib.import_module("src.planning.change_aware_integration")
 _visibility = importlib.import_module("src.sensing.visibility")
 
@@ -26,6 +27,7 @@ _CANONICAL_DIJKSTRA = {
     _exhaustive: _exhaustive.dijkstra,
     _stale: _stale.dijkstra,
     _change: _change.dijkstra,
+    _star: _star.dijkstra,
 }
 _CANONICAL_SYNCHRONIZE = _change.synchronize_revelations
 _CANONICAL_INSTALL = ChangeAwareGainCache.install_exact
@@ -110,7 +112,7 @@ class VisibilityWorkContext(AbstractContextManager[VisibilityWork]):
             self.work.visibility_supercover_cell_count += len(line)
             return _LineProxy(line, self.work)
 
-        for module in (_exhaustive, _stale, _integration):
+        for module in (_exhaustive, _stale, _integration, _star):
             self._set(
                 module,
                 "optimistic_visible_unknown_cells",
@@ -178,7 +180,7 @@ class DecompositionContext(AbstractContextManager["DecompositionContext"]):
     def __enter__(self) -> DecompositionContext:
         for module, canonical in _CANONICAL_DIJKSTRA.items():
             self._set(module, "dijkstra", self._timed("distance_time_ns", canonical))
-        for module in (_exhaustive, _stale, _integration):
+        for module in (_exhaustive, _stale, _integration, _star):
             self._set(
                 module,
                 "optimistic_visible_unknown_cells",
@@ -193,6 +195,12 @@ class DecompositionContext(AbstractContextManager["DecompositionContext"]):
             ChangeAwareGainCache,
             "install_exact",
             self._timed("maintenance_time_ns", _CANONICAL_INSTALL),
+        )
+        original_star_sync = _star.ChangeAwareStarNBV._synchronize_unknown_mask
+        self._set(
+            _star.ChangeAwareStarNBV,
+            "_synchronize_unknown_mask",
+            self._timed("maintenance_time_ns", original_star_sync),
         )
         return self
 
