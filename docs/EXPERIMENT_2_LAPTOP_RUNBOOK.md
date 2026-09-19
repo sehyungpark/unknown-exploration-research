@@ -138,6 +138,18 @@ Files are deliberately compact and Git-friendly:
 - summary.json
 - failure.json only if a failure occurs
 
+Science-critical planner/correctness failures also preserve E1-style immutable
+six-file evidence under:
+
+```text
+results/experiment_2/failures/<failure_run_id>/
+```
+
+containing `metadata.json`, `ground_truth.txt`, `belief_before.txt`,
+`candidates.json`, `algorithm_state.json`, and `failure.txt`. Failure
+serialization occurs only after the measured planner call has ended and is
+never included in primary timing.
+
 No giant per-snapshot dump is produced by Experiment 2.
 
 Inspect:
