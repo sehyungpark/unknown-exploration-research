@@ -1,0 +1,46 @@
+{
+  "version": "extension-pilot-20260929-v1",
+  "status": "STRUCTURAL_PASS",
+  "started": "2026-09-29T06:26:14.669832+00:00",
+  "python": "3.13.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "base_commit": "88f1b6bfefa56d928bd8dee62fcf1d30dc900714",
+  "script_sha256": "b4fa51cf8d62efd607c84c8d10f5ec9c40b8ad2270d958e9978b24e0e8fe0fe4",
+  "protocol_sha256": "4976e5dc56237819e35be39d696970aa655892a75e57f76922879b69b319c445",
+  "timing_orders": [
+    [
+      "B",
+      "S*",
+      "C*",
+      "CERT"
+    ],
+    [
+      "S*",
+      "C*",
+      "CERT",
+      "B"
+    ],
+    [
+      "C*",
+      "CERT",
+      "B",
+      "S*"
+    ],
+    [
+      "CERT",
+      "B",
+      "S*",
+      "C*"
+    ]
+  ],
+  "sensor_range": 8,
+  "timing_ids": [
+    "open",
+    "maze_like",
+    "rooms-20-door-1",
+    "rooms-30-door-3",
+    "random-20-0.1-1",
+    "random-30-0.3-1"
+  ],
+  "completed": "2026-09-29T06:33:38.590789+00:00"
+}
