@@ -1,12 +1,10 @@
-"""상하좌우로 이동하는 전수 NBV. 실행: python minimal_nbv.py
+"""상하좌우로 이동하는 전수 NBV. 실행: all_nbva.py
 
 실제 지도(truth)는 관측할 때만 사용하고, 계획은 관측 지도(known)로 계산한다.
 """
-
 from collections import deque
 from math import ceil, inf
 from random import Random
-
 
 # 0. 상수: 좌표는 (행, 열), 거리와 이동 비용은 칸 단위이다.
 HEIGHT = 20
@@ -18,7 +16,6 @@ MAX_MAP_ATTEMPTS = 1000
 UNKNOWN, FREE, WALL = -1, 0, 1
 MOVES = ((-1, 0), (0, -1), (0, 1), (1, 0))
 STEP_COST = 1
-
 # 한 번의 탐사에서 공유하는 전역 지도 상태이다.
 # truth는 실제 지도이고, known은 에이전트가 현재까지 관측한 지도이다.
 truth = None
@@ -34,8 +31,7 @@ def create_map():
     """
     global truth, known, NBVpath
     NBVpath.clear() 
-    if HEIGHT < 1 or WIDTH < 1 or not 0 <= OBSTACLE_RATE < 1:
-        raise ValueError("맵 크기는 양수, 장애물 확률은 0 이상 1 미만이어야 합니다.")
+
     rng = Random(SEED)
     for _ in range(MAX_MAP_ATTEMPTS):
         truth = [[int(rng.random() < OBSTACLE_RATE) for _ in range(WIDTH)]
@@ -116,8 +112,6 @@ def sensor_targets(origin):
 
 def Information_Gain(x, y):
     """전역 known 지도에서 (x, y)의 가시적인 미탐색 셀 수를 계산한다."""
-    if known is None:
-        raise RuntimeError("known 지도가 아직 생성되지 않았습니다.")
 
     gain = 0
     origin = (x, y)
@@ -185,8 +179,7 @@ def explore(truth, known, robot):
     """반환값: 최종 위치, 누적 이동 비용, NBV 선택 횟수. known은 직접 갱신된다."""
     global NBVpath
     NBVpath.clear()
-    if SENSOR_RANGE < 1:
-        raise ValueError("전체 지도 관측을 위해 시야 반경은 1 이상이어야 합니다.")
+
     total_cost = rounds = 0
     observe(truth, known, robot)
     while any(UNKNOWN in row for row in known):
@@ -202,7 +195,7 @@ def explore(truth, known, robot):
     return robot, total_cost, rounds
 
 
-if __name__ == "__main__":
+if True:
     truth, known, start = create_map()
     robot, total_cost, rounds = explore(truth, known, start)
     print(f"start={start}, end={robot}, NBV selections={rounds}, total cost={total_cost}")
