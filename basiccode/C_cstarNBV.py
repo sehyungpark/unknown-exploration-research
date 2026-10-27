@@ -45,7 +45,7 @@ def cell_bit(coord, width=None):
 
 
 def build_unknown_mask(known):
-    """매 계획 시작에 현재 UNKNOWN을 재구성한다. 선택 중에는 고정한다."""
+    """현재 UNKNOWN을 구성한다. 증분 모드에서는 탐사 중 최초 계획에만 쓴다."""
     width = len(known[0])
     mask = 0
     for row, values in enumerate(known):
@@ -53,6 +53,45 @@ def build_unknown_mask(known):
             if value == UNKNOWN:
                 mask |= cell_bit((row, col), width)
     return mask
+
+
+class UnknownMaskState:
+    """한 탐사에서만 사용하는 UNKNOWN mask와 아직 반영하지 않은 관측 셀.
+
+    첫 계획은 초기 관측 이후의 known으로 mask를 구성한다. 이후에는 관측
+    hook이 모은 UNKNOWN->known 셀만 지운다. 다른 탐사에 재사용하지 않는다.
+    """
+
+    def __init__(self):
+        self.mask = None
+        self.shape = None
+        self.pending = set()
+
+    def report_newly_known(self, cell):
+        self.pending.add(cell)
+
+    def synchronize(self, known):
+        shape = (len(known), len(known[0]))
+        if self.shape is not None and shape != self.shape:
+            raise ValueError("탐사 중 지도 크기가 바뀌었습니다. mask 상태를 새로 만드세요.")
+        height, width = shape
+        delta_mask = 0
+        for row, col in self.pending:
+            if not (0 <= row < height and 0 <= col < width):
+                raise ValueError("새로 알려진 셀이 지도 범위를 벗어났습니다.")
+            if known[row][col] == UNKNOWN:
+                raise ValueError("아직 UNKNOWN인 셀은 mask에서 제거할 수 없습니다.")
+            delta_mask |= cell_bit((row, col), width)
+        # 검증이 끝나기 전에는 유지 중인 mask나 pending을 변경하지 않는다.
+        if self.mask is None:
+            current = build_unknown_mask(known)
+        elif delta_mask:
+            current = self.mask & ~delta_mask
+        else:
+            current = self.mask
+        self.mask, self.shape = current, shape
+        self.pending.clear()
+        return current
 
 
 def sensor_range_mask(candidate, range_masks, shape=None):
@@ -90,13 +129,16 @@ def exact_evaluate(known, candidate, distance, cache, upper_gain):
     return nbv_score(gain, distance), gain, distance
 
 
-def evaluate_candidates(known, robot, cache, range_masks):
+def evaluate_candidates(known, robot, cache, range_masks, *, unknown_state=None):
     """(목표 또는 None, 이번 정확 평가 사전, BFS 부모 사전)을 반환한다.
 
     정적 환경·단조 공개·고정 센서가 전제이다. 기존 가시 집합을 현재 UNKNOWN과
     교차하는 작업은 후보가 힙에서 꺼내질 때만 수행한다.
+    unknown_state가 있으면 명시적으로 보고된 관측만 반영한다. 기존 네 인자
+    호출은 호환성과 비교 검증을 위해 매번 mask를 구성하는 동작을 유지한다.
     """
-    unknown_mask = build_unknown_mask(known)
+    unknown_mask = (build_unknown_mask(known) if unknown_state is None
+                    else unknown_state.synchronize(known))
     distances, parents = shortest_paths(known, robot)
     candidates = tuple(sorted(v for v in distances if v != robot))
     exact = {}
@@ -174,11 +216,15 @@ def explore(truth, known, robot):
     """탐사마다 두 캐시를 초기화하고 A/B와 같은 경로·종료 결과를 반환한다."""
     NBVpath.clear()
     cache, range_masks = {}, {}
+    unknown_state = UnknownMaskState()
 
     def select_candidate(grid, position):
-        return evaluate_candidates(grid, position, cache, range_masks)
+        return evaluate_candidates(
+            grid, position, cache, range_masks, unknown_state=unknown_state)
 
-    result = common.run_exploration(truth, known, robot, SENSOR_RANGE, select_candidate)
+    result = common.run_exploration(
+        truth, known, robot, SENSOR_RANGE, select_candidate,
+        on_newly_known=unknown_state.report_newly_known)
     NBVpath.extend(result.targets)
     return result
 
