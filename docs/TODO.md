@@ -70,13 +70,13 @@ Last updated: 2026-09-19
 - [x] Stage 10: implement the guarded `experiment-1-runner-v1` measurement runner and canonical serializers without changing Algorithms A/B/C or simulator semantics; formal Experiment 1 remains NOT EXECUTED.
 - [x] Add benchmark-only forwarding instrumentation for exact visibility work and internal time decomposition; prove it preserves canonical decisions and counters on synthetic/nonformal inputs.
 - [x] Add non-overwriting success/failure writers and schema validation for all six frozen Experiment 1 output files; no formal run was created during infrastructure validation.
-- [ ] Execute the first formal Experiment 1 invocation only after Stage 10 acceptance and a clean full suite/CI; retain every raw repetition and failure.
+- [x] Execute and retain formal Experiment 1 (`experiment1-formal-20260917-001`); independently recompute work, timing, and DROP classification on 2026-09-29. Raw result is locally present but currently untracked.
 - [ ] Compare stale-scalar versus change-aware bound tightness over planning cycles.
 - [ ] Compare exact gain evaluation counts and total ray work.
 - [ ] Compare total planning wall-clock time including all bookkeeping overhead.
 - [ ] Measure memory scaling versus candidate density and sensing range.
 - [ ] Measure path length and coverage/time to 90%, 95%, and 99% as sanity checks that exact decision equivalence is preserved.
-- [ ] Apply Pre-execution Amendment 1 exactly, with no post-result override: correctness first, then the all-three aggregate visibility-work gate, then the paired C/B timing-interval boundaries.
+- [x] Apply Pre-execution Amendment 1 exactly: historical C classified DROP despite lower ray work; its C/B interval lies wholly above 1.
 
 ## P4 — Algorithm C* Redesign
 
@@ -90,10 +90,36 @@ Last updated: 2026-09-19
 - [x] Add bitmask/range-bound/lifecycle/timing unit coverage plus complete A/C* shared-snapshot regressions on all seven fixtures and all 60 frozen `experiment-0-random-v2` maps.
 - [x] Verify the full GitHub Actions CI suite passes on the C* branch (`59cdf4530859ee3f432b7b5175185f5bb828a148`).
 - [x] Add focused behavioral regressions that explicitly force first-seen range-only pruning and stale-bound refresh/reinsert paths, in addition to the full A/C* regressions.
-- [ ] Preregister a new C* efficiency experiment before observing formal C* timing results; use fresh holdout maps rather than treating already-seen Experiment 1 maps as an unbiased final test set.
-- [ ] In the follow-up experiment, compare A/B/C/C* exact work, range-bound work, lazy-refresh counts, core planner time, audit time, memory, and scaling while preserving exact A-equivalence as a hard gate.
+- [x] Preregister Experiment 2 with fresh holdout master seed 20260919 and a committed canonical config before formal execution.
+- [x] Execute formal A/B/C/C* Experiment 2 with separate timing/work/decomposition/memory/audit/sensitivity passes; retained committed result is GO. Independently reproduce every summary field on 2026-09-29.
+
+## P5 — C* Follow-up (2026-09-29)
+
+- [x] Audit GitHub main `88f1b6b`, preserve existing local Experiment 1 raw files, and reconcile stale execution-status documents.
+- [x] Search primary literature for exact visibility reuse, online coverage, confidence sequences, prediction robustness, dynamic set cover, and joint gain/travel bounds.
+- [x] Freeze a research-only C* ablation/certificate pilot and retain its source, map seeds/hashes, complete snapshots, and unfavorable outcomes.
+- [x] Complete the frozen pilot's structural correctness pass: 21 maps, 616 snapshots, zero recorded mismatches; retain all raw evidence.
+- [ ] Complete its serial timing pass and final summary; S* versus C* runtime and certificate net benefit remain unverified.
+- [ ] Obtain a recorded completion result for the current full test suite; the 2026-09-29 empty log does not establish a pass or failure.
+- [x] Audit progress on 2026-10-20, check all 13 retained Experiment 1/2 hashes, and record `RESEARCH_PROGRESS_20261020.md`.
+- [ ] Preregister a larger structured/topology benchmark and a stronger scalar-plus-range baseline before a new confirmatory performance claim.
+- [ ] Evaluate local/tiled bitmask representation on large maps with extraction and conversion costs included.
+- [ ] Prove/test joint gain upper bounds and distance lower bounds before replacing full Dijkstra.
+
+## P6 — User-run C* pilot continuation
+
+- [x] Package the retained 21-map/616-snapshot structural inputs with frozen SHA-256 config and byte-preserving Git attributes.
+- [x] Add a separate PowerShell entry point and Python state machine for check/prepare/full-test/timing/memory/status.
+- [x] Require a verified full-suite completion log and unchanged committed source/config before timing; compare full decisions/paths to separate exhaustive references.
+- [x] Preserve the original six-map/four-method/one-warm-up/four-repetition timing protocol; separate Python allocation measurement and exploratory summaries.
+- [x] Validate runner infrastructure with focused tests, fake schedules, injected failures and a nonformal tiny map; do not execute the real benchmark during implementation.
+- [ ] User: run the full-suite gate and the 120 timing episodes, then the separate 24 memory episodes using `CSTAR_FOLLOWUP_POWERSHELL_RUNBOOK.md`.
+- [ ] Inspect every map-level C*/S* ratio and all failures before selecting any algorithm improvement or freezing a larger study.
 
 ## Deferred
+
+- [ ] Choose and freeze an environment-extension formulation from `ENVIRONMENT_EXTENSION_OPTIONS_20261020.md`; recommended initial scope is deterministic 2D hazard-aware NBV, followed independently by minimal 3D voxels. Neither is implemented or validated.
+- [ ] Before any hazard experiment, fix hazard revelation rules, cost/penalty versus hard-budget meaning, baseline objective, lambda/budgets, safety/return requirements, and raw exposure/coverage metrics.
 
 - [ ] Candidate 3 prototype after Candidate 1's initial empirical gate.
 - [ ] Candidate 2 prototype after Candidate 3.

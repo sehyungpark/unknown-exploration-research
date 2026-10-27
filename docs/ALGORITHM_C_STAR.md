@@ -1,7 +1,8 @@
 # Algorithm C* — Lazy Bitset Change-Aware Exact-Lazy NBV
 
-Status: development implementation only. This does **not** replace Algorithm C's
-historical Experiment 1 result and is not a new formal efficiency experiment.
+Status: implemented and formally evaluated by Experiment 2 on 2026-09-19
+(`experiment2-formal-20260919-001`, GO). This does **not** replace Algorithm C's
+historical Experiment 1 result. This document specifies the method, not a new experiment.
 
 ## Scope
 
@@ -89,5 +90,5 @@ algorithm runtime.
 ## Historical boundary
 
 Algorithm C remains the method evaluated by formal Experiment 1. C* is a new
-development implementation and must receive its own future preregistered
-efficiency experiment if it is formally evaluated.
+implementation evaluated in the separate preregistered Experiment 2. Its GO
+classification applies to that frozen workload; later extensions require separate evidence.

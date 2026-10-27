@@ -1,0 +1,2 @@
+# Preserve byte hashes of the already executed structural pilot on every OS.
+results/extension_pilot_20260929/run-001/* -text whitespace=cr-at-eol

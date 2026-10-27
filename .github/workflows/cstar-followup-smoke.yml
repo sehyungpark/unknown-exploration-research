@@ -1,0 +1,42 @@
+name: C-star follow-up infrastructure
+
+on:
+  pull_request:
+    paths:
+      - '.gitattributes'
+      - '.github/workflows/cstar-followup-smoke.yml'
+      - 'configs/cstar_followup_pilot_v1.json'
+      - 'research/**'
+      - 'scripts/run_cstar_followup.ps1'
+      - 'tests/test_cstar_followup_runner.py'
+      - 'results/extension_pilot_20260929/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: '3.12'
+          - os: windows-latest
+            python: '3.13'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Infrastructure tests only
+        run: python -m unittest tests.test_cstar_followup_runner -v
+      - name: Read-only preflight (Linux)
+        if: runner.os != 'Windows'
+        run: python -m research.cstar_followup_runner check
+      - name: Read-only PowerShell preflight (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/run_cstar_followup.ps1 -Stage Check -PythonExe (Get-Command python).Source

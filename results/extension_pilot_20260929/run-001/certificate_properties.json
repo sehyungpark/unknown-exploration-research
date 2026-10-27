@@ -1,0 +1,67 @@
+{
+  "beliefs": 6561,
+  "certified_transitions": 31218,
+  "transitions": 34992,
+  "strict_occlusion_slack": 3774,
+  "strict_slack_example": {
+    "states": [
+      "UNKNOWN",
+      "UNKNOWN",
+      "UNKNOWN",
+      "UNKNOWN",
+      "UNKNOWN",
+      "UNKNOWN",
+      "UNKNOWN",
+      "UNKNOWN"
+    ],
+    "cell": [
+      0,
+      1
+    ],
+    "cached_intersection": [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "exact": [
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  "failures": 0
+}

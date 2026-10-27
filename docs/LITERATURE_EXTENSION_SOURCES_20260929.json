@@ -1,0 +1,290 @@
+{
+  "search_date": "2026-09-29",
+  "provider": "Exa",
+  "search_calls": 9,
+  "requested_results": 59,
+  "results_are_discovery_not_validation": true,
+  "searches": [
+    {
+      "query_id": "initial_3",
+      "results": [
+        {
+          "title": "Efficient Autonomous Exploration Planning of",
+          "url": "https://www.ida.liu.se/divisions/aiics/publications/IRAL-2019-Efficient-Autonomous-Exploration.pdf"
+        },
+        {
+          "title": "N/A",
+          "url": "https://arxiv.org/pdf/2309.11695"
+        },
+        {
+          "title": "Active perception network for non-myopic online exploration and visual surface coverage - researchr publication",
+          "url": "https://researchr.org/publication/VutetakisX25"
+        },
+        {
+          "title": "[2109.09323] A Shadowcasting-Based Next-Best-View Planner for Autonomous 3D Exploration",
+          "url": "https://ar5iv.labs.arxiv.org/html/2109.09323"
+        },
+        {
+          "title": "Efficient Autonomous Exploration Planning of Large Scale 3D-Environments",
+          "url": "https://liu.diva-portal.org/smash/get/diva2:1285787/FULLTEXT01.pdf"
+        },
+        {
+          "title": "Efficient Autonomous Exploration Planning of Large Scale 3D-Environments",
+          "url": "https://www.diva-portal.org/smash/get/diva2:1285787/FULLTEXT01.pdf"
+        },
+        {
+          "title": "Active perception network for non-myopic online exploration and visual surface coverage",
+          "url": "https://exa.ai/library/publication/bn1kq8llwrc"
+        },
+        {
+          "title": "Active perception network for non-myopic online exploration and visual  surface coverage | alphaXiv",
+          "url": "https://www.alphaxiv.org/abs/2309.11695"
+        }
+      ]
+    },
+    {
+      "query_id": "initial_4",
+      "results": [
+        {
+          "title": "Simple grid polygon online exploration revisited",
+          "url": "https://arxiv.org/html/2407.17208"
+        },
+        {
+          "title": "Coverage Path Planning: The Boustrophedon Cellular Decomposition",
+          "url": "https://publications.ri.cmu.edu/storage/publications/pub_files/pub1/choset_howie_1997_5/choset_howie_1997_5.pdf"
+        },
+        {
+          "title": "journal.dvi",
+          "url": "http://algo2019.ak.in.tum.de/personen/albers/papers/soda99b.pdf"
+        },
+        {
+          "title": "Systematic Floor Coverage of Unknown Environments ...",
+          "url": "https://vigir.missouri.edu/~gdesouza/Research/Conference_CDs/IEEE_IROS_2013/media/files/1941.pdf"
+        },
+        {
+          "title": "Optimal Coverage of a Known Arbitrary Environment",
+          "url": "http://msdl.uantwerpen.be/people/raphael/files/yiannis_coverage.pdf"
+        },
+        {
+          "title": "Incremental coverage path planning method for UAV ground mapping in unknown area",
+          "url": "https://exa.ai/library/publication/f0j10m2vf3w"
+        },
+        {
+          "title": "Coverage Path Planning for Legged Robots in Unknown ...",
+          "url": "https://www.research-collection.ethz.ch/bitstreams/13090769-93bb-41c4-aa9e-b38cde026bd8/download"
+        },
+        {
+          "title": "[2302.03164] Adaptive Coverage Path Planning for Efficient Exploration of Unknown Environments *The work is partially supported by the Jet Propulsion Laboratory, California Institute of Technology, under a contract with the National Aeronautics and Space Administration (80NM0018D0004), and Defense Advanced Research Projects Agency (DARPA).",
+          "url": "https://ar5iv.labs.arxiv.org/html/2302.03164"
+        }
+      ]
+    },
+    {
+      "query_id": "initial_5",
+      "results": [
+        {
+          "title": "Lazier Than Lazy Greedy",
+          "url": "https://ojs.aaai.org/index.php/AAAI/article/view/9486"
+        },
+        {
+          "title": "Fast Multi-Stage Submodular Maximization",
+          "url": "https://people.ece.uw.edu/bilmes/p/mypubs/wei2014-fast-multi-stage-icml.pdf"
+        },
+        {
+          "title": "Adaptive Submodularity: Theory and Applications in Active Learning and Stochastic Optimization",
+          "url": "https://www.jair.org/index.php/jair/article/download/10731/25633/19980"
+        },
+        {
+          "title": "On the Benefits of Progressively Increasing Sampling Sizes in Stochastic Greedy Weak Submodular Maximization",
+          "url": "https://users.ece.utexas.edu/~gustavo/papers/HVD22.pdf"
+        },
+        {
+          "title": "Lazier Than Lazy Greedy",
+          "url": "https://las.inf.ethz.ch/files/mirzasoleiman15lazier.pdf"
+        },
+        {
+          "title": "Lazier Than Lazy Greedy",
+          "url": "https://ojs.aaai.org/index.php/AAAI/article/download/9486/9345"
+        },
+        {
+          "title": "Fast Adaptive Non-Monotone Submodular Maximization Subject to a Knapsack Constraint",
+          "url": "https://proceedings.neurips.cc/paper/2020/file/c49e446a46fa27a6e18ffb6119461c3f-Paper.pdf"
+        },
+        {
+          "title": "Non-monotone Adaptive Submodular Maximization",
+          "url": "https://las.inf.ethz.ch/files/gotovos15ijcai-long.pdf"
+        }
+      ]
+    },
+    {
+      "query_id": "shadow",
+      "results": [
+        {
+          "title": "A Shadowcasting-Based Next-Best-View Planner for Autonomous 3D Exploration",
+          "url": "https://doi.org/10.48550/arxiv.2109.09323"
+        },
+        {
+          "title": "[2109.09323] A Shadowcasting-Based Next-Best-View Planner for Autonomous 3D Exploration",
+          "url": "https://ar5iv.labs.arxiv.org/html/2109.09323"
+        },
+        {
+          "title": "[2009.04515] Proactive Estimation of Occlusions and Scene Coverage for Planning Next Best Views in an Unstructured Representation",
+          "url": "https://ar5iv.labs.arxiv.org/html/2009.04515"
+        },
+        {
+          "title": "GitHub - AnaBatinovic/nbvp_exploration: A Shadowcasting-Based Next-Best-View Planner for 3D Exploration · GitHub",
+          "url": "https://github.laiyagushi.com/AnaBatinovic/nbvp_exploration"
+        },
+        {
+          "title": "The surface edge explorer (SEE): A measurement-direct approach to next best view planning",
+          "url": "https://ora.ox.ac.uk/objects/uuid:fa42864a-ae0a-4528-aa38-c40fb661d992/files/rwp988m11t"
+        },
+        {
+          "title": "ASurvey on 2D VisibilityAlgorithms: Ray Casting, Rectangle Based FOV and Recursive Shadowcasting",
+          "url": "https://ace.ewapub.com/article/view/31573.pdf"
+        }
+      ]
+    },
+    {
+      "query_id": "benchmark",
+      "results": [
+        {
+          "title": "GLEAM: Learning Generalizable Exploration Policy for Active Mapping in Complex 3D Indoor Scene",
+          "url": "https://openaccess.thecvf.com/content/ICCV2025/papers/Chen_GLEAM_Learning_Generalizable_Exploration_Policy_for_Active_Mapping_in_Complex_ICCV_2025_paper.pdf"
+        },
+        {
+          "title": "P2Maze: A Protocol-Paired Sim-to-Real Robot Maze Navigation Dataset for Zero-Shot Transfer and Few-Shot Adaptation",
+          "url": "https://exa.ai/library/publication/54lf5pfmgth"
+        },
+        {
+          "title": "efc-robot/Explore-Bench",
+          "url": "https://github.com/efc-robot/Explore-Bench"
+        },
+        {
+          "title": "NavVerse: Benchmarking Indoor-to-Outdoor Embodied Navigation in Continuous Robot Simulation",
+          "url": "https://arxiv.org/pdf/2607.19695.pdf"
+        },
+        {
+          "title": "P2 Explore: Efficient Exploration in Unknown Cluttered Environment with Floor Plan Prediction",
+          "url": "https://arxiv.org/pdf/2409.10878"
+        },
+        {
+          "title": "N/A",
+          "url": "https://hal.science/hal-01589721/document"
+        }
+      ]
+    },
+    {
+      "query_id": "confidence",
+      "results": [
+        {
+          "title": "Adaptive Sensor Placement for Continuous Spaces",
+          "url": "https://arxiv.org/pdf/1905.06821v1.pdf"
+        },
+        {
+          "title": "N/A",
+          "url": "https://arxiv.org/pdf/2502.10380"
+        },
+        {
+          "title": "Finite-Sample Analysis of Elimination in Active Hypothesis Testing",
+          "url": "http://arxiv.org/abs/2605.01039v1"
+        },
+        {
+          "title": "[2212.14411] Near-Optimal Non-Parametric Sequential Tests and Confidence Sequences with Possibly Dependent Observations",
+          "url": "https://ar5iv.labs.arxiv.org/html/2212.14411"
+        },
+        {
+          "title": "Time-uniform central limit theory and asymptotic confidence sequences",
+          "url": "https://par.nsf.gov/servlets/purl/10520595"
+        },
+        {
+          "title": "Confidence sequences for sampling without replacement",
+          "url": "https://proceedings.neurips.cc/paper/2020/file/e96c7de8f6390b1e6c71556e4e0a4959-Paper.pdf"
+        }
+      ]
+    },
+    {
+      "query_id": "prediction",
+      "results": [
+        {
+          "title": "Robustification of Online Graph Exploration Methods",
+          "url": "https://ojs.aaai.org/index.php/AAAI/article/view/21208"
+        },
+        {
+          "title": "[2112.05422] Robustification of Online Graph Exploration Methods",
+          "url": "https://ar5iv.labs.arxiv.org/html/2112.05422"
+        },
+        {
+          "title": "Learning-Augmented Algorithms with Explicit Predictors",
+          "url": "https://papers.neurips.cc/paper_files/paper/2024/file/b1a72c79ac7512df8d7b573f38143ac4-Paper-Conference.pdf"
+        },
+        {
+          "title": "N/A",
+          "url": "https://arxiv.org/pdf/2510.14887"
+        },
+        {
+          "title": "Robustification of Online Graph Exploration Methods | alphaXiv",
+          "url": "https://www.alphaxiv.org/abs/2112.05422"
+        },
+        {
+          "title": "Robustification of Online Graph Exploration Methods | Arxiv - DeepPaper",
+          "url": "https://arxiv.deeppaper.ai/papers/2112.05422v1"
+        }
+      ]
+    },
+    {
+      "query_id": "howard",
+      "results": [
+        {
+          "title": "Time-uniform, nonparametric, nonasymptotic confidence sequences",
+          "url": "https://par.nsf.gov/servlets/purl/10251927"
+        },
+        {
+          "title": "Time-uniform, nonparametric, nonasymptotic confidence sequences",
+          "url": "https://arxiv.org/html/1810.08240v9"
+        },
+        {
+          "title": "Time-uniform, nonparametric, nonasymptotic confidence sequences",
+          "url": "https://doi.org/10.48550/arxiv.1810.08240"
+        },
+        {
+          "title": "Uniform, nonparametric, non-asymptotic confidence sequences",
+          "url": "https://arxiv.org/abs/1810.08240v2"
+        },
+        {
+          "title": "Time-uniform, nonparametric, nonasymptotic confidence sequences - MaRDI portal",
+          "url": "https://portal.mardi4nfdi.de/wiki/Publication:2039804"
+        }
+      ]
+    },
+    {
+      "query_id": "recourse",
+      "results": [
+        {
+          "title": "Online and Dynamic Algorithms for Set Cover",
+          "url": "https://users.cs.duke.edu/~debmalya/papers/stoc17-setcover.pdf"
+        },
+        {
+          "title": "Online and dynamic algorithms for set cover  - Publications of the IAS Fellows",
+          "url": "https://repository.ias.ac.in/123510/"
+        },
+        {
+          "title": "Online and dynamic algorithms for set cover - Scholars@Duke",
+          "url": "https://scholars.duke.edu/publication/1266679"
+        },
+        {
+          "title": "Online and Dynamic Algorithms for Set Cover",
+          "url": "https://exa.ai/library/publication/mfkvrzv2vm4"
+        },
+        {
+          "title": "Online and Dynamic Algorithms for Set Cover - arXiv.gg",
+          "url": "https://arxiv.gg/abs/1611.05646"
+        },
+        {
+          "title": "Online and dynamic algorithms for set cover",
+          "url": "https://exa.ai/library/publication/y8fpynp6q27"
+        }
+      ]
+    }
+  ]
+}

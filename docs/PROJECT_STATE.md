@@ -1,6 +1,19 @@
 # Project State
 
-Last updated: 2026-09-19
+Last updated: 2026-10-20
+
+## Latest Progress Audit — 2026-10-20
+
+- A separate user-run follow-up harness is prepared on `codex/cstar-followup-runner`: frozen structural inputs, full-test gate, complete A reference validation, 120 timing episodes and a separate 24-episode memory pass. Entry point: `scripts/run_cstar_followup.ps1`; instructions: `docs/CSTAR_FOLLOWUP_POWERSHELL_RUNBOOK.md`. All 24 focused infrastructure tests and PowerShell parsing passed; the actual full test suite and benchmark remain for the user to run. No frozen map planner workload was executed during implementation.
+- At the progress audit, GitHub main/local HEAD were `88f1b6b` and no PR was open. Before creating the user-run harness branch, main advanced to `a95d88c` with `readcodes/` additions and was fast-forwarded without changing the simulator/planners. The harness commit includes the compact historical structural pilot and relevant status records; the large local Experiment 1 raw files remain untracked.
+- Experiment 1/2 evidence files match all 13 SHA-256 hashes retained by the 2026-09-29 raw-result audit. No formal workload was rerun for this status check.
+- The follow-up pilot completed its structural phase: 21 maps, 616 shared snapshots, zero recorded correctness mismatches. S* required 12,717 exact evaluations versus C*'s 9,878 (22.32% fewer). This supports extra pruning from the cached-set bound on this exploratory workload; timing remains unmeasured.
+- The occlusion certificate reused 79/9,878 queries (0.80%) and required 113,957 dependency-build rays. Practical benefit remains unverified and its current priority is low.
+- Pilot status is `STRUCTURAL_PASS`; no `timing.jsonl` or final summary exists. The 2026-09-29 full-suite log is empty and provides no verified completion result. No Python benchmark process was observed during this audit.
+- Detailed assessment and remaining work: `docs/RESEARCH_PROGRESS_20261020.md`.
+- Environment/objective extensions were scoped on 2026-10-20 in `docs/ENVIRONMENT_EXTENSION_OPTIONS_20261020.md`: fixed 3D voxel geometry, deterministically revealed nonnegative traversal hazard, and separate harder budget/uncertainty formulations. These are proposals and analytical deductions only; no extension implementation or experiment exists and current core assumptions/results are unchanged.
+- Representative high-level papers for the original geometric exploration/mapping subject are recorded in `docs/CORE_MAPPING_PAPERS_20261020.md`, separating direct 2D theory (JACM 1998), modern system-level evidence (Science Robotics 2023), close mechanism comparison (APN), coverage guidance (FALCON), and stationary-scan polygon theory. This is a reading selection, not a new novelty determination.
+- Original method sections were additionally inspected for five algorithm walkthroughs in `docs/CORE_MAPPING_ALGORITHMS_20261020.md`. Geometric route/scan guarantees, hierarchical coverage planning, and C*'s exact-selection acceleration remain distinct claims; no implementation or experiment changed.
 
 ## Current Research Stage
 
@@ -9,15 +22,15 @@ Last updated: 2026-09-19
 - Candidate 1 is being investigated first.
 - Candidate 1 has passed a **conditional theory gate**.
 - Candidate 1 has received a **provisional novelty pass with high risk and a narrow claim only** after full-method comparison with major close prior art.
-- The empirical-value gate remains open.
+- Historical Algorithm C failed its formal empirical-value gate (Experiment 1: DROP). Algorithm C* passed its separate formal Experiment 2 gate (GO); generalization, mechanism attribution, and larger-map scaling remain open.
 - The minimal deterministic common simulator and exhaustive optimistic-NBV reference are implemented, oracle-hardened, and pass the current correctness suite.
 - Experiment 0 exact-equivalence validation is preregistered, its Stage 7 formal shared A/B/C runner is implemented, and the first formal preregistered invocation completed successfully in Stage 8. The preserved result is `results/experiment_0/runs/experiment0-formal-20260916-001/`.
 - Experiment 0's corrected `experiment-0-random-v2` 60-map correctness dataset, seed list, hashes, start/acceptance rules, cycle limits, per-cycle logging schema, and failure-artifact convention are frozen. The invalid v1 denominator was detected and corrected before Algorithms B/C or Experiment 0 execution.
-- Experiment 1 — Efficiency and Scaling Evaluation is preregistered but **has not been executed**. Its `experiment-1-efficiency-v1` 27-map primary dataset, nine-map timing/memory subset, three-map sensor-range subset, metrics, timing protocol, analysis, decision rule, raw schema, and failure handling are frozen.
-- Stage 10 Experiment 1 measurement infrastructure is implemented as guarded `experiment-1-runner-v1`, with canonical raw schemas/writers, immutable failure evidence, exact visibility-work instrumentation, separate timing/decomposition/memory passes, deterministic analysis/bootstrap, and the exact Pre-execution Amendment 1 classifier. Formal Experiment 1 remains **NOT EXECUTED** and the empirical-value gate remains **OPEN**.
+- Experiment 1 **was executed** on 2026-09-17. `experiment1-formal-20260917-001` is retained locally under `results/experiment_1/runs/`; its raw work/timing and decision were independently recomputed on 2026-09-29. Correctness passed, visibility work decreased, but C/B time ratio was 8.8379 (95% paired bootstrap interval 6.9545–10.8448), yielding **DROP** for historical C. These raw files are currently untracked, so GitHub alone does not preserve this invocation.
+- Stage 10 Experiment 1 measurement infrastructure remains accepted as guarded `experiment-1-runner-v1`. Its frozen protocol and original artifacts are unchanged; execution status above supersedes the stale NOT EXECUTED statements in earlier stage descriptions.
 - Algorithm B, the stale-scalar exact-lazy baseline, is implemented and passes development exact-equivalence regressions against Algorithm A on all seven fixed fixtures and all 60 frozen v2 random maps.
 - Algorithm C Stages 1-5 provide cache/index state, atomic exact cached-set installation/refresh, once-per-cell revelation decrement, immutable belief-snapshot synchronization, common exact visibility integration, a stateful certified exact-lazy selector, and fail-fast pre-refresh admissibility checks. Stage 6 passed the full development A/C exact-equivalence regression on all seven fixtures and all 60 frozen-v2 random maps.
-- Algorithm C* is implemented separately on the `algorithm-c-star` branch as a development-only redesign of C. It keeps the same admissible cached-visible-set theorem and exact A decision semantics, but replaces eager per-revelation bound maintenance with top-only lazy refresh, stores visible/UNKNOWN sets as Python-int bitmasks, gives first-seen candidates an exact sensor-range-mask upper bound, removes inverse-incidence maintenance from the hot path, and separates production/core timing from full debug/audit timing. C* intentionally does **not** include the proposed occlusion exactness certificate or shadow repair. Shared A/C* complete-run regressions cover all seven fixtures and all 60 frozen-v2 maps, and branch CI passed at `59cdf4530859ee3f432b7b5175185f5bb828a148`. C* has no formal efficiency result yet and does not replace or reinterpret Algorithm C's Experiment 1 evidence.
+- Algorithm C* was introduced separately and is now included in main. It keeps the cached-visible-set theorem and exact A semantics, with lazy refresh, Python-int bitmasks, first-seen range bounds, and separate core/audit timing. Formal Experiment 2 **was executed** on 2026-09-19 at `7956ffd`; committed invocation `experiment2-formal-20260919-001` passed its frozen gate: C*/B time ratio 0.33069 (95% interval 0.24543–0.44563), with all three aggregate visibility-work counters below B. On 2026-09-29 all Experiment 2 summary fields were reproduced exactly from raw records. C* does not replace historical C's DROP result. The committed production C* still excludes occlusion certificates and shadow repair.
 
 ## Current Candidate
 
@@ -74,8 +87,8 @@ This is not proof of global novelty. The novelty claim must remain scoped to the
 - **Theory gate:** PASS, conditional on stated assumptions.
 - **Novelty gate:** PROVISIONAL PASS, HIGH RISK, NARROW CLAIM ONLY.
 - **Experiment 0 exact-equivalence correctness gate:** PASS.
-- **Empirical-value gate:** OPEN.
-- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline and historical Algorithm C are implemented. Algorithms B and C matched exhaustive Algorithm A on every preregistered planning snapshot and complete target/stop sequence in the formal Experiment 0 dataset. Algorithm C* is additionally implemented on its development branch and has passed the 7-fixture + 60-map A/C* development regression and CI, but it has not yet received a preregistered formal efficiency evaluation.
+- **Empirical-value gate:** historical C DROP; C* formal Experiment 2 GO on the frozen workload. Further scope remains unverified.
+- **Implementation:** The exhaustive reference is accepted as the current correctness oracle after corner-occlusion, complete-fixture, and admissibility-property hardening. The stale-scalar exact-lazy baseline and historical Algorithm C are implemented. B and C passed formal Experiment 0. C* is included in main, passed its 7-fixture + 60-map development regression, and completed its separate preregistered formal Experiment 2 with a GO result.
 
 ## Implemented Features
 
@@ -152,7 +165,7 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 - Is the change-aware bound materially tighter than the stale scalar bound on realistic map progress?
 - Can one shortest-path computation per planning snapshot supply current distances cheaply enough that information-gain evaluation remains the dominant bottleneck?
 - Does the corner-inclusive supercover convention create materially different behavior from other fixed supercover conventions in later sensitivity checks?
-- The Experiment 1 protocol and Stage 10 measurement harness are implemented, but no formal workload has run; whether deterministic visibility-work savings outweigh C's bookkeeping and memory remains unresolved.
+- Experiment 1 and 2 were executed. Historical C's bookkeeping cost outweighed savings; C* passed its holdout gate. The current questions are causal attribution, larger-map representation cost, structured topology, and possible joint gain/distance certification.
 
 ## Next Steps
 
@@ -162,4 +175,4 @@ Correctness is primary: methods 2/3 must match the exhaustive deterministic argm
 4. Preserve the first formal Experiment 0 result unchanged as correctness evidence and keep its empirical conclusion separate from the conditional theorem.
 5. Preserve the accepted Stage 10 Experiment 1 measurement infrastructure, execution guard, exact schemas, instrumentation semantics, and synthetic fault-injection coverage without changing frozen inputs or A/B/C.
 6. Preserve Algorithm C* as a separate development implementation; do not rewrite historical Algorithm C or Experiment 0/1 artifacts around C*.
-7. Before making any C* efficiency claim, preregister a separate follow-up experiment with fresh holdout maps and explicit A/B/C/C* comparisons, core-vs-audit timing separation, work counters, memory, and failure rules.
+7. Preserve formal Experiment 2 unchanged. Continue C* with the separately frozen exploratory protocol `EXTENSION_PILOT_20260929_PROTOCOL.md`; make no formal new efficiency or novelty claim from this pilot.

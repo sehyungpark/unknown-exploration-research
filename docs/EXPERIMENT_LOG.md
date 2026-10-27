@@ -90,3 +90,30 @@ These entries predate this log. Missing values are explicitly marked rather than
 - **Runtime:** Approximately 21 minutes 35 seconds from formal manifest creation to summary write; retained as execution metadata only.
 - **Failure reason/artifact:** None; `failure_run_id` is null and no failure directory exists for this passing invocation.
 - **Interpretation:** Experiment 0 is a correctness experiment. It establishes empirical exact-equivalence on the preregistered correctness dataset, not a mathematical proof of global equivalence. No wall-clock, memory, speedup, or efficiency conclusion is drawn from this result.
+# Retrospective execution records checked on 2026-10-20
+
+These entries record already-executed workloads; the status audit did not rerun formal experiments.
+
+## Experiment 1 — historical C, executed 2026-09-17
+
+- Invocation: `experiment1-formal-20260917-001`, runner revision `225558b`.
+- Manifest PASS refers to correct execution; the frozen scientific classification is **DROP**.
+- Primary workload: 27 maps; nine-map timing subset with six retained timed repetitions per method.
+- C/B planning-time geometric mean ratio: 8.8378584, paired bootstrap 95% interval [6.9544667, 10.8448399]. The all-three visibility-work reduction gate passed, but the time interval was wholly above 1.
+- Raw evidence: `results/experiment_1/runs/experiment1-formal-20260917-001/`. Currently untracked locally. Preserve this unfavorable result.
+
+## Experiment 2 — C*, executed 2026-09-19
+
+- Invocation: `experiment2-formal-20260919-001`; config/runner revision `7956ffd`, results committed in `88f1b6b`.
+- Status: correctness and primary timing complete; frozen classification **GO**.
+- C*/B planning-time geometric mean ratio: 0.33069148, paired bootstrap 95% interval [0.24542776, 0.44562620]. All three primary visibility-work counters were below B.
+- Raw evidence: `results/experiment_2/runs/experiment2-formal-20260919-001/`. Its full stored summary had been reproduced from raw records in the 2026-09-29 audit. On 2026-10-20 all 13 Experiment 1/2 file hashes matched that retained audit.
+
+## C* extension pilot — structural phase executed 2026-09-29
+
+- Protocol: `docs/EXTENSION_PILOT_20260929_PROTOCOL.md`; source and map manifest retained in `results/extension_pilot_20260929/run-001/`.
+- Status: **STRUCTURAL_PASS**, 21 complete maps, 616 shared planning snapshots, no recorded target/status/value/path mismatch. The timed phase was not executed.
+- Exact gain evaluations: A 294,512; B 33,897; S* 12,717; C* 9,878. CERT has 9,878 exact-set resolutions, consisting of 9,799 canonical visibility calls and 79 certified reuses. Its independent structural audit recomputed all 79 reuses.
+- Certificate correctness enumeration: 6,561 beliefs, 34,992 monotone single-cell transitions, 31,218 certified transitions, zero violations. Strict occlusion slack occurred in 3,774 transitions and is retained.
+- Cost limitation: 113,957 dependency-build rays for 79 reuses. No wall-time benefit has been established. Preserve the low hit rate as unfavorable practical evidence.
+- Structural memory probe: 20 exact local/global-mask roundtrip checks passed. Integer-size observations do not establish complete planner memory or time improvement.
