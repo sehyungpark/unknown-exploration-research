@@ -1,5 +1,10 @@
 # Experiment Log
 
+## 2026-11-02 — large protocol correction, no execution
+
+- User specified 100/200/300/400/500, densities 0.1 through 0.5 and five timed repetitions; selected constructive connectivity/observability at target density. New default config: `configs/basiccode_large_v1.json`; 75 maps/1125 timed episodes with the existing seeds.
+- This update launched no map generation, exploration, timing or local regression command. New small tests are provided for user/CI execution. The retained smoke below used the earlier tiny legacy generator and cannot validate this new map distribution or large-run feasibility.
+
 ## BASICCODE-SMOKE-20261102-001 — infrastructure validation only
 
 - **Run ID:** `laptop-smoke-20261102-001`; Windows PowerShell, CPython 3.13.14.

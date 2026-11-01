@@ -49,14 +49,17 @@ def read_records(path):
     records, errors = [], []
     if not path.exists():
         return [], ["records.jsonl is missing"]
-    for index, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-        try:
-            record = json.loads(line)
-            if not isinstance(record, dict):
-                raise ValueError("Record is not an object")
-            records.append(record)
-        except (ValueError, TypeError) as exc:
-            errors.append(f"Invalid raw record at line {index}: {exc}")
+    with path.open(encoding="utf-8") as stream:
+        for index, line in enumerate(stream, 1):
+            try:
+                record = json.loads(line)
+                if not isinstance(record, dict):
+                    raise ValueError("Record is not an object")
+                if "outcome" in record:
+                    record["_outcome_hash_from_raw"] = digest(record.pop("outcome"))
+                records.append(record)
+            except (ValueError, TypeError) as exc:
+                errors.append(f"Invalid raw record at line {index}: {exc}")
     return records, errors
 
 
@@ -118,10 +121,13 @@ def analyze(directory):
         reference = lookup.get((case["case_id"], "A", reference_phase, 0), {})
         if record.get("outcome_hash") != reference.get("outcome_hash"):
             issues.append(f"Outcome mismatch: {case['case_id']} {record['method']} {phase}")
-        if phase in ("sanity", "structural") and digest(record.get("outcome")) != record.get("outcome_hash"):
-            issues.append(f"Saved outcome hash mismatch: {case['case_id']}")
+        full_outcome_required = manifest.get("outcome_storage") != "a_reference_only_v1" or record["method"] == "A"
+        if phase in ("sanity", "structural") and full_outcome_required:
+            if record.get("_outcome_hash_from_raw") != record.get("outcome_hash"):
+                issues.append(f"Saved outcome hash mismatch: {case['case_id']}")
         if phase in ("timing", "warmup"):
-            order = ORDERS[(record["repetition"] - 1) % len(ORDERS)]
+            offset = manifest.get("case_order_offsets", {}).get(case["case_id"], 0)
+            order = ORDERS[(record["repetition"] - 1 + offset) % len(ORDERS)]
             if record.get("order_index") != order.index(record["method"]):
                 issues.append("Recorded execution order does not match the protocol")
             for field in ("planner_ns", "episode_ns"):
@@ -136,7 +142,7 @@ def analyze(directory):
         if phase == "memory" and (type(record.get("python_peak_bytes")) is not int or record["python_peak_bytes"] < 0):
             issues.append("Invalid memory measurement")
     # Export failed and successful records alike; detailed traces remain in JSONL.
-    export_csv(directory / "records.csv", [{k: v for k, v in r.items() if k not in ("outcome", "traceback")} for r in records])
+    export_csv(directory / "records.csv", [{k: v for k, v in r.items() if k not in ("outcome", "traceback") and not k.startswith("_")} for r in records])
     summary = {"version": VERSION, "run_id": manifest["run_id"], "purpose": manifest["purpose"],
                "valid": not issues, "issues": sorted(set(issues)), "record_count": len(records),
                "requested_maps": len(expected_ids), "bootstrap_resamples": BOOTSTRAP_RESAMPLES,
@@ -146,6 +152,8 @@ def analyze(directory):
         flat = []
         for case in cases:
             item = {key: case[key] for key in ("case_id", "size", "obstacle_rate", "seed", "sensor_range", "map_hash")}
+            item["generator"] = case.get("generation", {}).get("generator", "legacy_rejection_v1")
+            item["realized_density"] = case.get("generation", {}).get("realized_density")
             item["methods"] = {}
             for method in METHODS:
                 structural = lookup[(case["case_id"], method, "structural", 0)]

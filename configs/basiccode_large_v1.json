@@ -1,0 +1,12 @@
+{
+  "version": "basiccode-benchmark-v1",
+  "map_generator": "connected_dominating_v1",
+  "sizes": [100, 200, 300, 400, 500],
+  "obstacle_rates": [0.1, 0.2, 0.3, 0.4, 0.5],
+  "seeds": [42, 43, 44],
+  "sensor_range": 4.0,
+  "warmups": 1,
+  "repetitions": 5,
+  "max_map_attempts": 1000,
+  "memory_pass": true
+}

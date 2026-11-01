@@ -2,13 +2,20 @@
 
 Last updated: 2026-11-02
 
+## Current user-corrected large workload
+
+- The default is now `configs/basiccode_large_v1.json`: sizes 100/200/300/400/500, densities 0.1/0.2/0.3/0.4/0.5, seeds 42/43/44, R=4, one warm-up, **five** timed repetitions. This is 75 maps, 1125 timed episodes, 1821 total episodes including sanity/structural/warm-up/memory passes.
+- User explicitly selected a constructive connected/observable generator. `connected_dominating_v1` uses a seed-dependent connected dominating free scaffold, exact wall counts, rotations/reflections and nested density sets. This is a structured map distribution, not IID Bernoulli rejection. A/B/C* and simulator semantics are unchanged.
+- The former small nine-map config remains historical and is no longer the default. All inputs are frozen before timing, but per-map correctness and timing now run together so earlier completed measurements are saved before expensive later cases. Full A outcomes/hashes are retained; analysis streams raw records and does not retain all trajectories in memory. Plots have one panel per density.
+- New generator/order/config regression checks were written but not executed locally. The user runs Check and the large benchmark; no new map generation, exploration or timing was launched in this update. The prior 34-test/smoke verification below predates these changes. Large-run wall time and laptop RAM feasibility remain unverified.
+
 ## Latest basiccode benchmark infrastructure
 
 - Added `benchmarks.basiccode_runner`, raw-data reanalysis and headless PNG/PDF plotting for the actual standalone A/B/C* `explore()` implementations. The simulator and algorithm files are unchanged from the incremental-mask revision.
 - Windows PowerShell wrapper and Windows/macOS runbook: `scripts/run_basiccode.ps1`, `docs/BASICCODE_RUNBOOK.md`. Methodology and frozen exploratory workload: `docs/BASICCODE_BENCHMARK.md`.
 - Verified 34 focused regressions, PowerShell syntax, and retained `laptop-smoke-20261102-001`: two tiny maps, 51 valid records, four PNG/PDF plot pairs. An additional invalid-numeric-record regression was added afterward; final re-execution is left to the user. No default 9-map timing workload was run.
 - The user will execute the actual benchmark on the Windows laptop first, then optionally on iMac. CPU-only simulation uses common 4-neighbor BFS/R=4/per-step sensing and paired maps/seeds. Smoke timings are validation metadata, not performance evidence.
-- Full default workload: nine maps, 162 timed episodes plus independent correctness/work/warm-up/memory passes. Failures and partial results remain saved; incomplete comparison plots are refused. Formal Experiment 2 evidence remains unchanged and was already executed.
+- Initial workload was nine maps/162 timed episodes; it is superseded by the user-corrected large workload above. Failures and partial results remain saved; incomplete comparison plots are refused. Formal Experiment 2 evidence remains unchanged and was already executed.
 
 ## Latest basiccode implementation update
 

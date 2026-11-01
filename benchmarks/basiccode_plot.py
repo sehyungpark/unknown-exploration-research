@@ -60,32 +60,42 @@ def plot(directory):
         if handles:
             ax.legend(fontsize=8)
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.3))
-    for ax, field, name in zip(axes, ("planner_ns", "episode_ns"), ("Planning", "Entire exploration")):
-        for index, rate in enumerate(rates):
+    def two_metric_panels():
+        if len(rates) == 1:
+            fig, axes = plt.subplots(1, 2, figsize=(11, 4.3))
+            return fig, [[axes[0]], [axes[1]]]
+        fig, axes = plt.subplots(2, len(rates), figsize=(4.6 * len(rates), 8.2), squeeze=False)
+        return fig, axes
+
+    time_scale = 1e9 if max(g["methods"]["A"]["episode_ns"]["value"] for g in summary["groups"]) >= 1e9 else 1e6
+    time_unit = "s" if time_scale == 1e9 else "ms"
+    fig, axes = two_metric_panels()
+    for row, (field, name) in enumerate(zip(("planner_ns", "episode_ns"), ("Planning", "Entire exploration"))):
+        for col, rate in enumerate(rates):
+            ax = axes[row][col]
             groups = sorted((g for g in summary["groups"] if g["obstacle_rate"] == rate), key=lambda g: g["size"])
             for method in METHODS:
                 series(ax, [(g, g["methods"][method][field]) for g in groups],
-                       f"{method}, p={rate:g}", COLORS[method], 1e6, ("-", "--", ":")[index % 3])
-        ax.set_title(name)
-        decorate(ax, "Time per exploration (ms)")
-        ax.set_ylim(bottom=0)
+                       method, COLORS[method], time_scale)
+            ax.set_title(f"{name} | density {rate:g}")
+            decorate(ax, f"Time per exploration ({time_unit})")
+            ax.set_ylim(bottom=0)
     save(fig, "timing", "Geometric mean of per-map repetition medians; bars: map-bootstrap 95% CI. Same machine only.")
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.3))
+    fig, axes = two_metric_panels()
     undefined = False
-    for ax, field, name in zip(axes, ("planner_ns", "episode_ns"), ("Planning speedup", "Entire exploration speedup")):
-        for index, rate in enumerate(rates):
+    for row, (field, name) in enumerate(zip(("planner_ns", "episode_ns"), ("Planning speedup", "Entire exploration speedup"))):
+        for col, rate in enumerate(rates):
+            ax = axes[row][col]
             groups = sorted((g for g in summary["groups"] if g["obstacle_rate"] == rate), key=lambda g: g["size"])
             for pair_index, (label, _, _) in enumerate(PAIRS):
                 points = [(g, g["speedups"][label][field]) for g in groups]
                 undefined |= any(v["value"] is None for _, v in points)
-                series(ax, points, f"{label}, p={rate:g}", ("#d97706", "#007f86", "#654aa0")[pair_index],
-                       style=("-", "--", ":")[index % 3])
-        ax.axhline(1, color="#999999", linewidth=1, linestyle="--")
-        ax.set_title(name)
-        decorate(ax, "Numerator time / denominator time (x)")
-        ax.set_ylim(bottom=0)
+                series(ax, points, label, ("#d97706", "#007f86", "#654aa0")[pair_index])
+            ax.axhline(1, color="#999999", linewidth=1, linestyle="--")
+            ax.set_title(f"{name} | density {rate:g}")
+            decorate(ax, "Numerator time / denominator time (x)")
+            ax.set_ylim(bottom=0)
     caption = "Paired map-level ratios; >1 means denominator is faster. Bars: map-bootstrap 95% CI."
     if undefined:
         caption += " Zero-time ratios undefined; see summary.json."
@@ -99,14 +109,16 @@ def plot(directory):
     ):
         if all(g["methods"]["A"][field]["value"] is None for g in summary["groups"]):
             continue
-        fig, ax = plt.subplots(figsize=(7.5, 4.5))
+        fig, axes = plt.subplots(1, len(rates), figsize=(max(7.5, 4.6 * len(rates)), 4.5), squeeze=False)
         for index, rate in enumerate(rates):
+            ax = axes[0][index]
             groups = sorted((g for g in summary["groups"] if g["obstacle_rate"] == rate), key=lambda g: g["size"])
             for method in METHODS:
                 series(ax, [(g, g["methods"][method][field]) for g in groups],
-                       f"{method}, p={rate:g}", COLORS[method], scale, ("-", "--", ":")[index % 3])
-        decorate(ax, ylabel)
-        ax.set_ylim(bottom=0)
+                       method, COLORS[method], scale)
+            ax.set_title(f"Density {rate:g}")
+            decorate(ax, ylabel)
+            ax.set_ylim(bottom=0)
         save(fig, name, caption)
     write_json(output / "figure_manifest.json", {"matplotlib": matplotlib.__version__,
                "generated_utc": datetime.now(timezone.utc).isoformat(), "files": files,

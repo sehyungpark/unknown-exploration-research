@@ -60,8 +60,8 @@ def append_jsonl(path, value):
 def validate_config(config):
     keys = {"version", "sizes", "obstacle_rates", "seeds", "sensor_range",
             "warmups", "repetitions", "max_map_attempts", "memory_pass"}
-    if not isinstance(config, dict) or set(config) != keys:
-        raise ValueError(f"Config must contain exactly {sorted(keys)}")
+    if not isinstance(config, dict) or set(config) not in (keys, keys | {"map_generator"}):
+        raise ValueError(f"Config requires {sorted(keys)}; map_generator is optional for legacy configs")
     if config["version"] != VERSION:
         raise ValueError("Unsupported config version")
     for key in ("sizes", "obstacle_rates", "seeds"):
@@ -88,6 +88,12 @@ def validate_config(config):
         raise ValueError("At least two timed repetitions are required")
     if type(config["memory_pass"]) is not bool:
         raise ValueError("memory_pass must be boolean")
+    generator = config.get("map_generator", "legacy_rejection_v1")
+    if generator not in ("legacy_rejection_v1", "connected_dominating_v1"):
+        raise ValueError("Unknown map_generator")
+    if generator == "connected_dominating_v1":
+        if min(config["sizes"]) < 5 or max(config["obstacle_rates"]) > 0.5:
+            raise ValueError("Connected generator requires sizes >= 5 and densities <= 0.5")
     return config
 
 
@@ -153,8 +159,15 @@ def materialize(config, common):
                 "size": size, "obstacle_rate": rate, "seed": seed,
                 "sensor_range": config["sensor_range"]}
         try:
-            truth, _, start = common.generate_map(size, size, rate, seed, config["max_map_attempts"])
-            case.update(truth=truth, start=list(start), map_hash=digest(truth))
+            if config.get("map_generator", "legacy_rejection_v1") == "connected_dominating_v1":
+                from .basiccode_maps import connected_map
+                truth, start, metadata = connected_map(size, rate, seed)
+            else:
+                truth, _, start = common.generate_map(size, size, rate, seed, config["max_map_attempts"])
+                walls = sum(sum(row) for row in truth)
+                metadata = {"generator": "legacy_rejection_v1", "requested_density": rate,
+                            "realized_density": walls / (size * size), "wall_count": walls}
+            case.update(truth=truth, start=list(start), map_hash=digest(truth), generation=metadata)
         except Exception as exc:
             case.update(generation_error=f"{type(exc).__name__}: {exc}",
                         generation_traceback=traceback.format_exc())
@@ -256,6 +269,7 @@ def run(config_path, output_root, run_id, *, smoke=False, plots=True):
                            "processor": platform.processor(), "executable": sys.executable,
                            "clock": vars(get_clock_info("perf_counter"))},
                 "orders": ORDERS,
+                "outcome_storage": "a_reference_only_v1",
                 "timing_boundary": "selector includes BFS/mask sync; episode includes sensing/mask reports; copies/IO/validation excluded",
                 "memory_boundary": "separate tracemalloc: allocations inside explore including result and wrapper; not process RSS"}
     write_json(directory / "manifest.json", manifest)
@@ -277,7 +291,7 @@ def run(config_path, output_root, run_id, *, smoke=False, plots=True):
             record.update(ok=False, error=f"{type(exc).__name__}: {exc}", traceback=traceback.format_exc())
             problems.append({"case_id": case["case_id"], "method": method, "phase": phase,
                              "repetition": repetition, "error": record["error"]})
-        if phase in ("structural", "sanity") or not record["ok"]:
+        if (phase in ("structural", "sanity") and method == "A") or not record["ok"]:
             record["outcome"] = outcome
         append_jsonl(records_path, record)
         return outcome if record["ok"] else None
@@ -286,31 +300,42 @@ def run(config_path, output_root, run_id, *, smoke=False, plots=True):
         common, modules = load_algorithms()
         cases, anchors = materialize(config, common), sanity_cases()
         write_json(directory / "maps.json", {"benchmark": cases, "sanity": anchors})
-        references = {}
-        # Freeze inputs and validate all seven families/all maps before timing.
-        for case in anchors + cases:
-            if "generation_error" in case:
-                problem = {"case_id": case["case_id"], "phase": "generation", "error": case["generation_error"]}
-                problems.append(problem)
-                append_jsonl(directory / "failures.jsonl", problem)
+        # With five repetitions, each map necessarily omits one permutation.
+        # Across three seeds per condition omit ABC/BCA/CAB respectively: every
+        # method then occurs five times in each execution position per condition.
+        offsets = {case["case_id"]: (1, 4, 5)[index % 3] if config["repetitions"] == 5 else 0
+                   for index, case in enumerate(cases)}
+        manifest["case_order_offsets"] = offsets
+        write_json(directory / "manifest.json", manifest)
+        for case in cases:
+            if "generation_error" not in case:
                 continue
-            phase = "sanity" if case["kind"] == "sanity" else "structural"
-            reference = execute(case, "A", phase, 0, 0, None)
-            references[case["case_id"]] = reference
+            problem = {"case_id": case["case_id"], "phase": "generation", "error": case["generation_error"]}
+            problems.append(problem)
+            append_jsonl(directory / "failures.jsonl", problem)
+        for case in anchors:
+            reference = execute(case, "A", "sanity", 0, 0, None)
             for index, method in enumerate(METHODS[1:], 1):
-                execute(case, method, phase, 0, index, reference)
+                execute(case, method, "sanity", 0, index, reference)
         if problems:
             raise RuntimeError("Correctness/input gate failed; no performance measurement was started")
         for case in cases:
+            print(f"Checking {case['case_id']}", flush=True)
+            reference = execute(case, "A", "structural", 0, 0, None)
+            before_errors = len(problems)
+            for index, method in enumerate(METHODS[1:], 1):
+                execute(case, method, "structural", 0, index, reference)
+            if reference is None or len(problems) != before_errors:
+                raise RuntimeError("Correctness/input gate failed for this case; prior records retained")
             print(f"Measuring {case['case_id']}", flush=True)
-            reference = references[case["case_id"]]
             for phase, count in (("warmup", config["warmups"]), ("timing", config["repetitions"])):
                 for repetition in range(1, count + 1):
-                    for index, method in enumerate(ORDERS[(repetition - 1) % len(ORDERS)]):
+                    for index, method in enumerate(ORDERS[(repetition - 1 + offsets[case["case_id"]]) % len(ORDERS)]):
                         execute(case, method, phase, repetition, index, reference)
             if config["memory_pass"]:
                 for index, method in enumerate(METHODS):
                     execute(case, method, "memory", 1, index, reference)
+            reference = None  # Do not retain all large A reference trajectories.
         manifest["status"] = "failed" if problems else "completed"
     except BaseException as exc:
         manifest["status"] = "interrupted" if isinstance(exc, KeyboardInterrupt) else "failed"
@@ -341,7 +366,7 @@ def main(argv=None):
     if args.smoke and args.config:
         parser.error("--smoke uses the fixed tiny config; omit --config")
     config = args.config or ROOT / ("configs/basiccode_smoke_v1.json" if args.smoke
-                                  else "configs/basiccode_benchmark_v1.json")
+                                  else "configs/basiccode_large_v1.json")
     try:
         run(config, args.output_root, args.run_id, smoke=args.smoke, plots=not args.no_plots)
     except KeyboardInterrupt:

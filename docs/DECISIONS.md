@@ -145,6 +145,15 @@ This file records research assumptions and decisions that affect formulation, im
 
 ## Remaining Open Decisions
 
+### D-023 — User-selected large-map generator and repetitions (2026-11-02)
+
+- **Status:** Explicitly selected by the user before any large performance measurement.
+- **Decision:** Use 100/200/300/400/500 square maps, densities 0.1 to 0.5 in 0.1 steps, and five timed repetitions. Keep seeds 42/43/44, R=4 and one warm-up. The user selected guaranteed FREE connectivity and wall observability at target density rather than retaining IID random obstacles with disconnected/unobservable regions.
+- **Construction:** Use a connected dominating free-row/spine scaffold, seed-dependent geometric transforms, and a shuffled eligible-cell list with an exact wall count. This defines a structured distribution. Same seed has nested wall sets and the same start across densities; every algorithm receives identical inputs. No generator decision uses measured planner behavior.
+- **Consequence:** Legacy rejection-generator results and this constructive family cannot be described as the same random-map distribution. The original algorithms and metrics remain fixed; large-workload time/RAM feasibility has not been tested. The previous 10/15/20 workload is retained as a historical config, not the current default.
+
+## Still Open
+
 - Benchmark seed sets and randomized-map generators for later empirical scaling experiments.
 - Coverage targets and termination reporting for large experiments.
 - Raw-result schema and storage location.

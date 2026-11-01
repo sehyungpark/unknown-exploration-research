@@ -1,5 +1,14 @@
 # TODO
 
+## User-corrected large basiccode workload — 2026-11-02
+
+- [x] Set sizes 100/200/300/400/500 and densities 0.1/0.2/0.3/0.4/0.5, with five timed repetitions and the existing three seeds.
+- [x] Use the explicitly user-selected connected/observable exact-density generator; document its structured scaffold distribution and preserve the legacy/smoke generator.
+- [x] Balance execution positions across the three seeds at five repetitions, save each case's measurements before moving to later cases, and facet graphs by density.
+- [x] Avoid retaining every large reference trajectory; stream raw analysis while preserving full A reference and failed outcomes.
+- [ ] User/CI: execute the expanded small regression checks. No local validation of this large-workload update was run.
+- [ ] User: execute `configs/basiccode_large_v1.json` in PowerShell using a fresh run ID. Preserve all failures/partial runs. Large runtime/RAM feasibility is unresolved.
+
 ## basiccode benchmark infrastructure — 2026-11-02
 
 - [x] Reuse actual A/B/C* and common simulator; add paired-input correctness gating, separate work/timing/memory passes and immutable run IDs.

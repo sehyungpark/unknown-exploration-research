@@ -184,12 +184,76 @@ class BenchmarkTests(unittest.TestCase):
 
 
 class ConfigTests(unittest.TestCase):
+    def test_user_large_workload_is_exactly_preserved(self):
+        config = json.loads((runner.ROOT / "configs/basiccode_large_v1.json").read_text())
+        runner.validate_config(config)
+        self.assertEqual(config["sizes"], [100, 200, 300, 400, 500])
+        self.assertEqual(config["obstacle_rates"], [0.1, 0.2, 0.3, 0.4, 0.5])
+        self.assertEqual(config["repetitions"], 5)
+        self.assertEqual(len(config["sizes"]) * len(config["obstacle_rates"]) * len(config["seeds"]), 75)
+        # No large maps or exploration are run in this check.
+
+    def test_five_repetitions_balance_positions_across_three_seeds(self):
+        from collections import Counter
+        positions = Counter()
+        for offset in (1, 4, 5):
+            for rep in range(5):
+                for position, method in enumerate(runner.ORDERS[(rep + offset) % 6]):
+                    positions[(method, position)] += 1
+        self.assertEqual(set(positions.values()), {5})
+
     def test_invalid_or_duplicate_conditions_are_refused(self):
         config = json.loads((runner.ROOT / "configs/basiccode_smoke_v1.json").read_text())
         for key, value in (("sizes", [4, 4]), ("seeds", [True]), ("obstacle_rates", [float("nan")]),
                            ("repetitions", 1), ("sensor_range", 0), ("memory_pass", 1)):
             with self.subTest(key=key), self.assertRaises(ValueError):
                 runner.validate_config({**config, key: value})
+
+
+class ConnectedMapTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.common, _ = runner.load_algorithms()
+
+    def test_small_maps_have_exact_density_connectivity_and_observable_walls(self):
+        from benchmarks.basiccode_maps import connected_map
+        for size in (5, 6, 7, 8, 10, 17):
+            for density in (0, 0.1, 0.2, 0.3, 0.4, 0.5):
+                for seed in (0, 42):
+                    with self.subTest(size=size, density=density, seed=seed):
+                        truth, start, metadata = connected_map(size, density, seed)
+                        walls = sum(map(sum, truth))
+                        self.assertEqual(walls, round(size * size * density))
+                        reached, _ = self.common.shortest_paths(truth, start)
+                        self.assertEqual(len(reached), size * size - walls)
+                        self.assertTrue(all(any(self.common.free_neighbors(truth, (r, c)))
+                                            for r in range(size) for c in range(size) if truth[r][c] == 1))
+                        self.assertEqual(metadata["wall_count"], walls)
+                        self.assertEqual((truth, start, metadata), connected_map(size, density, seed))
+
+    def test_density_sets_are_nested_and_start_is_fixed(self):
+        from benchmarks.basiccode_maps import connected_map
+        previous, start = set(), None
+        for density in (0.1, 0.2, 0.3, 0.4, 0.5):
+            truth, current_start, _ = connected_map(20, density, 42)
+            walls = {(r, c) for r in range(20) for c in range(20) if truth[r][c] == 1}
+            self.assertTrue(previous <= walls)
+            start = current_start if start is None else start
+            self.assertEqual(start, current_start)
+            previous = walls
+
+    def test_small_connected_case_matches_all_methods(self):
+        from benchmarks.basiccode_maps import connected_map
+        _, modules = runner.load_algorithms()
+        reference = None
+        for density in (0.1, 0.5):
+            truth, start, _ = connected_map(6, density, 42)
+            case = {"truth": truth, "start": start, "sensor_range": 2}
+            reference = None
+            for module in modules.values():
+                _, outcome = runner.run_episode(module, case, "structural")
+                reference = outcome if reference is None else reference
+                self.assertEqual(outcome, reference)
 
 
 if __name__ == "__main__":

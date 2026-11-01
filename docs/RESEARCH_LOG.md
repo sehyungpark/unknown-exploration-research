@@ -1,5 +1,11 @@
 # Research Log
 
+## 2026-11-02 — user correction of the unexecuted large-workload protocol
+
+- User fixed sizes at 100/200/300/400/500 and densities at 0.1/0.2/0.3/0.4/0.5 with five timed repetitions; the three pre-existing seeds remain. No large performance results existed when these conditions changed.
+- User chose a generator guaranteeing connected FREE and observable WALL at target occupancy. Implemented a constructive connected dominating scaffold, exact counts and seed-defined obstacle order, shared across algorithms. Its distribution is explicitly structured, not IID Bernoulli.
+- Preserved unchanged algorithms/simulator/metrics, retained the earlier smoke evidence and legacy config, and added small generator/equivalence/order tests for user/CI execution. No new local experiment was executed, and no performance/generalization conclusion changed.
+
 ## 2026-11-02 — standalone basiccode measurement infrastructure
 
 - Implemented a separate user-invoked runner around unchanged A/B/C* and their common simulator, with frozen shared inputs, full outcome equality, separate structural/timing/memory passes, provenance and replotting from raw records.
