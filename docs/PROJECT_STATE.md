@@ -1,6 +1,14 @@
 # Project State
 
-Last updated: 2026-10-27
+Last updated: 2026-11-02
+
+## Latest basiccode benchmark infrastructure
+
+- Added `benchmarks.basiccode_runner`, raw-data reanalysis and headless PNG/PDF plotting for the actual standalone A/B/C* `explore()` implementations. The simulator and algorithm files are unchanged from the incremental-mask revision.
+- Windows PowerShell wrapper and Windows/macOS runbook: `scripts/run_basiccode.ps1`, `docs/BASICCODE_RUNBOOK.md`. Methodology and frozen exploratory workload: `docs/BASICCODE_BENCHMARK.md`.
+- Verified 34 focused regressions, PowerShell syntax, and retained `laptop-smoke-20261102-001`: two tiny maps, 51 valid records, four PNG/PDF plot pairs. An additional invalid-numeric-record regression was added afterward; final re-execution is left to the user. No default 9-map timing workload was run.
+- The user will execute the actual benchmark on the Windows laptop first, then optionally on iMac. CPU-only simulation uses common 4-neighbor BFS/R=4/per-step sensing and paired maps/seeds. Smoke timings are validation metadata, not performance evidence.
+- Full default workload: nine maps, 162 timed episodes plus independent correctness/work/warm-up/memory passes. Failures and partial results remain saved; incomplete comparison plots are refused. Formal Experiment 2 evidence remains unchanged and was already executed.
 
 ## Latest basiccode implementation update
 

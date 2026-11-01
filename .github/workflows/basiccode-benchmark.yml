@@ -1,0 +1,39 @@
+name: basiccode benchmark infrastructure
+
+on:
+  pull_request:
+    paths:
+      - 'basiccode/**'
+      - 'benchmarks/**'
+      - 'configs/basiccode*'
+      - 'requirements-basiccode.txt'
+      - 'scripts/run_basiccode.ps1'
+      - 'tests/test_basiccode*'
+      - '.github/workflows/basiccode-benchmark.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -r requirements-basiccode.txt
+      - run: python -m unittest tests.test_basiccode_unknown_mask tests.test_basiccode_benchmark -v
+      - name: Tiny end-to-end validation only
+        run: python -m benchmarks.basiccode_runner --smoke --run-id ci-smoke
+      - name: Preserve smoke output, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: basiccode-smoke-${{ matrix.os }}
+          path: results/basiccode/

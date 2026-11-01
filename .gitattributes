@@ -1,0 +1,2 @@
+# Preserve saved experimental evidence byte-for-byte across platforms.
+results/basiccode/** -text

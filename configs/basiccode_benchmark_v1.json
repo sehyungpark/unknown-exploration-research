@@ -1,0 +1,11 @@
+{
+  "version": "basiccode-benchmark-v1",
+  "sizes": [10, 15, 20],
+  "obstacle_rates": [0.2],
+  "seeds": [42, 43, 44],
+  "sensor_range": 4.0,
+  "warmups": 1,
+  "repetitions": 6,
+  "max_map_attempts": 1000,
+  "memory_pass": true
+}

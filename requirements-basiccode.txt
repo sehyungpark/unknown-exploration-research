@@ -1,0 +1,2 @@
+# Only graph generation needs third-party packages.
+matplotlib>=3.9,<4

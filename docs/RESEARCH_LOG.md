@@ -1,5 +1,11 @@
 # Research Log
 
+## 2026-11-02 — standalone basiccode measurement infrastructure
+
+- Implemented a separate user-invoked runner around unchanged A/B/C* and their common simulator, with frozen shared inputs, full outcome equality, separate structural/timing/memory passes, provenance and replotting from raw records.
+- Small correctness and smoke validation succeeded; this establishes only infrastructure behavior. Runtime/evaluation/memory advantage on the default workload remains an unresolved hypothesis. No new algorithmic novelty or theoretical result is claimed; formal C* Experiment 2 was already executed and is unchanged.
+- Primary user execution is now the Windows laptop via PowerShell; iMac is a later same-source/config run whose timings must remain separate.
+
 This is an append-only log of theoretical findings, literature results, hypothesis changes, counterexamples, and other research-significant observations. Entries must label their status as verified, hypothesis, unresolved, preliminary evidence, or refuted.
 
 ## 2026-09-14 — Initial Consolidation

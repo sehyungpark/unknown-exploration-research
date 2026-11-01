@@ -1,5 +1,15 @@
 # TODO
 
+## basiccode benchmark infrastructure — 2026-11-02
+
+- [x] Reuse actual A/B/C* and common simulator; add paired-input correctness gating, separate work/timing/memory passes and immutable run IDs.
+- [x] Add raw JSONL/CSV, provenance, map-level statistics and saved PNG/PDF figures without rerunning exploration.
+- [x] Validate Windows PowerShell syntax, 34 focused tests and retained two-map/51-record smoke output; inspect the timing figure.
+- [x] Add Windows/macOS commands and explicit protocol. Include cross-platform CI; its result is pending.
+- [ ] User: run Check to include the final invalid-numeric-record test, then launch the default benchmark in PowerShell with a new run ID.
+- [ ] User: preserve and inspect every map/failure and compare planning/episode time separately. No standalone basiccode speedup has been established.
+- [ ] Later: run the same commit/config on iMac and report within-machine ratios separately.
+
 ## basiccode UNKNOWN mask maintenance — 2026-10-27
 
 - [x] Keep the existing basiccode sensor/motion/score/heap/caches/completion contract and A/B files unchanged.

@@ -137,6 +137,14 @@ This file records research assumptions and decisions that affect formulation, im
 
 ## Open Decisions
 
+### D-022 — Standalone basiccode benchmark boundary (2026-11-02)
+
+- **Status:** Accepted for this exploratory benchmark.
+- **Decision:** Measure the actual standalone `explore()` implementations under their shared 4-neighbor/per-step-sensing contract. Keep original formal `src`/Experiment 2 unchanged. Time planner calls and whole exploration separately so incremental mask observation bookkeeping is included in episode time. Count work and trace Python allocations in separate passes. Freeze shared maps/config before timing and resample map-level repetition medians for comparisons.
+- **Rationale:** The standalone execution contract differs from the formal experiment. Fewer gain evaluations do not alone establish a speedup; preserved unfavorable runtime, completion and failure evidence can reject that hypothesis on the fixed workload.
+
+## Remaining Open Decisions
+
 - Benchmark seed sets and randomized-map generators for later empirical scaling experiments.
 - Coverage targets and termination reporting for large experiments.
 - Raw-result schema and storage location.

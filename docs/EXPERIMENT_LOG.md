@@ -1,5 +1,16 @@
 # Experiment Log
 
+## BASICCODE-SMOKE-20261102-001 — infrastructure validation only
+
+- **Run ID:** `laptop-smoke-20261102-001`; Windows PowerShell, CPython 3.13.14.
+- **Purpose:** End-to-end infrastructure smoke, not a performance experiment or a new GO/DROP decision. User runs the default comparison separately.
+- **Source:** Development branch `codex/basiccode-benchmark`, based on `157c0ba`; source was uncommitted, explicitly permitted only by `--smoke`. Manifest retains individual source/config hashes and dirty status.
+- **Inputs:** Saved 4x4 and 6x6 maps, seed 42, p=0.1, R=2, plus seven tiny correctness families. Shared copies for A/B/C*, one warm-up, two timed repetitions and one separate memory pass per tiny map/method.
+- **Verified:** 51 records; summary valid=true; A/B/C* complete outcomes/final grids agree. Four PNG/PDF figure pairs generated; timing PNG visually inspected. Raw input/output retained at `results/basiccode/runs/laptop-smoke-20261102-001/`.
+- **Other checks:** 34 focused regressions passed before the final numeric-validation guard/test was added; PowerShell wrapper parser passed. Final expanded regression execution is user-run. Injected failure tests verified that mismatch/generation failure blocks timing, partial/duplicate/malformed records cannot become valid comparisons, and run IDs cannot overwrite evidence.
+- **Runtime interpretation:** Any smoke times/memory are validation metadata only. No default 10/15/20 comparison, full repository suite, actual iMac hardware run or standalone basiccode performance conclusion.
+- **Failures:** None in the retained smoke invocation. Synthetic failure injections are unit-test fixtures, not suppressed research maps.
+
 This is an append-only record. Failed, unfavorable, incomplete, and non-reproducible experiments must remain in the log.
 
 For new runs, record at least: date/time, run ID, code/algorithm version, map family and instance ID, map seed, start seed, map size, movement model, sensor configuration, algorithm, parameters, completion target, metrics, raw-result location, runtime, success/failure, failure reason, and interpretation.
