@@ -184,6 +184,20 @@ class BenchmarkTests(unittest.TestCase):
 
 
 class ConfigTests(unittest.TestCase):
+    def test_default_uses_user_approved_reduced_workload_without_running_it(self):
+        path = runner.ROOT / "configs/basiccode_reduced_v1.json"
+        config = json.loads(path.read_text())
+        runner.validate_config(config)
+        self.assertEqual(config["sizes"], [50, 100, 150])
+        self.assertEqual(config["obstacle_rates"], [0.1, 0.3, 0.5])
+        self.assertEqual(config["seeds"], [42, 43, 44])
+        self.assertEqual(config["repetitions"], 5)
+        self.assertEqual(config["sensor_range"], 4.0)
+        with patch.object(runner, "run") as run:
+            self.assertEqual(runner.main(["--run-id", "routing-check", "--no-plots"]), 0)
+        self.assertEqual(run.call_args.args[0], path)
+        # Mocked dispatch only: no map generation or exploration is executed.
+
     def test_user_large_workload_is_exactly_preserved(self):
         config = json.loads((runner.ROOT / "configs/basiccode_large_v1.json").read_text())
         runner.validate_config(config)

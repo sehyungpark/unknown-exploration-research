@@ -12,7 +12,11 @@
 
 ## Workload
 
-The user-corrected default is **`configs/basiccode_large_v1.json`**: 100/200/300/400/500 square grids, target obstacle densities 0.1/0.2/0.3/0.4/0.5, seeds 42/43/44, R=4, one warm-up and **five** timed repetitions per method. The 25 size-density conditions give 75 maps, 1125 timed episodes, 225 warm-ups, 225 structural episodes, 225 separate memory episodes and 21 sanity episodes: **1821 total**. No default large experiment has been run locally.
+The user-approved current default is **`configs/basiccode_reduced_v1.json`**: **50/100/150** square grids, target obstacle densities **0.1/0.3/0.5**, seeds 42/43/44, R=4, one warm-up and **five** timed repetitions per method. The nine size-density conditions give **27 maps, 405 timed episodes**, 81 warm-ups, 81 structural episodes, 81 separate memory episodes and 21 sanity episodes: **669 total**. The complete-exploration and exact-equivalence protocol remains unchanged; no sampled-state redesign was adopted. The agent has not executed this reduced benchmark or inferred a completion-time guarantee from the count reduction.
+
+The user reduced levels because of observed runtime/resource burden, while retaining all three algorithms, low/middle/high densities, three seeds and five measurements. This change was not selected from favorable speed ratios. Freeze this new config before its new primary run and use a new run ID. Keep the previous user-run evidence, including the reported sleep event, separate until its provenance/timing eligibility is audited.
+
+**`configs/basiccode_large_v1.json` is preserved unchanged** as the historical 100/200/300/400/500, five-density configuration: 75 maps, 1125 timed/1821 total episodes. It remains executable with an explicit `--config` but is no longer the default. The user reported reaching `Measuring n200-p0.1-seed42`; those external raw files have not been imported or analyzed by the agent. No running process or existing result file is changed by this configuration update.
 
 `configs/basiccode_benchmark_v1.json` remains the historical 10/15/20, p=0.20, six-repetition configuration. It is no longer the default and was never executed as a full performance workload. Its existence does not override the user's large-map specification.
 
@@ -47,7 +51,7 @@ For each grid size/density, reduce repetitions to a median per map/method, then 
 
 The headless Matplotlib Agg backend writes `timing`, `speedup`, `exact_evaluations`, `python_memory` as both PNG and PDF. **Each density has its own panel**; timing/speedup also separate planning/episode rows. Memory figures are omitted if the committed config disables that pass. The plot command re-analyzes raw files, verifies the complete record matrix/input hashes/outcome agreement, and refuses comparison plots when data are failed, partial, duplicated or malformed. No experiment is rerun to adjust a figure.
 
-The requested 500x500 workload is computationally substantial. In particular, exhaustive A evaluates many candidates and C* retains global-index Python integer bitsets; candidate count and map area can both increase memory/work. No completion-time or laptop-RAM feasibility estimate is available. Algorithms are not silently optimized, replaced, capped or omitted to make the large workload look successful. There is no automatic resume or per-episode timeout; completed raw episodes remain saved if interrupted.
+The historical 500x500 workload is computationally substantial. In particular, exhaustive A evaluates many candidates and C* retains global-index Python integer bitsets; candidate count and map area can both increase memory/work. The reduced default lowers the count of timed episodes by 64% and the maximum side length to 150, but its actual wall time and RAM usage remain unmeasured by the agent. Algorithms are not silently optimized, replaced, capped or omitted. There is no automatic resume or per-episode timeout; completed raw episodes remain saved if interrupted.
 
 Do not merge timings across different computers/Python builds. Compare A/B/C* within the laptop run and later within the iMac run. Source/version/workload matching is necessary to discuss cross-machine differences. This runner does not tune parameters based on observed performance.
 

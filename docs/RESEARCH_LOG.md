@@ -1,5 +1,12 @@
 # Research Log
 
+## 2026-11-02 — reduced full-exploration workload adopted
+
+- **Accepted protocol change:** User approved sizes 50/100/150 and densities 0.1/0.3/0.5, preserving three seeds and five timed repetitions. The new default has 27 maps/405 timed episodes; old large config/results remain preserved.
+- **Unchanged:** Full `explore()` runs, A/B/C* complete outcome checks, original algorithms, generator, R=4, measurements and graph semantics. The sampled-state redesign remains archived and unimplemented.
+- **Reason:** Runtime feasibility, not selection of favorable speed ratios. User reported active CPU computation at `Measuring n200-p0.1-seed42` and an accidental sleep; exact affected timing intervals/raw results have not been audited. Existing evidence is retained separately.
+- **Verification scope:** Static configuration counts/default routing reviewed and a non-executing dispatch regression added. No new local experiment or Python regression run; no performance or theoretical conclusion changed.
+
 ## 2026-11-02 — user correction of the unexecuted large-workload protocol
 
 - User fixed sizes at 100/200/300/400/500 and densities at 0.1/0.2/0.3/0.4/0.5 with five timed repetitions; the three pre-existing seeds remain. No large performance results existed when these conditions changed.

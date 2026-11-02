@@ -154,6 +154,15 @@ This file records research assumptions and decisions that affect formulation, im
 
 ## Still Open
 
+### D-024 — User-approved reduced full-exploration workload (2026-11-02)
+
+- **Status:** Accepted by the user after runtime-feasibility feedback from the earlier large run.
+- **Decision:** Make `configs/basiccode_reduced_v1.json` the default: sizes 50/100/150 and densities 0.1/0.3/0.5, with seeds 42/43/44, five timed repetitions, R=4, one warm-up and separate memory measurement. Continue complete explorations and A/B/C* outcome equality checks with the same connected/observable generator. The sampled-state redesign was not adopted.
+- **Rationale:** Reduce size/density levels while keeping low/middle/high occupancy and map variation. This reduces 75 to 27 maps and 1125 to 405 timed episodes (64% fewer), without selecting conditions by favorable algorithm speed ratios or weakening A.
+- **Evidence policy:** Keep the historical config and all earlier raw records. Start reduced timing under a new run ID and committed config. Do not silently combine sleep-affected or incomplete earlier measurements with the new primary results. No runtime benefit or completion-time guarantee is established by this protocol change.
+
+## Open Follow-up Decisions
+
 - Benchmark seed sets and randomized-map generators for later empirical scaling experiments.
 - Coverage targets and termination reporting for large experiments.
 - Raw-result schema and storage location.

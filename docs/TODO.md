@@ -1,13 +1,26 @@
 # TODO
 
-## User-corrected large basiccode workload — 2026-11-02
+## Current reduced full-exploration workload — 2026-11-02
+
+- [x] Add `configs/basiccode_reduced_v1.json` for 50/100/150 and densities 0.1/0.3/0.5, preserving three seeds, five repetitions, R=4 and the separate memory pass; set it as the CLI/PowerShell wrapper default.
+- [x] Preserve historical large config and all raw evidence; retain complete-exploration A/B/C* comparisons and generator/metric semantics.
+- [x] Update Windows/macOS commands to explicit reduced config and new run IDs; add a mocked-dispatch regression without launching the workload.
+- [ ] User/CI: run configuration/regression checks. No new local Python test/simulation was run for this parameter update.
+- [ ] User: finish or manually stop the old run, preserve its files, update the clone and launch the reduced workload under a fresh ID. Audit old-run sleep impact before any timing reuse.
+
+## Archived experiment redesign — not adopted
+
+- [ ] Audit existing completed 100-size timing records and sleep impact without launching another experiment; cumulative CPU hours alone are not a completion-time estimate.
+- The draft `docs/BASICCODE_EXPERIMENT_REDESIGN_PROPOSAL.md` is retained as unadopted history. The user chose full explorations on fewer size/density levels; sampled-state execution and resume enhancements are not part of this update.
+
+## Historical large basiccode workload — 2026-11-02
 
 - [x] Set sizes 100/200/300/400/500 and densities 0.1/0.2/0.3/0.4/0.5, with five timed repetitions and the existing three seeds.
 - [x] Use the explicitly user-selected connected/observable exact-density generator; document its structured scaffold distribution and preserve the legacy/smoke generator.
 - [x] Balance execution positions across the three seeds at five repetitions, save each case's measurements before moving to later cases, and facet graphs by density.
 - [x] Avoid retaining every large reference trajectory; stream raw analysis while preserving full A reference and failed outcomes.
 - [ ] User/CI: execute the expanded small regression checks. No local validation of this large-workload update was run.
-- [ ] User: execute `configs/basiccode_large_v1.json` in PowerShell using a fresh run ID. Preserve all failures/partial runs. Large runtime/RAM feasibility is unresolved.
+- User reported executing the large workload through `Measuring n200-p0.1-seed42`; raw files are external to this worktree and have not been audited. The current plan uses the reduced config above. Preserve large-run failures/partial results and sleep information.
 
 ## basiccode benchmark infrastructure — 2026-11-02
 

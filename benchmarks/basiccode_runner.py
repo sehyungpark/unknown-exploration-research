@@ -366,7 +366,7 @@ def main(argv=None):
     if args.smoke and args.config:
         parser.error("--smoke uses the fixed tiny config; omit --config")
     config = args.config or ROOT / ("configs/basiccode_smoke_v1.json" if args.smoke
-                                  else "configs/basiccode_large_v1.json")
+                                  else "configs/basiccode_reduced_v1.json")
     try:
         run(config, args.output_root, args.run_id, smoke=args.smoke, plots=not args.no_plots)
     except KeyboardInterrupt:

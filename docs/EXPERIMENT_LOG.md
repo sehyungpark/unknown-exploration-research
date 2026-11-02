@@ -1,5 +1,12 @@
 # Experiment Log
 
+## 2026-11-02 — reduced workload configuration, no new execution
+
+- **User-approved config:** `configs/basiccode_reduced_v1.json`, sizes 50/100/150, densities 0.1/0.3/0.5, seeds 42/43/44, R=4, five timed repetitions and one warm-up. 27 maps, 405 timed and 669 total episodes with correctness/memory/sanity passes.
+- **Context:** User reported the previous large invocation at `Measuring n200-p0.1-seed42`, including accidental sleep; CPU counters showed active computation. No external raw run directory or exact sleep-affected repetition has been audited. Preserve it as separate evidence pending timing eligibility review.
+- **Changes:** New default/config/runbook; complete-exploration, algorithm, generator and metric semantics remain fixed. The sampled-state proposal was not adopted. Historical configs and result files are unchanged.
+- **Execution:** No map generation, simulation, benchmark or local Python regression was launched by the agent for this update. Static JSON counts/default routing were reviewed; added a mocked-dispatch regression for user/CI execution. Runtime/RAM of this reduced workload remains unmeasured.
+
 ## 2026-11-02 — large protocol correction, no execution
 
 - User specified 100/200/300/400/500, densities 0.1 through 0.5 and five timed repetitions; selected constructive connectivity/observability at target density. New default config: `configs/basiccode_large_v1.json`; 75 maps/1125 timed episodes with the existing seeds.
