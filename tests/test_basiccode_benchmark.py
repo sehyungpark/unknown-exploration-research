@@ -193,7 +193,7 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(config["seeds"], [42, 43, 44])
         self.assertEqual(config["repetitions"], 5)
         self.assertEqual(config["sensor_range"], 4.0)
-        with patch.object(runner, "run") as run:
+        with patch("benchmarks.basiccode_schedule.run") as run:
             self.assertEqual(runner.main(["--run-id", "routing-check", "--no-plots"]), 0)
         self.assertEqual(run.call_args.args[0], path)
         # Mocked dispatch only: no map generation or exploration is executed.

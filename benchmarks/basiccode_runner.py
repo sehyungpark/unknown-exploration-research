@@ -362,15 +362,28 @@ def main(argv=None):
     parser.add_argument("--output-root", type=Path, default=ROOT / "results/basiccode/runs")
     parser.add_argument("--smoke", action="store_true", help="Tiny validation; not performance evidence")
     parser.add_argument("--no-plots", action="store_true", help="Generate figures separately later")
+    parser.add_argument("--mode", choices=("isolated", "concurrent"), default="isolated")
+    parser.add_argument("--workers", type=int, default=2)
+    parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--backup-root", type=Path, help="Save verified archives between completed waves")
+    parser.add_argument("--status", action="store_true")
     args = parser.parse_args(argv)
     if args.smoke and args.config:
         parser.error("--smoke uses the fixed tiny config; omit --config")
     config = args.config or ROOT / ("configs/basiccode_smoke_v1.json" if args.smoke
                                   else "configs/basiccode_reduced_v1.json")
     try:
-        run(config, args.output_root, args.run_id, smoke=args.smoke, plots=not args.no_plots)
+        from . import basiccode_schedule
+        if args.status:
+            if not RUN_ID.fullmatch(args.run_id):
+                raise ValueError("Invalid run ID")
+            print(json.dumps(basiccode_schedule.status(args.output_root / args.run_id)))
+            return 0
+        basiccode_schedule.run(config, args.output_root, args.run_id, smoke=args.smoke,
+                               plots=not args.no_plots, mode=args.mode, workers=args.workers,
+                               resume=args.resume, backup_root=args.backup_root)
     except KeyboardInterrupt:
-        print("Interrupted; partial evidence retained. Use a new run ID next time.", file=sys.stderr)
+        print("Interrupted; checkpoints retained. Repeat the command with --resume.", file=sys.stderr)
         return 130
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

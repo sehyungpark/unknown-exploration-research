@@ -24,6 +24,8 @@ def plot(directory):
     output.mkdir(exist_ok=True)
     rates = sorted({g["obstacle_rate"] for g in summary["groups"]})
     title = summary["run_id"]
+    if "mode" in summary:
+        title += " | isolated timing" if summary["mode"] == "isolated" else f" | concurrent (up to {summary['workers']} jobs)"
     if summary["purpose"] == "smoke_validation":
         title += " | SMOKE VALIDATION - NOT PERFORMANCE EVIDENCE"
     plt.rcParams.update({"font.size": 10, "axes.spines.top": False, "axes.spines.right": False})

@@ -109,6 +109,16 @@ def analyze(directory):
         issues.append("Missing, extra or duplicate raw records; partial data cannot form a valid comparison")
     lookup = {(r.get("case_id"), r.get("method"), r.get("phase"), r.get("repetition")): r for r in records}
     for record in records:
+        if manifest.get("execution_schema") == 2:
+            expected_workers = 1 if record.get("phase") == "sanity" or (
+                manifest["mode"] == "isolated" and record.get("phase") in ("warmup", "timing")
+            ) else manifest["workers"]
+            if (record.get("mode") != manifest["mode"] or record.get("workers") != expected_workers
+                    or not record.get("completed") or not record.get("correctness_ok")
+                    or record.get("session") not in {item["id"] for item in manifest["sessions"]}):
+                issues.append("Incompatible execution metadata")
+            if record.get("phase") in ("warmup", "timing") and record.get("timing_state") != "eligible":
+                issues.append("Timing eligibility check failed")
         case = case_by_id.get(record.get("case_id"))
         if case is None or not record.get("ok"):
             issues.append(f"Failed/unknown record: {record.get('case_id')} {record.get('method')} {record.get('phase')}")
@@ -149,6 +159,9 @@ def analyze(directory):
                "bootstrap_seed": BOOTSTRAP_SEED, "per_case": [], "groups": [],
                "note": "Map medians; map-level paired bootstrap. Zero/undefined ratios are retained, never silently dropped."}
     if not issues:
+        if manifest.get("execution_schema") == 2:
+            summary["mode"] = manifest["mode"]
+            summary["workers"] = manifest["workers"]
         flat = []
         for case in cases:
             item = {key: case[key] for key in ("case_id", "size", "obstacle_rate", "seed", "sensor_range", "map_hash")}
