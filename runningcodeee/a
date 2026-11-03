@@ -1,0 +1,15 @@
+[박세형] [오후 3:03] xcode-select --install
+[박세형] [오후 3:03] git --version
+python3.13 --version
+[박세형] [오후 3:03] cd ~
+git clone --branch codex/basiccode-benchmark https://github.com/sehyungpark/unknown-exploration-research.git unknown-exploration-basiccode
+cd unknown-exploration-basiccode
+python3.13 -m venv .venv
+.venv/bin/python -m pip install -r requirements-basiccode.txt
+[박세형] [오후 3:03] .venv/bin/python -m benchmarks.basiccode_power --seconds 600
+[박세형] [오후 3:03] .venv/bin/python -m benchmarks.basiccode_runner --smoke --run-id imac-v2-check-001
+[박세형] [오후 3:04] open results/basiccode/runs/imac-v2-check-001/figures
+[박세형] [오후 3:04] 까지가 예비 실험
+[박세형] [오후 3:04] .venv/bin/python -m benchmarks.basiccode_runner --mode isolated --workers 2 --run-id imac-v2-001
+[박세형] [오후 3:04] open results/basiccode/runs/imac-v2-001/figures
+[박세형] [오후 3:05] 이게 본실험
