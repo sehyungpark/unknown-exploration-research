@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.13'
       - run: python -m pip install -r requirements-basiccode.txt
-      - run: python -m unittest tests.test_basiccode_unknown_mask tests.test_basiccode_benchmark -v
+      - run: python -m unittest tests.test_basiccode_unknown_mask tests.test_basiccode_benchmark tests.test_basiccode_retry -v
       - name: Tiny end-to-end validation only
         run: python -m benchmarks.basiccode_runner --smoke --run-id ci-smoke
       - name: Preserve smoke output, including failures

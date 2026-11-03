@@ -1,5 +1,9 @@
 # basiccode 실험 실행: Windows PowerShell / macOS
 
+## 2026-11-03 · Basiccode execution schema 2
+
+현재 실행기는 [재실행 안내](BASICCODE_RERUN.md)를 따른다. 아래의 자동 재개 관련 설명은 이전 실행 형식에 해당한다.
+
 현재 실행 브랜치: `codex/basiccode-benchmark`. UNKNOWN mask 증분 관리와 A/B/C* 비교 실행기, 분석기, 그래프 생성기를 함께 포함한다. 기존 formal Experiment 2용 `src.evaluation.experiment_2_runner`와는 다른 실험이다.
 
 ## Windows 노트북: 처음 준비
@@ -9,10 +13,12 @@
 1. 충전기를 연결한다.
 2. PowerShell에서 `control.exe powercfg.cpl`을 실행한다.
 3. 왼쪽 **덮개를 닫으면 수행되는 작업 선택**에서 **덮개를 닫을 때 → 전원 사용 → 아무 것도 안 함**을 선택하고 저장한다.
-4. 전원 옵션으로 돌아가 현재 전원 관리 옵션의 **설정 변경**에서 **전원 사용 → 컴퓨터를 절전 모드로 설정 → 해당 없음/안 함**으로 설정한다. 고급 전원 설정에 자동 최대 절전 항목이 있으면 전원 사용 시 사용 안 함으로 설정한다. 화면만 꺼지는 것은 괜찮다.
+4. 전원 옵션으로 돌아가 현재 전원 관리 옵션의 **설정 변경**에서 **전원 사용 → 컴퓨터를 절전 모드로 설정 → 해당 없음/안 함**으로 설정한다. 고급 전원 설정에 자동 최대 절전 항목이 있으면 전원 사용 시 사용 안 함으로 설정한다. Modern Standby(최신 대기) 기기는 화면이 꺼지면 Screen Off/Sleep을 포함하는 대기 세션이 시작될 수 있으므로, 화면만 꺼졌다는 이유로 계산이 계속된다고 단정하지 않는다. 장시간 무인 측정 전 Windows **설정 → 시스템 → 전원 및 배터리 → 화면/절전 시간 제한**도 확인하고, 해당 장치에서는 전원 사용 시 화면 끄기와 절전을 모두 안 함으로 맞춘 뒤 고정된 조건으로 측정한다.
 5. 실행 후 PowerShell 창은 열어 둔 채 덮개만 닫는다. 로그아웃/종료/재시작하면 프로세스가 중단된다. 책상처럼 통풍되는 곳에 둔다. 실험 후 절전 설정은 원하는 값으로 돌린다.
 
 [Microsoft 덮개 동작 설정 안내](https://www.microsoft.com/en-us/windows/learning-center/how-to-use-external-monitor-with-laptop-closed). 실제 Windows 전원 설정은 사용자가 직접 변경하며, 이 저장소의 실행기는 전원 설정을 바꾸지 않는다.
+
+2026-11-03 실행 중 진단에서 실제 Python의 CPU 사용은 계속 증가했지만 Windows의 최신 대기 진입/해제와 일부 측정 시간 급증을 확인했다. 이후 조회한 현재 AC 화면 끄기/절전과 덮개 동작은 이미 안 함이었다. 당시 설정 이력은 확인되지 않았으므로 사용자 설정 오류로 원인을 확정하지 않는다. 대기 세션 전체가 실제 Sleep인 것은 아니므로 정확한 영향은 별도 감사가 필요하다. 원시 기록을 삭제하거나 느린 반복만 제외하지 말고, 시간 비교의 사용 가능 여부를 확인한다. 현재 실행기는 대기 방지 요청이나 대기 발생 시 시간 측정 무효화를 구현하지 않으므로, 무인 재측정 전 해당 보호와 장치에서의 동작 확인이 필요하다. [Microsoft 최신 대기 상태 설명](https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/modern-standby-states).
 
 ### 코드 내려받기
 

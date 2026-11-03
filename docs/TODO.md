@@ -1,5 +1,10 @@
 # TODO
 
+## 2026-11-03 · Basiccode execution schema 2
+
+- [x] Implement recoverable isolated/concurrent map execution, power checks, mode-aware analysis and PowerShell/Colab entry points.
+- [ ] User hardware verification under intended idle/lid conditions, followed by a fresh run. Hosted Colab validation is pending.
+
 ## Current reduced full-exploration workload — 2026-11-02
 
 - [x] Add `configs/basiccode_reduced_v1.json` for 50/100/150 and densities 0.1/0.3/0.5, preserving three seeds, five repetitions, R=4 and the separate memory pass; set it as the CLI/PowerShell wrapper default.

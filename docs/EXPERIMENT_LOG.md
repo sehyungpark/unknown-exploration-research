@@ -1,5 +1,9 @@
 # Experiment Log
 
+## 2026-11-03 · Basiccode execution schema 2
+
+Infrastructure verification only. Windows isolated and concurrent two-map smoke runs each yielded 51 records with matching outcomes and exact counts. Resume reproduced both raw record files byte for byte. A simulated power transition exercised rejection and a full paired retry. The initial smoke found a tuple/list mismatch when reopening the saved reference. Canonical full-outcome comparison resolved it. Physical lid/suspend behavior and full benchmark performance remain unverified.
+
 ## 2026-11-02 — reduced workload configuration, no new execution
 
 - **User-approved config:** `configs/basiccode_reduced_v1.json`, sizes 50/100/150, densities 0.1/0.3/0.5, seeds 42/43/44, R=4, five timed repetitions and one warm-up. 27 maps, 405 timed and 669 total episodes with correctness/memory/sanity passes.

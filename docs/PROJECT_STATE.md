@@ -1,5 +1,9 @@
 # Project State
 
+## 2026-11-03 · Basiccode execution schema 2
+
+Execution schema 2 now runs the existing basiccode explorations with durable attempts, power evidence and isolated or concurrent scheduling. See [the rerun guide](BASICCODE_RERUN.md). Windows small-case verification passed. The 27-map user run and physical lid/suspend preflight are pending.
+
 Last updated: 2026-11-02
 
 ## Current user-approved reduced workload

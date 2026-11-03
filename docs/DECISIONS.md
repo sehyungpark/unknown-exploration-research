@@ -1,5 +1,9 @@
 # Decisions
 
+## 2026-11-03 · Basiccode execution schema 2
+
+The reduced map configuration is the input contract. Execution schema 2 uses a single timing job by default and two map workers for structural and memory passes. Concurrent timing is a separate regime. Interrupted paired warm-up/timing blocks require a fresh complete attempt. Eligible timing requires stable observed power evidence throughout the block.
+
 This file records research assumptions and decisions that affect formulation, implementation, or evaluation. Update existing decisions when their status changes while preserving the history and rationale.
 
 ## 2026-09-14 — Initial Decisions Consolidated from Existing Documents
