@@ -19,6 +19,9 @@ SENSOR_RANGE = 4.0
 SEED = 42
 MAX_MAP_ATTEMPTS = 1000
 
+# 이번 탐사에서 정확한 정보 이득을 계산한 횟수
+exact_gain_calls = 0
+
 truth = None
 known = None
 NBVpath = []
@@ -47,6 +50,9 @@ def Information_Gain(x, y, grid=None):
 
 def exact_evaluate(known, candidate, distance, cached_gains):
     """현재 gain을 정확히 계산하고 마지막 정확 gain 숫자만 저장한다."""
+    global exact_gain_calls
+    exact_gain_calls += 1
+
     gain = Information_Gain(*candidate, grid=known)
     old_gain = cached_gains.get(candidate)
     if old_gain is not None and gain > old_gain:
@@ -79,13 +85,15 @@ def evaluate_candidates(known, robot, cached_gains):
     def upper_rank(candidate):
         upper_gain = cached_gains[candidate]
         distance = distances[candidate]
-        return candidate_rank(candidate,
-                              (nbv_score(upper_gain, distance), upper_gain, distance))
+        return candidate_rank(
+            candidate,
+            (nbv_score(upper_gain, distance), upper_gain, distance))
 
     while True:
         # 상한이 모두 0이면 현재 양의 gain을 가진 후보도 없다.
         if all(cached_gains[v] == 0 for v in candidates):
             return None, exact, parents
+
         best_exact = choose_best_candidate(exact)
         if not remaining:
             return best_exact, exact, parents
@@ -95,6 +103,7 @@ def evaluate_candidates(known, robot, cached_gains):
         if best_exact is not None:
             if candidate_rank(best_exact, exact[best_exact]) < upper_rank(next_candidate):
                 return best_exact, exact, parents
+
         remaining.remove(next_candidate)
         exact[next_candidate] = exact_evaluate(
             known, next_candidate, distances[next_candidate], cached_gains)
@@ -112,13 +121,17 @@ def move_to_nbv(truth, known, robot, target, parents, total_cost):
 
 def explore(truth, known, robot):
     """탐사마다 캐시를 초기화하고 A와 같은 경로·종료 결과를 반환한다."""
+    global exact_gain_calls
+    exact_gain_calls = 0
+
     NBVpath.clear()
     cached_gains = {}
 
     def select_candidate(grid, position):
         return evaluate_candidates(grid, position, cached_gains)
 
-    result = common.run_exploration(truth, known, robot, SENSOR_RANGE, select_candidate)
+    result = common.run_exploration(
+        truth, known, robot, SENSOR_RANGE, select_candidate)
     NBVpath.extend(result.targets)
     return result
 
@@ -127,3 +140,4 @@ if __name__ == "__main__":
     truth, known, start = create_map()
     result = explore(truth, known, start)
     print_result(result, known)
+    print(f"정확한 정보 이득 계산 횟수: {exact_gain_calls}")
