@@ -1,0 +1,6 @@
+cd ~ &&
+git clone --branch codex/basiccode-benchmark https://github.com/sehyungpark/unknown-exploration-research.git unknown-exploration-basiccode-large &&
+cd unknown-exploration-basiccode-large &&
+python3.15 -m venv .venv &&
+.venv/bin/python -m pip install -r requirements-basiccode.txt &&
+caffeinate -is .venv/bin/python -m benchmarks.basiccode_runner --config configs/basiccode_200_500_v1.json --mode isolated --workers 2 --run-id imac-large-20261105-001
