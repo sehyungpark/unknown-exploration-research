@@ -1,5 +1,13 @@
 # Decisions
 
+## D-026 — Extend the requested map sizes with explicit configurations (2026-11-05)
+
+- **Request:** The user wants 200/300/400/500 after the previous 50/100/150 workload. Other parameters inherit the most recent reduced protocol: densities 0.1/0.3/0.5, seeds 42/43/44, five timed repetitions, R=4, one warm-up, separate memory pass and the connected/observable scaffold generator.
+- **Execution arrangement:** Provide four size-specific configurations and an optional combined one. Recommend isolated timing and one worker initially. Separate invocations avoid blocking all 200 timing behind the larger maps' structural passes, without weakening A, sampling exploration states or changing the shared simulator.
+- **Scientific boundary:** Candidate 1 scaling under the existing hypothesis: identical full outputs and potentially lower exact work/runtime. Slower or failing cases remain evidence against an efficiency claim. No selected seed, metric, sensing or algorithm change is made. Cross-run time aggregation is not automatically certified by using these configs.
+- **Resource boundary:** Global-index integer bitmasks in C* can require roughly quadratic storage in the number of grid cells when cached for many candidates (fourth power in side length under that occupancy assumption). This is a structural risk, not a measured 500-grid memory requirement. Large A episodes can also be costly. Worker count one limits overlap, not per-episode peak or elapsed time.
+- **Status:** Configurations and instructions prepared before new runs. No new performance result, hardware-feasibility result or prior-run completion audit is claimed.
+
 ## 2026-11-03 · Basiccode execution schema 2
 
 The reduced map configuration is the input contract. Execution schema 2 uses a single timing job by default and two map workers for structural and memory passes. Concurrent timing is a separate regime. Interrupted paired warm-up/timing blocks require a fresh complete attempt. Eligible timing requires stable observed power evidence throughout the block.

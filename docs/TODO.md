@@ -1,5 +1,14 @@
 # TODO
 
+## 2026-11-05 · 200/300/400/500 extension
+
+- [x] Add one config per requested size and an optional combined config, inheriting all other reduced-workload conditions.
+- [x] Provide Windows commands for update, preflight, isolated execution, status and resume; use one worker initially to limit overlapping large-map memory use.
+- [x] Check JSON parameters/counts without executing an experiment; preserve the default/old configs and all previous records.
+- [ ] User: verify the current runner's power/interruption behavior on the intended device, then execute 200 first and inspect its time/memory/completeness before proceeding to larger sizes.
+- [ ] User: run 300/400/500 under fresh IDs or resume only their compatible schema-2 IDs. Preserve failures and all attempts; do not infer completion-time or memory guarantees.
+- [ ] Later cross-size comparison: validate machine, source/algorithm versions, mode, seeds, sensing and timing eligibility before assembling one comparison; the existing plot command summarizes one invocation at a time.
+
 ## 2026-11-03 · Basiccode execution schema 2
 
 - [x] Implement recoverable isolated/concurrent map execution, power checks, mode-aware analysis and PowerShell/Colab entry points.

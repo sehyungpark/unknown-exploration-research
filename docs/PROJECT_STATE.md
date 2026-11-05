@@ -1,5 +1,13 @@
 # Project State
 
+## 2026-11-05 · Extension to 200/300/400/500 grids
+
+- User requested the next sizes after the earlier 50/100/150 experiment. Added explicit configs for 200, 300, 400 and 500 separately, plus an optional combined config. Densities 0.1/0.3/0.5, seeds 42/43/44, R=4, one warm-up, five timed repetitions, constructive generator and separate memory pass inherit the reduced protocol.
+- Recommended execution is four isolated runs with one worker, each 9 maps/135 timed episodes/237 total explorations. This yields 36 maps/540 timed episodes/948 total explorations across sizes, including four sets of sanity checks. The optional combined run has 885 total explorations because it checks sanity only once.
+- Separate sizes let 200 reach timing/analysis before correctness checks on 300/400/500: schema 2 has a barrier between all structural work and timing within each invocation. The CLI default remains the reduced config; the extension must be selected explicitly.
+- Guide: [200–500 runbook](BASICCODE_200_500_RUNBOOK.md). Existing simulator/A/B/C*, metrics, previous configs and result files are preserved. Current schema-2 power/checkpoint/resume behavior is reused; it still needs preflight verification on the user's device.
+- Configuration syntax, inherited parameters and episode counts were checked statically. No map generation, simulation, performance experiment, regression suite or OS power-setting change was executed for this extension. Large-size runtime and RAM feasibility remain unmeasured.
+
 ## 2026-11-03 · Basiccode execution schema 2
 
 Execution schema 2 now runs the existing basiccode explorations with durable attempts, power evidence and isolated or concurrent scheduling. See [the rerun guide](BASICCODE_RERUN.md). Windows small-case verification passed. The 27-map user run and physical lid/suspend preflight are pending.
