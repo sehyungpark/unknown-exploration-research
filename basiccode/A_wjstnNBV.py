@@ -19,6 +19,9 @@ SENSOR_RANGE = 4.0
 SEED = 42
 MAX_MAP_ATTEMPTS = 1000
 
+# 이번 탐사에서 정확한 정보 이득을 계산한 횟수
+exact_gain_calls = 0
+
 truth = None
 known = None
 NBVpath = []  # 선택 목표 목록. 실제 이동 경로는 result.actual_path에 따로 보관한다.
@@ -49,6 +52,9 @@ def Information_Gain(x, y, grid=None):
 
 def exact_evaluate(known, candidate, distance):
     """gain을 한 번 계산하여 (score, gain, distance)를 반환한다. 캐시는 없다."""
+    global exact_gain_calls
+    exact_gain_calls += 1
+
     gain = Information_Gain(*candidate, grid=known)
     return nbv_score(gain, distance), gain, distance
 
@@ -87,8 +93,12 @@ def explore(truth, known, robot):
     result.actual_path는 시작점과 실제 밟은 모든 셀을 순서대로 포함한다.
     result.status는 COMPLETE 또는 NO_OBSERVABLE_CANDIDATE이다.
     """
+    global exact_gain_calls
+    exact_gain_calls = 0
+
     NBVpath.clear()
-    result = common.run_exploration(truth, known, robot, SENSOR_RANGE, evaluate_candidates)
+    result = common.run_exploration(
+        truth, known, robot, SENSOR_RANGE, evaluate_candidates)
     NBVpath.extend(result.targets)
     return result
 
@@ -97,3 +107,4 @@ if __name__ == "__main__":
     truth, known, start = create_map()
     result = explore(truth, known, start)
     print_result(result, known)
+    print(f"정확한 정보 이득 계산 횟수: {exact_gain_calls}")
