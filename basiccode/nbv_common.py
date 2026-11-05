@@ -129,11 +129,14 @@ def generate_map(height, width, obstacle_rate, seed, max_attempts):
     raise RuntimeError("전체를 관측할 수 있는 맵 생성 실패: 장애물 확률을 낮춰주세요.")
 
 
-def observe(truth, known, robot, sensor_range):
-    """각 광선의 첫 실제 벽까지 공개한다. 첫 벽 자체도 관측한다."""
+def observe(truth, known, robot, sensor_range, *, on_newly_known=None):
+    """첫 실제 벽까지 공개하고, 선택적 hook에 UNKNOWN->known 셀을 보고한다."""
     for target in sensor_targets(robot, len(known), len(known[0]), sensor_range):
         for r, c in ray_cells(robot, target):
+            newly_known = on_newly_known is not None and known[r][c] == UNKNOWN
             known[r][c] = truth[r][c]
+            if newly_known:
+                on_newly_known((r, c))
             if truth[r][c] == WALL:
                 break
 
@@ -149,14 +152,15 @@ def reconstruct_path(parents, robot, target):
     return tuple(reversed(path))
 
 
-def move_to_nbv(truth, known, robot, target, parents, total_cost, sensor_range):
+def move_to_nbv(truth, known, robot, target, parents, total_cost, sensor_range, *,
+                on_newly_known=None):
     """실제로 밟은 셀만 기록한다. 전체 관측 완료 시 기존처럼 중간 종료한다."""
     planned_path = reconstruct_path(parents, robot, target)
     actual_path = [robot]
     for robot in planned_path[1:]:
         total_cost += STEP_COST
         actual_path.append(robot)
-        observe(truth, known, robot, sensor_range)
+        observe(truth, known, robot, sensor_range, on_newly_known=on_newly_known)
         if unknown_count(known) == 0:
             break
     return robot, total_cost, planned_path, tuple(actual_path)
@@ -195,7 +199,8 @@ class ExplorationResult:
         return tuple(record.target for record in self.decisions)
 
 
-def run_exploration(truth, known, robot, sensor_range, select_candidate):
+def run_exploration(truth, known, robot, sensor_range, select_candidate, *,
+                    on_newly_known=None):
     """공통 탐사 진행. 선택 함수는 (target, exact_evaluations, parents)를 반환한다.
 
     각 알고리즘은 선택 함수만 제공한다. 관측/이동/경로 기록은 여기서 공유한다.
@@ -208,7 +213,7 @@ def run_exploration(truth, known, robot, sensor_range, select_candidate):
     actual_path = [robot]
     decisions = []
     status = COMPLETE
-    observe(truth, known, robot, sensor_range)
+    observe(truth, known, robot, sensor_range, on_newly_known=on_newly_known)
     while unknown_count(known):
         target, exact, parents = select_candidate(known, robot)
         if target is None:
@@ -216,7 +221,8 @@ def run_exploration(truth, known, robot, sensor_range, select_candidate):
             break
         score, gain, distance = exact[target]
         robot, total_cost, planned, moved = move_to_nbv(
-            truth, known, robot, target, parents, total_cost, sensor_range)
+            truth, known, robot, target, parents, total_cost, sensor_range,
+            on_newly_known=on_newly_known)
         decisions.append(PlanRecord(target, score, gain, distance, planned, moved))
         actual_path.extend(moved[1:])
     return ExplorationResult(start, robot, total_cost, status, unknown_count(known),

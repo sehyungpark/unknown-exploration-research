@@ -1,5 +1,13 @@
 # TODO
 
+## basiccode UNKNOWN mask maintenance — 2026-10-27
+
+- [x] Keep the existing basiccode sensor/motion/score/heap/caches/completion contract and A/B files unchanged.
+- [x] Add an optional observation hook and episode-local C* mask state; initialize once and apply pending deltas inside planning.
+- [x] Preserve legacy direct C* evaluation and common return signatures.
+- [x] Check small A/B/rebuild-C*/incremental-C* equivalence, all intermediate observation deltas, duplicate/empty reports, lifecycle failures and one-time mask construction.
+- [ ] User: execute any desired full-size performance comparison separately; include observation bookkeeping and planner time. No speedup has been measured for this change.
+
 Last updated: 2026-09-19
 
 ## P0 — Research Gates Before Implementation

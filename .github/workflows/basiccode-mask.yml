@@ -1,0 +1,31 @@
+name: basiccode incremental mask
+
+on:
+  pull_request:
+    paths:
+      - 'basiccode/**'
+      - 'tests/test_basiccode_unknown_mask.py'
+      - '.github/workflows/basiccode-mask.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: '3.12'
+          - os: windows-latest
+            python: '3.13'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Small correctness regressions only
+        run: python -m unittest tests.test_basiccode_unknown_mask -v

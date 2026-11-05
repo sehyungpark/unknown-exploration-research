@@ -1,6 +1,14 @@
 # Project State
 
-Last updated: 2026-09-19
+Last updated: 2026-10-27
+
+## Latest basiccode implementation update
+
+- `basiccode/C_cstarNBV.py` now initializes UNKNOWN once at the first planning call and applies only pending UNKNOWN-to-known revelations afterward. Initial scan and all movement-step observations forward an optional hook through `nbv_common.py`.
+- A/B source files, 4-neighbor BFS, R=4 defaults, score/tie rules, heap/range/cached-set bounds, sensing cadence, actual/planned paths and completion rules are unchanged. Legacy four-argument C* evaluation remains reconstruction-based for compatibility.
+- All 20 focused regressions passed, comparing full A/B/rebuild-C*/incremental-C* outputs across seven tiny environment families, exact mask equality at planning snapshots, one initialization, and delta/lifecycle failures. No default 20x20 benchmark or performance timing was executed.
+- Details and commands: `docs/BASICCODE_INCREMENTAL_MASK.md`. Runtime benefit is unverified; observation-hook bookkeeping must be accounted for in later measurements.
+- Existing C* formal Experiment 2 was already executed with a GO result at `results/experiment_2/runs/experiment2-formal-20260919-001/`; older stage descriptions below predate that execution. This standalone basiccode implementation change does not alter that evidence.
 
 ## Current Research Stage
 
