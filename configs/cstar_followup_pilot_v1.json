@@ -1,0 +1,59 @@
+{
+  "version": "cstar-followup-runner-v1",
+  "kind": "exploratory",
+  "sensor_range": 8,
+  "methods": [
+    "B",
+    "S*",
+    "C*",
+    "CERT"
+  ],
+  "timing_ids": [
+    "open",
+    "maze_like",
+    "rooms-20-door-1",
+    "rooms-30-door-3",
+    "random-20-0.1-1",
+    "random-30-0.3-1"
+  ],
+  "orders": [
+    [
+      "B",
+      "S*",
+      "C*",
+      "CERT"
+    ],
+    [
+      "S*",
+      "C*",
+      "CERT",
+      "B"
+    ],
+    [
+      "C*",
+      "CERT",
+      "B",
+      "S*"
+    ],
+    [
+      "CERT",
+      "B",
+      "S*",
+      "C*"
+    ]
+  ],
+  "warmups": 1,
+  "timed_repetitions": 4,
+  "expected_maps": 21,
+  "expected_snapshots": 616,
+  "baseline_path": "results/extension_pilot_20260929/run-001",
+  "baseline_hashes": {
+    "manifest.json": "bef831c1c2a39d067b303affc2c0fdf26366b404d70d24487b471b6832dbab7c",
+    "maps.json": "6f49f02dc0463c511350a9feadd49cdf703e0ed52beeb460ce62320ff5a0f050",
+    "structural.jsonl": "5db1fbc2ccc647fe4a674c1f0a4b34c9607967eb499d31116fc13e5b6e20e31a",
+    "snapshots.jsonl": "9ab46b222753e96b2cf08f8ffb634f6f58e0e2007050ec539bd78947c12a3db3",
+    "certificate_properties.json": "c65b711c39fba7854d7782a476e491befe13d407ddb2c4153887faafd85f2d3c",
+    "structural_source.py": "b4fa51cf8d62efd607c84c8d10f5ec9c40b8ad2270d958e9978b24e0e8fe0fe4",
+    "structural_protocol.md": "4976e5dc56237819e35be39d696970aa655892a75e57f76922879b69b319c445"
+  }
+}

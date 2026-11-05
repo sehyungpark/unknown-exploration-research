@@ -1,0 +1,268 @@
+{
+  "python": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]",
+  "int_bits_per_digit": 30,
+  "records": [
+    {
+      "size": 40,
+      "candidate": [
+        0,
+        0
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 321,
+      "local_bit_length": 281,
+      "global_integer_bytes": 68,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 40,
+      "candidate": [
+        0,
+        39
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 360,
+      "local_bit_length": 281,
+      "global_integer_bytes": 72,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 40,
+      "candidate": [
+        20,
+        20
+      ],
+      "radius": 8,
+      "memberships": 197,
+      "global_bit_length": 1141,
+      "local_bit_length": 281,
+      "global_integer_bytes": 180,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 40,
+      "candidate": [
+        39,
+        0
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 1569,
+      "local_bit_length": 153,
+      "global_integer_bytes": 236,
+      "local_integer_bytes": 48
+    },
+    {
+      "size": 40,
+      "candidate": [
+        39,
+        39
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 1600,
+      "local_bit_length": 145,
+      "global_integer_bytes": 240,
+      "local_integer_bytes": 44
+    },
+    {
+      "size": 80,
+      "candidate": [
+        0,
+        0
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 641,
+      "local_bit_length": 281,
+      "global_integer_bytes": 112,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 80,
+      "candidate": [
+        0,
+        79
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 720,
+      "local_bit_length": 281,
+      "global_integer_bytes": 120,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 80,
+      "candidate": [
+        40,
+        40
+      ],
+      "radius": 8,
+      "memberships": 197,
+      "global_bit_length": 3881,
+      "local_bit_length": 281,
+      "global_integer_bytes": 544,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 80,
+      "candidate": [
+        79,
+        0
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 6329,
+      "local_bit_length": 153,
+      "global_integer_bytes": 868,
+      "local_integer_bytes": 48
+    },
+    {
+      "size": 80,
+      "candidate": [
+        79,
+        79
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 6400,
+      "local_bit_length": 145,
+      "global_integer_bytes": 880,
+      "local_integer_bytes": 44
+    },
+    {
+      "size": 160,
+      "candidate": [
+        0,
+        0
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 1281,
+      "local_bit_length": 281,
+      "global_integer_bytes": 196,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 160,
+      "candidate": [
+        0,
+        159
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 1440,
+      "local_bit_length": 281,
+      "global_integer_bytes": 216,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 160,
+      "candidate": [
+        80,
+        80
+      ],
+      "radius": 8,
+      "memberships": 197,
+      "global_bit_length": 14161,
+      "local_bit_length": 281,
+      "global_integer_bytes": 1916,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 160,
+      "candidate": [
+        159,
+        0
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 25449,
+      "local_bit_length": 153,
+      "global_integer_bytes": 3420,
+      "local_integer_bytes": 48
+    },
+    {
+      "size": 160,
+      "candidate": [
+        159,
+        159
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 25600,
+      "local_bit_length": 145,
+      "global_integer_bytes": 3440,
+      "local_integer_bytes": 44
+    },
+    {
+      "size": 320,
+      "candidate": [
+        0,
+        0
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 2561,
+      "local_bit_length": 281,
+      "global_integer_bytes": 368,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 320,
+      "candidate": [
+        0,
+        319
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 2880,
+      "local_bit_length": 281,
+      "global_integer_bytes": 408,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 320,
+      "candidate": [
+        160,
+        160
+      ],
+      "radius": 8,
+      "memberships": 197,
+      "global_bit_length": 53921,
+      "local_bit_length": 281,
+      "global_integer_bytes": 7216,
+      "local_integer_bytes": 64
+    },
+    {
+      "size": 320,
+      "candidate": [
+        319,
+        0
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 102089,
+      "local_bit_length": 153,
+      "global_integer_bytes": 13636,
+      "local_integer_bytes": 48
+    },
+    {
+      "size": 320,
+      "candidate": [
+        319,
+        319
+      ],
+      "radius": 8,
+      "memberships": 58,
+      "global_bit_length": 102400,
+      "local_bit_length": 145,
+      "global_integer_bytes": 13680,
+      "local_integer_bytes": 44
+    }
+  ],
+  "semantic_roundtrip_checks": 20,
+  "limitation": "Integer objects only; excludes containers, local UNKNOWN extraction, conversions and planner runtime. Local/tiled planner is unimplemented."
+}

@@ -1,0 +1,557 @@
+{
+  "1": {
+    "source": "results\\experiment_1\\runs\\experiment1-formal-20260917-001",
+    "hashes": {
+      "episodes.jsonl": "e9c17f15f2fd77c89f7aa1a6066e1eba3bc01dcf9e2a23f0120a72cd2b3b7cf8",
+      "manifest.json": "7e6d7c7367c9807da5f2dc09f6d41380781fb08b8b6b345e874686cc60320712",
+      "memory.jsonl": "7f4b325499e7d569f2f0b6f021381121899879a43b31698ca05926401b487be3",
+      "snapshots.jsonl": "2b6436d88aeea8dbd2f59125c6f18a7e6cec68c298e55b6057b80afc440efc1d",
+      "summary.json": "397e8889d81171f551345b7f3e6680c319eff44cb27dff651f9a9275a7fa1270",
+      "timing_repetitions.jsonl": "891f3184dcfced418116631144e3f5296242939d970e07128e72b8b03e3eb780"
+    },
+    "manifest": {
+      "anchor_fixture_ids": [
+        "open",
+        "single_room",
+        "corridor",
+        "dead_end",
+        "separated_rooms",
+        "clutter",
+        "maze_like"
+      ],
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20260916,
+      "completed_at_utc": "2026-09-17T16:45:19.130175Z",
+      "cpu_affinity": null,
+      "cpu_model": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "created_at_utc": "2026-09-17T12:03:35.854078Z",
+      "dataset_version": "experiment-1-efficiency-v1",
+      "experiment_name": "Experiment 1 — Efficiency and Scaling Evaluation",
+      "experiment_version": "experiment-1-runner-v1",
+      "failure_run_ids": [],
+      "frequency_control_state": null,
+      "invocation_id": "experiment1-formal-20260917-001",
+      "logical_cpu_count": 18,
+      "master_seed": 20260916,
+      "movement_semantics": "8-neighbor known-FREE; orthogonal=1; diagonal=sqrt(2); no corner cutting",
+      "os": "Windows",
+      "os_version": "10.0.26200",
+      "physical_cpu_count": null,
+      "primary_map_ids": [
+        "efficiency-20x20-sparse-01",
+        "efficiency-20x20-sparse-02",
+        "efficiency-20x20-sparse-03",
+        "efficiency-20x20-medium-01",
+        "efficiency-20x20-medium-02",
+        "efficiency-20x20-medium-03",
+        "efficiency-20x20-dense-01",
+        "efficiency-20x20-dense-02",
+        "efficiency-20x20-dense-03",
+        "efficiency-30x30-sparse-01",
+        "efficiency-30x30-sparse-02",
+        "efficiency-30x30-sparse-03",
+        "efficiency-30x30-medium-01",
+        "efficiency-30x30-medium-02",
+        "efficiency-30x30-medium-03",
+        "efficiency-30x30-dense-01",
+        "efficiency-30x30-dense-02",
+        "efficiency-30x30-dense-03",
+        "efficiency-40x40-sparse-01",
+        "efficiency-40x40-sparse-02",
+        "efficiency-40x40-sparse-03",
+        "efficiency-40x40-medium-01",
+        "efficiency-40x40-medium-02",
+        "efficiency-40x40-medium-03",
+        "efficiency-40x40-dense-01",
+        "efficiency-40x40-dense-02",
+        "efficiency-40x40-dense-03"
+      ],
+      "primary_sensor_range": 8.0,
+      "process_architecture": "64bit",
+      "python_implementation": "CPython",
+      "python_version": "3.13.14",
+      "ram_bytes": null,
+      "repository_commit": "225558b018c9cfc32168d4e5da55655da3c9d17d",
+      "runner_version": "experiment-1-runner-v1",
+      "score_and_tie_rule_version": "candidate-rank-key-v1",
+      "sensing_semantics": "initial and arrival only; none while moving",
+      "sensitivity_sensor_ranges": [
+        4.0,
+        8.0,
+        12.0
+      ],
+      "sensitivity_subset_map_ids": [
+        "efficiency-30x30-sparse-01",
+        "efficiency-30x30-medium-01",
+        "efficiency-30x30-dense-01"
+      ],
+      "started_at_utc": "2026-09-17T12:03:35.854078Z",
+      "status": "PASS",
+      "timed_repetitions": 6,
+      "timing_orders": [
+        [
+          "A",
+          "B",
+          "C"
+        ],
+        [
+          "B",
+          "C",
+          "A"
+        ],
+        [
+          "C",
+          "A",
+          "B"
+        ],
+        [
+          "A",
+          "C",
+          "B"
+        ],
+        [
+          "C",
+          "B",
+          "A"
+        ],
+        [
+          "B",
+          "A",
+          "C"
+        ]
+      ],
+      "timing_subset_map_ids": [
+        "efficiency-20x20-sparse-01",
+        "efficiency-20x20-medium-01",
+        "efficiency-20x20-dense-01",
+        "efficiency-30x30-sparse-01",
+        "efficiency-30x30-medium-01",
+        "efficiency-30x30-dense-01",
+        "efficiency-40x40-sparse-01",
+        "efficiency-40x40-medium-01",
+        "efficiency-40x40-dense-01"
+      ],
+      "visibility_semantics": "corner-inclusive supercover; UNKNOWN-transparent optimistic; first-hit OCCUPIED physical",
+      "warmup_repetitions": 1
+    },
+    "snapshot_flags": {
+      "snapshots": 19482,
+      "invalid": 0
+    },
+    "classification": "DROP",
+    "work": {
+      "A": {
+        "exact_gain_evaluation_count": 935635,
+        "visibility_ray_count": 17121160,
+        "visibility_supercover_cell_count": 148277338,
+        "visibility_interior_probe_count": 63434838
+      },
+      "B": {
+        "exact_gain_evaluation_count": 58704,
+        "visibility_ray_count": 1937707,
+        "visibility_supercover_cell_count": 16670443,
+        "visibility_interior_probe_count": 8549239
+      },
+      "C": {
+        "exact_gain_evaluation_count": 29249,
+        "visibility_ray_count": 1570397,
+        "visibility_supercover_cell_count": 13467314,
+        "visibility_interior_probe_count": 6967539
+      }
+    },
+    "timing_comparisons": {
+      "C/B": {
+        "per_map_ratios": {
+          "efficiency-20x20-dense-01": 4.019079131766738,
+          "efficiency-20x20-medium-01": 6.891355938341449,
+          "efficiency-20x20-sparse-01": 8.831987659021973,
+          "efficiency-30x30-dense-01": 7.756606676338354,
+          "efficiency-30x30-medium-01": 10.77655147517636,
+          "efficiency-30x30-sparse-01": 13.912529000282973,
+          "efficiency-40x40-dense-01": 9.384432523038912,
+          "efficiency-40x40-medium-01": 10.87875731615659,
+          "efficiency-40x40-sparse-01": 11.326316897453236
+        },
+        "geometric_mean": 8.837858432418813,
+        "median_paired_ratio": 9.384432523038912,
+        "bootstrap_resamples": 10000,
+        "bootstrap_seed": 20260916,
+        "bootstrap_interval_95": [
+          6.954466742639219,
+          10.844839897860881
+        ]
+      },
+      "B/A": {
+        "per_map_ratios": {
+          "efficiency-20x20-dense-01": 0.23411299074548816,
+          "efficiency-20x20-medium-01": 0.5295528418441068,
+          "efficiency-20x20-sparse-01": 0.7775557279542803,
+          "efficiency-30x30-dense-01": 0.19889812026492676,
+          "efficiency-30x30-medium-01": 0.29718989177418825,
+          "efficiency-30x30-sparse-01": 0.7699372497635578,
+          "efficiency-40x40-dense-01": 0.2759164156644525,
+          "efficiency-40x40-medium-01": 0.4462829741457786,
+          "efficiency-40x40-sparse-01": 0.9966606247001176
+        },
+        "geometric_mean": 0.43330258771618185,
+        "median_paired_ratio": 0.4462829741457786,
+        "bootstrap_resamples": 10000,
+        "bootstrap_seed": 20260916,
+        "bootstrap_interval_95": [
+          0.30335798036611616,
+          0.624512608593414
+        ]
+      },
+      "C/A": {
+        "per_map_ratios": {
+          "efficiency-20x20-dense-01": 0.9409186355806909,
+          "efficiency-20x20-medium-01": 3.6493371213079757,
+          "efficiency-20x20-sparse-01": 6.86736259349405,
+          "efficiency-30x30-dense-01": 1.5427744875580798,
+          "efficiency-30x30-medium-01": 3.2026821666066314,
+          "efficiency-30x30-sparse-01": 10.711774315733614,
+          "efficiency-40x40-dense-01": 2.589318984801811,
+          "efficiency-40x40-medium-01": 4.855004170064512,
+          "efficiency-40x40-sparse-01": 11.28849407456724
+        },
+        "geometric_mean": 3.82946692863635,
+        "median_paired_ratio": 3.6493371213079757,
+        "bootstrap_resamples": 10000,
+        "bootstrap_seed": 20260916,
+        "bootstrap_interval_95": [
+          2.2704449607773523,
+          6.385728470422069
+        ]
+      }
+    }
+  },
+  "2": {
+    "source": "results\\experiment_2\\runs\\experiment2-formal-20260919-001",
+    "hashes": {
+      "audit.jsonl": "4784550d99cfd7cbf735c2fac5d5867146e8287865b51a5a88d5151778c2cba2",
+      "decomposition.jsonl": "810fc42296b43e9f265f260933394ed14315c141fe337cf8ffcfdb65d82b0d59",
+      "manifest.json": "65be6efd343a307900f9d4c181f5a28007b2748b4899c179c542dc9e38e99938",
+      "memory.jsonl": "76b554123e68ce1bed9404aa089f6ffcf13449e5f8458cf6c3e6c07052f492cb",
+      "structural.jsonl": "d61be866dcecc164e0a19173776487118148f73948c9845c5aca2bc6f3a4a09e",
+      "summary.json": "17e2d4a33373cbec3a9953909dbf1f8c43933d9cee1cc67a602af0fb17ca4cf8",
+      "timing_repetitions.jsonl": "66269168a750ce836ebd091eaf6258591a098b772dba679fa39b7190f4bb964e"
+    },
+    "manifest": {
+      "algorithm_implementations": {
+        "A": "src.planning.exhaustive_nbv:exhaustive_nbv",
+        "B": "src.planning.stale_scalar_lazy_nbv:StaleScalarLazyNBV",
+        "C": "src.planning.change_aware_lazy_nbv:ChangeAwareLazyNBV",
+        "C*": "src.planning.change_aware_star_nbv:ChangeAwareStarNBV"
+      },
+      "anchor_fixture_ids": [
+        "open",
+        "single_room",
+        "corridor",
+        "dead_end",
+        "separated_rooms",
+        "clutter",
+        "maze_like"
+      ],
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20260919,
+      "completed_at_utc": "2026-09-19T12:06:56.995443Z",
+      "cpu_affinity": null,
+      "cpu_model": "Intel64 Family 6 Model 190 Stepping 0, GenuineIntel",
+      "dataset_version": "experiment-2-cstar-efficiency-v1",
+      "experiment_name": "Experiment 2 — C* Efficiency and Scaling Evaluation",
+      "experiment_version": "experiment-2-runner-v1",
+      "frequency_control_state": null,
+      "invocation_id": "experiment2-formal-20260919-001",
+      "logical_cpu_count": 4,
+      "master_seed": 20260919,
+      "methods": [
+        "A",
+        "B",
+        "C",
+        "C*"
+      ],
+      "movement_semantics": "8-neighbor known-FREE; orthogonal=1; diagonal=sqrt(2); no corner cutting",
+      "os": "Windows",
+      "os_version": "10.0.26200",
+      "physical_cpu_count": null,
+      "primary_decision_comparison": "C*/B",
+      "primary_map_ids": [
+        "cstar-20x20-sparse-01",
+        "cstar-20x20-sparse-02",
+        "cstar-20x20-sparse-03",
+        "cstar-20x20-medium-01",
+        "cstar-20x20-medium-02",
+        "cstar-20x20-medium-03",
+        "cstar-20x20-dense-01",
+        "cstar-20x20-dense-02",
+        "cstar-20x20-dense-03",
+        "cstar-30x30-sparse-01",
+        "cstar-30x30-sparse-02",
+        "cstar-30x30-sparse-03",
+        "cstar-30x30-medium-01",
+        "cstar-30x30-medium-02",
+        "cstar-30x30-medium-03",
+        "cstar-30x30-dense-01",
+        "cstar-30x30-dense-02",
+        "cstar-30x30-dense-03",
+        "cstar-40x40-sparse-01",
+        "cstar-40x40-sparse-02",
+        "cstar-40x40-sparse-03",
+        "cstar-40x40-medium-01",
+        "cstar-40x40-medium-02",
+        "cstar-40x40-medium-03",
+        "cstar-40x40-dense-01",
+        "cstar-40x40-dense-02",
+        "cstar-40x40-dense-03"
+      ],
+      "primary_sensor_range": 8.0,
+      "process_architecture": "64bit",
+      "python_implementation": "CPython",
+      "python_version": "3.12.10",
+      "ram_bytes": null,
+      "repository_commit": "7956ffda5ec3326ee29a672fb0f12c6c9b1c11ad",
+      "score_and_tie_rule_version": "candidate-rank-key-v1",
+      "sensing_semantics": "initial and arrival only; none while moving",
+      "sensitivity_sensor_ranges": [
+        4.0,
+        8.0,
+        12.0
+      ],
+      "sensitivity_subset_map_ids": [
+        "cstar-30x30-sparse-01",
+        "cstar-30x30-medium-01",
+        "cstar-30x30-dense-01"
+      ],
+      "started_at_utc": "2026-09-19T07:48:27.907400Z",
+      "status": "PASS",
+      "timed_repetitions": 6,
+      "timing_orders": [
+        [
+          "A",
+          "B",
+          "C",
+          "C*"
+        ],
+        [
+          "B",
+          "C",
+          "C*",
+          "A"
+        ],
+        [
+          "C",
+          "C*",
+          "A",
+          "B"
+        ],
+        [
+          "C*",
+          "A",
+          "B",
+          "C"
+        ],
+        [
+          "A",
+          "C*",
+          "C",
+          "B"
+        ],
+        [
+          "C",
+          "B",
+          "A",
+          "C*"
+        ]
+      ],
+      "timing_subset_map_ids": [
+        "cstar-20x20-sparse-01",
+        "cstar-20x20-medium-01",
+        "cstar-20x20-dense-01",
+        "cstar-30x30-sparse-01",
+        "cstar-30x30-medium-01",
+        "cstar-30x30-dense-01",
+        "cstar-40x40-sparse-01",
+        "cstar-40x40-medium-01",
+        "cstar-40x40-dense-01"
+      ],
+      "visibility_semantics": "corner-inclusive supercover; UNKNOWN-transparent optimistic; first-hit OCCUPIED physical",
+      "warmup_order": [
+        "A",
+        "B",
+        "C",
+        "C*"
+      ],
+      "warmup_repetitions": 1
+    },
+    "all_summary_fields_identical": true,
+    "classification": "GO",
+    "work": {
+      "overall": {
+        "A": {
+          "exact_gain_evaluation_count": 981501,
+          "visibility_ray_count": 18612655,
+          "visibility_supercover_cell_count": 161064621,
+          "visibility_interior_probe_count": 68288238
+        },
+        "B": {
+          "exact_gain_evaluation_count": 59552,
+          "visibility_ray_count": 1987490,
+          "visibility_supercover_cell_count": 17091744,
+          "visibility_interior_probe_count": 8718166
+        },
+        "C": {
+          "exact_gain_evaluation_count": 29619,
+          "visibility_ray_count": 1593104,
+          "visibility_supercover_cell_count": 13652843,
+          "visibility_interior_probe_count": 7034857
+        },
+        "C*": {
+          "exact_gain_evaluation_count": 23391,
+          "visibility_ray_count": 1150761,
+          "visibility_supercover_cell_count": 10002171,
+          "visibility_interior_probe_count": 4681633
+        }
+      },
+      "overall_ratios": {
+        "B/A": {
+          "exact_gain_evaluation_count": 0.06067441602199081,
+          "visibility_ray_count": 0.10678164936705699,
+          "visibility_supercover_cell_count": 0.1061173080337736,
+          "visibility_interior_probe_count": 0.12766716868576986
+        },
+        "C/B": {
+          "exact_gain_evaluation_count": 0.4973636485760344,
+          "visibility_ray_count": 0.801565794041731,
+          "visibility_supercover_cell_count": 0.7987975364012004,
+          "visibility_interior_probe_count": 0.8069193681331601
+        },
+        "C*/B": {
+          "exact_gain_evaluation_count": 0.3927827780763031,
+          "visibility_ray_count": 0.5790021585014264,
+          "visibility_supercover_cell_count": 0.5852048216963699,
+          "visibility_interior_probe_count": 0.5369974602456525
+        },
+        "C*/C": {
+          "exact_gain_evaluation_count": 0.7897295654816165,
+          "visibility_ray_count": 0.7223389056834959,
+          "visibility_supercover_cell_count": 0.7326071939741782,
+          "visibility_interior_probe_count": 0.6654908550379915
+        },
+        "C*/A": {
+          "exact_gain_evaluation_count": 0.023831865683274903,
+          "visibility_ray_count": 0.061826805471868466,
+          "visibility_supercover_cell_count": 0.06210036032680324,
+          "visibility_interior_probe_count": 0.06855694534101173
+        }
+      }
+    },
+    "timing_comparisons": {
+      "B/A": {
+        "per_map_ratios": {
+          "cstar-20x20-dense-01": 0.21289882819356534,
+          "cstar-20x20-medium-01": 0.4305713237127146,
+          "cstar-20x20-sparse-01": 0.6576148035726718,
+          "cstar-30x30-dense-01": 0.1494952070321368,
+          "cstar-30x30-medium-01": 0.43601698597328575,
+          "cstar-30x30-sparse-01": 0.7772823917842632,
+          "cstar-40x40-dense-01": 0.1776825251225365,
+          "cstar-40x40-medium-01": 0.36923295043739635,
+          "cstar-40x40-sparse-01": 0.7698858860538225
+        },
+        "geometric_mean": 0.3771156486963905,
+        "median_paired_ratio": 0.4305713237127146,
+        "bootstrap_resamples": 10000,
+        "bootstrap_seed": 20260919,
+        "bootstrap_interval_95": [
+          0.2552959423172854,
+          0.5462874953781515
+        ]
+      },
+      "C/B": {
+        "per_map_ratios": {
+          "cstar-20x20-dense-01": 4.811393777551353,
+          "cstar-20x20-medium-01": 5.960520328566028,
+          "cstar-20x20-sparse-01": 8.912651890485135,
+          "cstar-30x30-dense-01": 6.618659218508309,
+          "cstar-30x30-medium-01": 10.959058635471001,
+          "cstar-30x30-sparse-01": 10.617834305104811,
+          "cstar-40x40-dense-01": 9.282929160248045,
+          "cstar-40x40-medium-01": 11.628840477771991,
+          "cstar-40x40-sparse-01": 13.062547651486447
+        },
+        "geometric_mean": 8.672703677603678,
+        "median_paired_ratio": 9.282929160248045,
+        "bootstrap_resamples": 10000,
+        "bootstrap_seed": 20260919,
+        "bootstrap_interval_95": [
+          6.974565848310303,
+          10.526979482266867
+        ]
+      },
+      "C*/B": {
+        "per_map_ratios": {
+          "cstar-20x20-dense-01": 0.6662741659508492,
+          "cstar-20x20-medium-01": 0.46991726890090296,
+          "cstar-20x20-sparse-01": 0.2820097835965533,
+          "cstar-30x30-dense-01": 0.5535795097443524,
+          "cstar-30x30-medium-01": 0.3046960808618413,
+          "cstar-30x30-sparse-01": 0.20173649739157162,
+          "cstar-40x40-dense-01": 0.4139952611917257,
+          "cstar-40x40-medium-01": 0.256546583285231,
+          "cstar-40x40-sparse-01": 0.1482093444321141
+        },
+        "geometric_mean": 0.3306914837946873,
+        "median_paired_ratio": 0.3046960808618413,
+        "bootstrap_resamples": 10000,
+        "bootstrap_seed": 20260919,
+        "bootstrap_interval_95": [
+          0.2454277555087817,
+          0.4456261967766462
+        ]
+      },
+      "C*/C": {
+        "per_map_ratios": {
+          "cstar-20x20-dense-01": 0.13847841119542162,
+          "cstar-20x20-medium-01": 0.07883829649046006,
+          "cstar-20x20-sparse-01": 0.03164151220778835,
+          "cstar-30x30-dense-01": 0.08363922230598182,
+          "cstar-30x30-medium-01": 0.02780312534104313,
+          "cstar-30x30-sparse-01": 0.01899977825935571,
+          "cstar-40x40-dense-01": 0.044597481467871444,
+          "cstar-40x40-medium-01": 0.02206123506256779,
+          "cstar-40x40-sparse-01": 0.011346128518447829
+        },
+        "geometric_mean": 0.03813014903860514,
+        "median_paired_ratio": 0.03164151220778835,
+        "bootstrap_resamples": 10000,
+        "bootstrap_seed": 20260919,
+        "bootstrap_interval_95": [
+          0.023631832019164824,
+          0.06302055943705641
+        ]
+      },
+      "C*/A": {
+        "per_map_ratios": {
+          "cstar-20x20-dense-01": 0.14184898918658087,
+          "cstar-20x20-medium-01": 0.20233290050612546,
+          "cstar-20x20-sparse-01": 0.18545380844541912,
+          "cstar-30x30-dense-01": 0.08275748341798077,
+          "cstar-30x30-medium-01": 0.1328526668152526,
+          "cstar-30x30-sparse-01": 0.15680622720270054,
+          "cstar-40x40-dense-01": 0.07355972339730985,
+          "cstar-40x40-medium-01": 0.09472545187103906,
+          "cstar-40x40-sparse-01": 0.11410428245957432
+        },
+        "geometric_mean": 0.1247089334296054,
+        "median_paired_ratio": 0.1328526668152526,
+        "bootstrap_resamples": 10000,
+        "bootstrap_seed": 20260919,
+        "bootstrap_interval_95": [
+          0.09925409933392147,
+          0.1552386441889791
+        ]
+      }
+    },
+    "structural_records": 172
+  }
+}

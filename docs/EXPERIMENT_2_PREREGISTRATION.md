@@ -1,6 +1,11 @@
 # Experiment 2 — C* Efficiency and Scaling Evaluation
 
-Status: **PREREGISTERED — FORMAL RUN REQUIRES THE FROZEN DATASET CONFIG TO BE COMMITTED**
+Status: **EXECUTED — first invocation completed on 2026-09-19, GO**.
+
+Execution note added 2026-09-29: the frozen config was committed at `7956ffd`
+before `experiment2-formal-20260919-001`. All protocol details below remain
+unchanged. The complete stored summary was independently reproduced from raw
+records on 2026-09-29; see `PROJECT_STATE.md` and `EXPERIMENT_LOG.md`.
 
 ## Purpose
 
