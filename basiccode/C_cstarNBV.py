@@ -20,6 +20,9 @@ SENSOR_RANGE = 4.0
 SEED = 42
 MAX_MAP_ATTEMPTS = 1000
 
+# 이번 탐사에서 정확한 정보 이득을 계산한 횟수
+exact_gain_calls = 0
+
 truth = None
 known = None
 NBVpath = []
@@ -80,6 +83,9 @@ def visible_unknown_mask(known, candidate):
 
 def exact_evaluate(known, candidate, distance, cache, upper_gain):
     """현재 정확 가시 집합과 gain으로 캐시를 교체한다."""
+    global exact_gain_calls
+    exact_gain_calls += 1
+
     mask = visible_unknown_mask(known, candidate)
     gain = mask.bit_count()
     if gain > upper_gain:
@@ -114,8 +120,9 @@ def evaluate_candidates(known, robot, cache, range_masks):
         entry = cache.get(candidate)
         upper_gain = range_upper if entry is None else min(entry["upper_gain"], range_upper)
         distance = distances[candidate]
-        queue.append(candidate_rank(candidate,
-                                    (nbv_score(upper_gain, distance), upper_gain, distance)))
+        queue.append(candidate_rank(
+            candidate,
+            (nbv_score(upper_gain, distance), upper_gain, distance)))
     heapify(queue)
     best_candidate = best_key = None
 
@@ -126,6 +133,7 @@ def evaluate_candidates(known, robot, cache, range_masks):
             best_candidate is None or exact[best_candidate][1] == 0
         ):
             return None, exact, parents
+
         # 현재 exact 최선이 모든 미평가 후보의 상한을 이기는 경우만 확정한다.
         if best_key is not None and best_key < top_key:
             return best_candidate, exact, parents
@@ -144,11 +152,13 @@ def evaluate_candidates(known, robot, cache, range_masks):
             entry["upper_gain"] = change_upper
             refreshed.add(candidate)
             upper_gain = min(change_upper, range_bounds[candidate])
-            heappush(queue, candidate_rank(candidate,
-                                          (nbv_score(upper_gain, distance), upper_gain, distance)))
+            heappush(queue, candidate_rank(
+                candidate,
+                (nbv_score(upper_gain, distance), upper_gain, distance)))
             continue
 
-        evaluation = exact_evaluate(known, candidate, distance, cache, -popped_key[1])
+        evaluation = exact_evaluate(
+            known, candidate, distance, cache, -popped_key[1])
         exact[candidate] = evaluation
         rank = candidate_rank(candidate, evaluation)
         if best_key is None or rank < best_key:
@@ -172,13 +182,17 @@ def move_to_nbv(truth, known, robot, target, parents, total_cost):
 
 def explore(truth, known, robot):
     """탐사마다 두 캐시를 초기화하고 A/B와 같은 경로·종료 결과를 반환한다."""
+    global exact_gain_calls
+    exact_gain_calls = 0
+
     NBVpath.clear()
     cache, range_masks = {}, {}
 
     def select_candidate(grid, position):
         return evaluate_candidates(grid, position, cache, range_masks)
 
-    result = common.run_exploration(truth, known, robot, SENSOR_RANGE, select_candidate)
+    result = common.run_exploration(
+        truth, known, robot, SENSOR_RANGE, select_candidate)
     NBVpath.extend(result.targets)
     return result
 
@@ -187,3 +201,4 @@ if __name__ == "__main__":
     truth, known, start = create_map()
     result = explore(truth, known, start)
     print_result(result, known)
+    print(f"정확한 정보 이득 계산 횟수: {exact_gain_calls}")
