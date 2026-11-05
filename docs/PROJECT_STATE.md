@@ -1,6 +1,46 @@
 # Project State
 
-Last updated: 2026-10-27
+## 2026-11-05 · Extension to 200/300/400/500 grids
+
+- User requested the next sizes after the earlier 50/100/150 experiment. Added explicit configs for 200, 300, 400 and 500 separately, plus an optional combined config. Densities 0.1/0.3/0.5, seeds 42/43/44, R=4, one warm-up, five timed repetitions, constructive generator and separate memory pass inherit the reduced protocol.
+- Recommended execution is four isolated runs with one worker, each 9 maps/135 timed episodes/237 total explorations. This yields 36 maps/540 timed episodes/948 total explorations across sizes, including four sets of sanity checks. The optional combined run has 885 total explorations because it checks sanity only once.
+- Separate sizes let 200 reach timing/analysis before correctness checks on 300/400/500: schema 2 has a barrier between all structural work and timing within each invocation. The CLI default remains the reduced config; the extension must be selected explicitly.
+- Guide: [200–500 runbook](BASICCODE_200_500_RUNBOOK.md). Existing simulator/A/B/C*, metrics, previous configs and result files are preserved. Current schema-2 power/checkpoint/resume behavior is reused; it still needs preflight verification on the user's device.
+- Configuration syntax, inherited parameters and episode counts were checked statically. No map generation, simulation, performance experiment, regression suite or OS power-setting change was executed for this extension. Large-size runtime and RAM feasibility remain unmeasured.
+
+## 2026-11-03 · Basiccode execution schema 2
+
+Execution schema 2 now runs the existing basiccode explorations with durable attempts, power evidence and isolated or concurrent scheduling. See [the rerun guide](BASICCODE_RERUN.md). Windows small-case verification passed. The 27-map user run and physical lid/suspend preflight are pending.
+
+Last updated: 2026-11-02
+
+## Current user-approved reduced workload
+
+- Default config is now `configs/basiccode_reduced_v1.json`: **50/100/150**, densities **0.1/0.3/0.5**, seeds 42/43/44, R=4, one warm-up, five timed repetitions and the separate memory pass. This gives **27 maps, 405 timed episodes, 669 total explorations** including seven-family sanity/structural/warm-up/memory passes.
+- The user adopted fewer size/density levels because of runtime burden. The algorithms, connected/observable exact-density generator, full-exploration execution, complete A/B/C* outcome checks, measurement boundaries and plotting remain unchanged. This is not adoption of the sampled-state proposal.
+- `configs/basiccode_large_v1.json`, all previous configs and stored raw results are preserved. Current running processes are not stopped or changed. Use a fresh run ID for the reduced experiment; do not automatically pool the older sleep-affected run into the new primary timing.
+- Static JSON/condition counts and default dispatch are reviewed; a mocked-dispatch config regression was added for user/CI execution. No simulation, performance run or local Python regression was launched for this update. Runtime/RAM usage of the reduced workload remains unmeasured by the agent.
+
+## Archived measurement redesign — not adopted
+
+- User requested reconsidering experiment design after reporting active computation at the first 200x200 condition and an accidental sleep. A draft separates complete-exploration evidence from stateful large-map planner probes: `docs/BASICCODE_EXPERIMENT_REDESIGN_PROPOSAL.md`.
+- The draft preserves requested large sizes/densities and five measurements, explicitly preserves historical cache state, and limits large-probe claims to planner latency. Existing records should first establish a time budget and sleep eligibility; no new experiment was run to forecast runtime.
+- The user subsequently chose to keep complete explorations and reduce size/density levels instead. Resume/suspend detection and sampled-state benchmarking remain unimplemented. The draft is retained as unadopted history, not current execution guidance.
+
+## Historical user-corrected large workload — superseded
+
+- The previous default was `configs/basiccode_large_v1.json`: sizes 100/200/300/400/500, densities 0.1/0.2/0.3/0.4/0.5, seeds 42/43/44, R=4, one warm-up, **five** timed repetitions. This is 75 maps, 1125 timed episodes, 1821 total episodes including sanity/structural/warm-up/memory passes. It is preserved as an explicit historical config.
+- User explicitly selected a constructive connected/observable generator. `connected_dominating_v1` uses a seed-dependent connected dominating free scaffold, exact wall counts, rotations/reflections and nested density sets. This is a structured map distribution, not IID Bernoulli rejection. A/B/C* and simulator semantics are unchanged.
+- The former small nine-map config remains historical and is no longer the default. All inputs are frozen before timing, but per-map correctness and timing now run together so earlier completed measurements are saved before expensive later cases. Full A outcomes/hashes are retained; analysis streams raw records and does not retain all trajectories in memory. Plots have one panel per density.
+- New generator/order/config regression checks were written but not executed locally. The user runs Check and the large benchmark; no new map generation, exploration or timing was launched in this update. The prior 34-test/smoke verification below predates these changes. Large-run wall time and laptop RAM feasibility remain unverified.
+
+## Latest basiccode benchmark infrastructure
+
+- Added `benchmarks.basiccode_runner`, raw-data reanalysis and headless PNG/PDF plotting for the actual standalone A/B/C* `explore()` implementations. The simulator and algorithm files are unchanged from the incremental-mask revision.
+- Windows PowerShell wrapper and Windows/macOS runbook: `scripts/run_basiccode.ps1`, `docs/BASICCODE_RUNBOOK.md`. Methodology and frozen exploratory workload: `docs/BASICCODE_BENCHMARK.md`.
+- Verified 34 focused regressions, PowerShell syntax, and retained `laptop-smoke-20261102-001`: two tiny maps, 51 valid records, four PNG/PDF plot pairs. An additional invalid-numeric-record regression was added afterward; final re-execution is left to the user. No default 9-map timing workload was run.
+- The user will execute the actual benchmark on the Windows laptop first, then optionally on iMac. CPU-only simulation uses common 4-neighbor BFS/R=4/per-step sensing and paired maps/seeds. Smoke timings are validation metadata, not performance evidence.
+- Initial workload was nine maps/162 timed episodes, followed by the historical large workload and now the current reduced workload above. Failures and partial results remain saved; incomplete comparison plots are refused. Formal Experiment 2 evidence remains unchanged and was already executed.
 
 ## Latest basiccode implementation update
 

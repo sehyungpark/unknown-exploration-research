@@ -1,5 +1,32 @@
 # Experiment Log
 
+## 2026-11-03 · Basiccode execution schema 2
+
+Infrastructure verification only. Windows isolated and concurrent two-map smoke runs each yielded 51 records with matching outcomes and exact counts. Resume reproduced both raw record files byte for byte. A simulated power transition exercised rejection and a full paired retry. The initial smoke found a tuple/list mismatch when reopening the saved reference. Canonical full-outcome comparison resolved it. Physical lid/suspend behavior and full benchmark performance remain unverified.
+
+## 2026-11-02 — reduced workload configuration, no new execution
+
+- **User-approved config:** `configs/basiccode_reduced_v1.json`, sizes 50/100/150, densities 0.1/0.3/0.5, seeds 42/43/44, R=4, five timed repetitions and one warm-up. 27 maps, 405 timed and 669 total episodes with correctness/memory/sanity passes.
+- **Context:** User reported the previous large invocation at `Measuring n200-p0.1-seed42`, including accidental sleep; CPU counters showed active computation. No external raw run directory or exact sleep-affected repetition has been audited. Preserve it as separate evidence pending timing eligibility review.
+- **Changes:** New default/config/runbook; complete-exploration, algorithm, generator and metric semantics remain fixed. The sampled-state proposal was not adopted. Historical configs and result files are unchanged.
+- **Execution:** No map generation, simulation, benchmark or local Python regression was launched by the agent for this update. Static JSON counts/default routing were reviewed; added a mocked-dispatch regression for user/CI execution. Runtime/RAM of this reduced workload remains unmeasured.
+
+## 2026-11-02 — large protocol correction, no execution
+
+- User specified 100/200/300/400/500, densities 0.1 through 0.5 and five timed repetitions; selected constructive connectivity/observability at target density. New default config: `configs/basiccode_large_v1.json`; 75 maps/1125 timed episodes with the existing seeds.
+- This update launched no map generation, exploration, timing or local regression command. New small tests are provided for user/CI execution. The retained smoke below used the earlier tiny legacy generator and cannot validate this new map distribution or large-run feasibility.
+
+## BASICCODE-SMOKE-20261102-001 — infrastructure validation only
+
+- **Run ID:** `laptop-smoke-20261102-001`; Windows PowerShell, CPython 3.13.14.
+- **Purpose:** End-to-end infrastructure smoke, not a performance experiment or a new GO/DROP decision. User runs the default comparison separately.
+- **Source:** Development branch `codex/basiccode-benchmark`, based on `157c0ba`; source was uncommitted, explicitly permitted only by `--smoke`. Manifest retains individual source/config hashes and dirty status.
+- **Inputs:** Saved 4x4 and 6x6 maps, seed 42, p=0.1, R=2, plus seven tiny correctness families. Shared copies for A/B/C*, one warm-up, two timed repetitions and one separate memory pass per tiny map/method.
+- **Verified:** 51 records; summary valid=true; A/B/C* complete outcomes/final grids agree. Four PNG/PDF figure pairs generated; timing PNG visually inspected. Raw input/output retained at `results/basiccode/runs/laptop-smoke-20261102-001/`.
+- **Other checks:** 34 focused regressions passed before the final numeric-validation guard/test was added; PowerShell wrapper parser passed. Final expanded regression execution is user-run. Injected failure tests verified that mismatch/generation failure blocks timing, partial/duplicate/malformed records cannot become valid comparisons, and run IDs cannot overwrite evidence.
+- **Runtime interpretation:** Any smoke times/memory are validation metadata only. No default 10/15/20 comparison, full repository suite, actual iMac hardware run or standalone basiccode performance conclusion.
+- **Failures:** None in the retained smoke invocation. Synthetic failure injections are unit-test fixtures, not suppressed research maps.
+
 This is an append-only record. Failed, unfavorable, incomplete, and non-reproducible experiments must remain in the log.
 
 For new runs, record at least: date/time, run ID, code/algorithm version, map family and instance ID, map seed, start seed, map size, movement model, sensor configuration, algorithm, parameters, completion target, metrics, raw-result location, runtime, success/failure, failure reason, and interpretation.

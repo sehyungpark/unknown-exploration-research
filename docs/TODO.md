@@ -1,5 +1,51 @@
 # TODO
 
+## 2026-11-05 · 200/300/400/500 extension
+
+- [x] Add one config per requested size and an optional combined config, inheriting all other reduced-workload conditions.
+- [x] Provide Windows commands for update, preflight, isolated execution, status and resume; use one worker initially to limit overlapping large-map memory use.
+- [x] Check JSON parameters/counts without executing an experiment; preserve the default/old configs and all previous records.
+- [ ] User: verify the current runner's power/interruption behavior on the intended device, then execute 200 first and inspect its time/memory/completeness before proceeding to larger sizes.
+- [ ] User: run 300/400/500 under fresh IDs or resume only their compatible schema-2 IDs. Preserve failures and all attempts; do not infer completion-time or memory guarantees.
+- [ ] Later cross-size comparison: validate machine, source/algorithm versions, mode, seeds, sensing and timing eligibility before assembling one comparison; the existing plot command summarizes one invocation at a time.
+
+## 2026-11-03 · Basiccode execution schema 2
+
+- [x] Implement recoverable isolated/concurrent map execution, power checks, mode-aware analysis and PowerShell/Colab entry points.
+- [ ] User hardware verification under intended idle/lid conditions, followed by a fresh run. Hosted Colab validation is pending.
+
+## Current reduced full-exploration workload — 2026-11-02
+
+- [x] Add `configs/basiccode_reduced_v1.json` for 50/100/150 and densities 0.1/0.3/0.5, preserving three seeds, five repetitions, R=4 and the separate memory pass; set it as the CLI/PowerShell wrapper default.
+- [x] Preserve historical large config and all raw evidence; retain complete-exploration A/B/C* comparisons and generator/metric semantics.
+- [x] Update Windows/macOS commands to explicit reduced config and new run IDs; add a mocked-dispatch regression without launching the workload.
+- [ ] User/CI: run configuration/regression checks. No new local Python test/simulation was run for this parameter update.
+- [ ] User: finish or manually stop the old run, preserve its files, update the clone and launch the reduced workload under a fresh ID. Audit old-run sleep impact before any timing reuse.
+
+## Archived experiment redesign — not adopted
+
+- [ ] Audit existing completed 100-size timing records and sleep impact without launching another experiment; cumulative CPU hours alone are not a completion-time estimate.
+- The draft `docs/BASICCODE_EXPERIMENT_REDESIGN_PROPOSAL.md` is retained as unadopted history. The user chose full explorations on fewer size/density levels; sampled-state execution and resume enhancements are not part of this update.
+
+## Historical large basiccode workload — 2026-11-02
+
+- [x] Set sizes 100/200/300/400/500 and densities 0.1/0.2/0.3/0.4/0.5, with five timed repetitions and the existing three seeds.
+- [x] Use the explicitly user-selected connected/observable exact-density generator; document its structured scaffold distribution and preserve the legacy/smoke generator.
+- [x] Balance execution positions across the three seeds at five repetitions, save each case's measurements before moving to later cases, and facet graphs by density.
+- [x] Avoid retaining every large reference trajectory; stream raw analysis while preserving full A reference and failed outcomes.
+- [ ] User/CI: execute the expanded small regression checks. No local validation of this large-workload update was run.
+- User reported executing the large workload through `Measuring n200-p0.1-seed42`; raw files are external to this worktree and have not been audited. The current plan uses the reduced config above. Preserve large-run failures/partial results and sleep information.
+
+## basiccode benchmark infrastructure — 2026-11-02
+
+- [x] Reuse actual A/B/C* and common simulator; add paired-input correctness gating, separate work/timing/memory passes and immutable run IDs.
+- [x] Add raw JSONL/CSV, provenance, map-level statistics and saved PNG/PDF figures without rerunning exploration.
+- [x] Validate Windows PowerShell syntax, 34 focused tests and retained two-map/51-record smoke output; inspect the timing figure.
+- [x] Add Windows/macOS commands and explicit protocol. Include cross-platform CI; its result is pending.
+- [ ] User: run Check to include the final invalid-numeric-record test, then launch the default benchmark in PowerShell with a new run ID.
+- [ ] User: preserve and inspect every map/failure and compare planning/episode time separately. No standalone basiccode speedup has been established.
+- [ ] Later: run the same commit/config on iMac and report within-machine ratios separately.
+
 ## basiccode UNKNOWN mask maintenance — 2026-10-27
 
 - [x] Keep the existing basiccode sensor/motion/score/heap/caches/completion contract and A/B files unchanged.

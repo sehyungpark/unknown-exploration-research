@@ -1,5 +1,17 @@
 # Decisions
 
+## D-026 — Extend the requested map sizes with explicit configurations (2026-11-05)
+
+- **Request:** The user wants 200/300/400/500 after the previous 50/100/150 workload. Other parameters inherit the most recent reduced protocol: densities 0.1/0.3/0.5, seeds 42/43/44, five timed repetitions, R=4, one warm-up, separate memory pass and the connected/observable scaffold generator.
+- **Execution arrangement:** Provide four size-specific configurations and an optional combined one. Recommend isolated timing and one worker initially. Separate invocations avoid blocking all 200 timing behind the larger maps' structural passes, without weakening A, sampling exploration states or changing the shared simulator.
+- **Scientific boundary:** Candidate 1 scaling under the existing hypothesis: identical full outputs and potentially lower exact work/runtime. Slower or failing cases remain evidence against an efficiency claim. No selected seed, metric, sensing or algorithm change is made. Cross-run time aggregation is not automatically certified by using these configs.
+- **Resource boundary:** Global-index integer bitmasks in C* can require roughly quadratic storage in the number of grid cells when cached for many candidates (fourth power in side length under that occupancy assumption). This is a structural risk, not a measured 500-grid memory requirement. Large A episodes can also be costly. Worker count one limits overlap, not per-episode peak or elapsed time.
+- **Status:** Configurations and instructions prepared before new runs. No new performance result, hardware-feasibility result or prior-run completion audit is claimed.
+
+## 2026-11-03 · Basiccode execution schema 2
+
+The reduced map configuration is the input contract. Execution schema 2 uses a single timing job by default and two map workers for structural and memory passes. Concurrent timing is a separate regime. Interrupted paired warm-up/timing blocks require a fresh complete attempt. Eligible timing requires stable observed power evidence throughout the block.
+
 This file records research assumptions and decisions that affect formulation, implementation, or evaluation. Update existing decisions when their status changes while preserving the history and rationale.
 
 ## 2026-09-14 — Initial Decisions Consolidated from Existing Documents
@@ -136,6 +148,32 @@ This file records research assumptions and decisions that affect formulation, im
 - **Rationale:** Dividing by total FREE cells admits maps whose traversable component occupies too little of the full grid and contradicts the intended preregistered dataset rule. The mismatch was found before Algorithms B/C or Experiment 0 results existed, so a complete refreeze avoids outcome-dependent selection.
 
 ## Open Decisions
+
+### D-022 — Standalone basiccode benchmark boundary (2026-11-02)
+
+- **Status:** Accepted for this exploratory benchmark.
+- **Decision:** Measure the actual standalone `explore()` implementations under their shared 4-neighbor/per-step-sensing contract. Keep original formal `src`/Experiment 2 unchanged. Time planner calls and whole exploration separately so incremental mask observation bookkeeping is included in episode time. Count work and trace Python allocations in separate passes. Freeze shared maps/config before timing and resample map-level repetition medians for comparisons.
+- **Rationale:** The standalone execution contract differs from the formal experiment. Fewer gain evaluations do not alone establish a speedup; preserved unfavorable runtime, completion and failure evidence can reject that hypothesis on the fixed workload.
+
+## Remaining Open Decisions
+
+### D-023 — User-selected large-map generator and repetitions (2026-11-02)
+
+- **Status:** Explicitly selected by the user before any large performance measurement.
+- **Decision:** Use 100/200/300/400/500 square maps, densities 0.1 to 0.5 in 0.1 steps, and five timed repetitions. Keep seeds 42/43/44, R=4 and one warm-up. The user selected guaranteed FREE connectivity and wall observability at target density rather than retaining IID random obstacles with disconnected/unobservable regions.
+- **Construction:** Use a connected dominating free-row/spine scaffold, seed-dependent geometric transforms, and a shuffled eligible-cell list with an exact wall count. This defines a structured distribution. Same seed has nested wall sets and the same start across densities; every algorithm receives identical inputs. No generator decision uses measured planner behavior.
+- **Consequence:** Legacy rejection-generator results and this constructive family cannot be described as the same random-map distribution. The original algorithms and metrics remain fixed; large-workload time/RAM feasibility has not been tested. The previous 10/15/20 workload is retained as a historical config, not the current default.
+
+## Still Open
+
+### D-024 — User-approved reduced full-exploration workload (2026-11-02)
+
+- **Status:** Accepted by the user after runtime-feasibility feedback from the earlier large run.
+- **Decision:** Make `configs/basiccode_reduced_v1.json` the default: sizes 50/100/150 and densities 0.1/0.3/0.5, with seeds 42/43/44, five timed repetitions, R=4, one warm-up and separate memory measurement. Continue complete explorations and A/B/C* outcome equality checks with the same connected/observable generator. The sampled-state redesign was not adopted.
+- **Rationale:** Reduce size/density levels while keeping low/middle/high occupancy and map variation. This reduces 75 to 27 maps and 1125 to 405 timed episodes (64% fewer), without selecting conditions by favorable algorithm speed ratios or weakening A.
+- **Evidence policy:** Keep the historical config and all earlier raw records. Start reduced timing under a new run ID and committed config. Do not silently combine sleep-affected or incomplete earlier measurements with the new primary results. No runtime benefit or completion-time guarantee is established by this protocol change.
+
+## Open Follow-up Decisions
 
 - Benchmark seed sets and randomized-map generators for later empirical scaling experiments.
 - Coverage targets and termination reporting for large experiments.

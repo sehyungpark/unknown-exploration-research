@@ -1,5 +1,24 @@
 # Research Log
 
+## 2026-11-02 — reduced full-exploration workload adopted
+
+- **Accepted protocol change:** User approved sizes 50/100/150 and densities 0.1/0.3/0.5, preserving three seeds and five timed repetitions. The new default has 27 maps/405 timed episodes; old large config/results remain preserved.
+- **Unchanged:** Full `explore()` runs, A/B/C* complete outcome checks, original algorithms, generator, R=4, measurements and graph semantics. The sampled-state redesign remains archived and unimplemented.
+- **Reason:** Runtime feasibility, not selection of favorable speed ratios. User reported active CPU computation at `Measuring n200-p0.1-seed42` and an accidental sleep; exact affected timing intervals/raw results have not been audited. Existing evidence is retained separately.
+- **Verification scope:** Static configuration counts/default routing reviewed and a non-executing dispatch regression added. No new local experiment or Python regression run; no performance or theoretical conclusion changed.
+
+## 2026-11-02 — user correction of the unexecuted large-workload protocol
+
+- User fixed sizes at 100/200/300/400/500 and densities at 0.1/0.2/0.3/0.4/0.5 with five timed repetitions; the three pre-existing seeds remain. No large performance results existed when these conditions changed.
+- User chose a generator guaranteeing connected FREE and observable WALL at target occupancy. Implemented a constructive connected dominating scaffold, exact counts and seed-defined obstacle order, shared across algorithms. Its distribution is explicitly structured, not IID Bernoulli.
+- Preserved unchanged algorithms/simulator/metrics, retained the earlier smoke evidence and legacy config, and added small generator/equivalence/order tests for user/CI execution. No new local experiment was executed, and no performance/generalization conclusion changed.
+
+## 2026-11-02 — standalone basiccode measurement infrastructure
+
+- Implemented a separate user-invoked runner around unchanged A/B/C* and their common simulator, with frozen shared inputs, full outcome equality, separate structural/timing/memory passes, provenance and replotting from raw records.
+- Small correctness and smoke validation succeeded; this establishes only infrastructure behavior. Runtime/evaluation/memory advantage on the default workload remains an unresolved hypothesis. No new algorithmic novelty or theoretical result is claimed; formal C* Experiment 2 was already executed and is unchanged.
+- Primary user execution is now the Windows laptop via PowerShell; iMac is a later same-source/config run whose timings must remain separate.
+
 This is an append-only log of theoretical findings, literature results, hypothesis changes, counterexamples, and other research-significant observations. Entries must label their status as verified, hypothesis, unresolved, preliminary evidence, or refuted.
 
 ## 2026-09-14 — Initial Consolidation
